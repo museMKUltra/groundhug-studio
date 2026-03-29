@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "@/features/auth/hooks";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
+    const navigate = useNavigate();
     const { login, loading } = useAuth();
 
     const [email, setEmail] = useState("");
@@ -9,8 +11,9 @@ export default function LoginPage() {
 
     const handleLogin = async () => {
         const success = await login(email, password);
+
         if (success) {
-            window.location.href = "/";
+            navigate("/");
         }
     };
 
