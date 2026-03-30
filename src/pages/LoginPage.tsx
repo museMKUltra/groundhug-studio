@@ -1,19 +1,23 @@
-import { useState } from "react";
-import { useAuth } from "@/features/auth/hooks";
-import { useNavigate } from "react-router-dom";
+import {useState} from "react";
+import {useAuth} from "@/features/auth/hooks";
+import {useLocation, useNavigate} from "react-router-dom";
 
 export default function LoginPage() {
     const navigate = useNavigate();
-    const { login, loading } = useAuth();
+    const location = useLocation();
+    const {login, loading} = useAuth();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const from = location.state?.from?.pathname || "/";
+    console.log("from", from)
 
     const handleLogin = async () => {
         const success = await login(email, password);
 
         if (success) {
-            navigate("/");
+            navigate(from, {replace: true});
         }
     };
 
