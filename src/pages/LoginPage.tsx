@@ -2,19 +2,29 @@ import {useState} from "react";
 import {useAuth} from "@/features/auth/hooks";
 import {useLocation, useNavigate} from "react-router-dom";
 
+import {Box, Button, Card, CardContent, Collapse, Stack, Tab, Tabs, TextField, Typography,} from "@mui/material";
+
 export default function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const {login, loading} = useAuth();
+    const {login, register, loading} = useAuth();
 
+    const [mode, setMode] = useState<"login" | "register">("login");
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const from = location.state?.from?.pathname || "/";
-    console.log("from", from)
+    const from = location.state?.from?.pathname || "/attendance";
 
-    const handleLogin = async () => {
-        const success = await login(email, password);
+    const isLogin = mode === "login";
+    const handleSubmit = async () => {
+        let success: boolean;
+
+        if (isLogin) {
+            success = await login(email, password);
+        } else {
+            success = await register(name, email, password);
+        }
 
         if (success) {
             navigate(from, {replace: true});
@@ -22,25 +32,66 @@ export default function LoginPage() {
     };
 
     return (
-        <div>
-            <h1>Login</h1>
+        <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="100vh"
+            bgcolor="#f5f5f5"
+        >
+            <Card sx={{width: 400, borderRadius: 3, boxShadow: 3}}>
+                <CardContent>
+                    <Typography variant="h5" textAlign="center" mb={2}>
+                        {isLogin ? "Login" : "Register"}
+                    </Typography>
 
-            <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="email"
-            />
+                    <Tabs
+                        value={mode}
+                        onChange={(_, value) => setMode(value)}
+                        centered
+                        sx={{mb: 2}}
+                    >
+                        <Tab label="Login" value="login"/>
+                        <Tab label="Register" value="register"/>
+                    </Tabs>
 
-            <input
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="password"
-                type="password"
-            />
+                    <Stack spacing={2}>
+                        <Collapse in={mode === "register"}>
+                            <TextField
+                                label="Name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                fullWidth
+                            />
+                        </Collapse>
 
-            <button onClick={handleLogin} disabled={loading}>
-                Login
-            </button>
-        </div>
+                        <TextField
+                            label="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            fullWidth
+                        />
+
+                        <TextField
+                            label="Password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            fullWidth
+                        />
+
+                        <Button
+                            variant="contained"
+                            onClick={handleSubmit}
+                            disabled={loading}
+                            fullWidth
+                            size="large"
+                        >
+                            {isLogin ? "Login" : "Register"}
+                        </Button>
+                    </Stack>
+                </CardContent>
+            </Card>
+        </Box>
     );
 }
