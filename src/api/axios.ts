@@ -7,6 +7,7 @@ const axiosInstance = axios.create({
 
 // Request interceptor (attach token)
 axiosInstance.interceptors.request.use((config) => {
+    console.log("request config", config)
     const token = localStorage.getItem("access_token");
 
     if (token) {
@@ -20,15 +21,19 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
     (res) => res,
     async (error) => {
+        console.log("response error", error)
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (error.response?.status === 401 &&
+            !originalRequest._retry &&
+            !originalRequest.url?.includes("/auth/refresh")
+        ) {
             originalRequest._retry = true;
 
             try {
                 const res = await axiosInstance.post("/auth/refresh");
 
-                const newToken = res.data.accessToken;
+                const newToken = res.data.token;
                 localStorage.setItem("access_token", newToken);
 
                 originalRequest.headers.Authorization = `Bearer ${newToken}`;

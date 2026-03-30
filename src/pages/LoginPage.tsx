@@ -1,13 +1,15 @@
 import {useState} from "react";
-import {useAuth} from "@/features/auth/hooks";
 import {useLocation, useNavigate} from "react-router-dom";
+import {useAuth} from "@/features/auth/hooks";
+import {useUsers} from "@/features/users/hooks.ts";
 
 import {Box, Button, Card, CardContent, Collapse, Stack, Tab, Tabs, TextField, Typography,} from "@mui/material";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const {login, register, loading} = useAuth();
+    const {login, loading} = useAuth();
+    const {register} = useUsers();
 
     const [mode, setMode] = useState<"login" | "register">("login");
     const [name, setName] = useState("");
@@ -17,17 +19,19 @@ export default function LoginPage() {
     const from = location.state?.from?.pathname || "/attendance";
 
     const isLogin = mode === "login";
+    const reset = () => {
+        setName("");
+        setEmail("");
+        setPassword("");
+    }
     const handleSubmit = async () => {
-        let success: boolean;
-
         if (isLogin) {
-            success = await login(email, password);
-        } else {
-            success = await register(name, email, password);
-        }
-
-        if (success) {
+            await login(email, password);
             navigate(from, {replace: true});
+        } else {
+            await register(name, email, password);
+            reset();
+            setMode("login");
         }
     };
 
