@@ -7,7 +7,8 @@ export const useUsers = () => {
     const register = async (name: string, email: string, password: string) => {
         setLoading(true);
         try {
-            await registerApi({name, email, password});
+            const data = await registerApi({name, email, password});
+            return data;
         } finally {
             setLoading(false);
         }
