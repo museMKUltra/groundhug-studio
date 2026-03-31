@@ -4,13 +4,16 @@ import GuestRoute from "@/routes/GuestRoute.tsx";
 import LoginPage from "@/pages/LoginPage";
 import AttendancePage from "@/pages/AttendancePage";
 import MainLayout from "@/layouts/MainLayout.tsx";
+import AuthLayout from "@/layouts/AuthLayout.tsx";
 
 export default function AppRoutes() {
     return (
         <Routes>
             <Route path="/login" element={
                 <GuestRoute>
-                    <LoginPage/>
+                    <AuthLayout>
+                        <LoginPage/>
+                    </AuthLayout>
                 </GuestRoute>
             }/>
 
