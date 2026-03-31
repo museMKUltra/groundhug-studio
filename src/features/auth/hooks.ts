@@ -15,8 +15,13 @@ export const useAuth = () => {
         }
     };
 
+    const logout = () => {
+        localStorage.removeItem("access_token");
+    };
+
     return {
         login,
+        logout,
         loading,
     };
 };
