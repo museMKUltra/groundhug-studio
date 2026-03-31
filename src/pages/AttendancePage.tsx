@@ -1,39 +1,264 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
+import {
+    Alert,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Snackbar,
+    Stack,
+    Typography,
+} from "@mui/material";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
 import {useAttendance} from "@/features/attendance/hooks";
-import type {ActiveSessionResponse} from "@/features/attendance/types";
+import type {Session, Summary} from "@/features/attendance/types";
+import type {AxiosError} from "axios";
+
+dayjs.extend(duration);
 
 export default function AttendancePage() {
-    const {getActiveSession, loading} = useAttendance();
-    const [session, setSession] = useState<ActiveSessionResponse>({
-        active: false,
-        session: null,
-        summary: null,
-    });
+    const {
+        loading,
+        getActiveSession,
+        clockIn,
+        clockOut,
+        getWorkSummaryPreview,
+    } = useAttendance();
+
+    const [session, setSession] = useState<Session | null>(null);
+    const [todaySummary, setTodaySummary] = useState<Summary | null>(null);
+    const [monthSummary, setMonthSummary] = useState<Summary | null>(null);
+    const [open, setOpen] = useState(false);
+    const [now, setNow] = useState<number>(() => Date.now());
+
+    // error handling
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+
+    const year = dayjs().year();
+    const month = dayjs().month() + 1;
+
+    const normalizeSession = (active: boolean, session: Session | null) => {
+        return active ? session : null;
+    };
+
+    const handleError = (err: unknown) => {
+        const error = err as AxiosError<{
+            error?: string
+            name?: string
+            email?: string
+            password?: string
+        }>;
+
+        console.error(error);
+        setError(error?.response?.data?.error || "Something went wrong");
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
+        const init = async () => {
             try {
-                const data = await getActiveSession();
-                setSession(data);
-            } catch (err) {
-                console.error("Failed to load active session", err);
+                const res = await getActiveSession();
+                setSession(normalizeSession(res.active, res.session));
+                setTodaySummary(res?.summary);
+            } catch (e) {
+                handleError(e);
             }
         };
 
-        fetchData();
+        init();
     }, []);
 
+    useEffect(() => {
+        const timer = setInterval(() => setNow(Date.now()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const handleClockIn = async () => {
+        try {
+            const res = await clockIn();
+            setSession(normalizeSession(res.active, res.session));
+            setTodaySummary(res?.summary);
+            setSuccess("Clock in success");
+        } catch (e) {
+            handleError(e);
+        }
+    };
+
+    const handleClockOut = async () => {
+        try {
+            const res = await clockOut();
+            setSession(normalizeSession(res.active, res.session));
+            setTodaySummary(res?.summary);
+            setSuccess("Clock out success");
+        } catch (e) {
+            handleError(e);
+        }
+    };
+
+    const handleOpenPreview = async () => {
+        try {
+            const res = await getWorkSummaryPreview(year, month);
+            setMonthSummary(res);
+            setOpen(true);
+        } catch (e) {
+            handleError(e);
+        }
+    };
+
+    const durationText = useMemo(() => {
+        if (!session?.clockIn) return "-";
+        const start = dayjs(session.clockIn);
+        const diff = dayjs(now).diff(start);
+        const d = dayjs.duration(diff);
+        return `${d.hours()}h ${d.minutes()}m ${d.seconds()}s`;
+    }, [session, now]);
+
+    const formatCurrency = (value: number) =>
+        new Intl.NumberFormat("zh-TW", {
+            style: "currency",
+            currency: "TWD",
+            maximumFractionDigits: 0,
+        }).format(value);
+
+    const todayHours = (todaySummary?.totalHours || 0).toFixed(2);
+    const todayMostHours = 4;
+    const hourlyRate = (todaySummary?.hourlyRate || 0);
+    const todaySalary = formatCurrency(todaySummary?.salaryAmount || 0);
+    const todayMostSalary = formatCurrency(todayMostHours * hourlyRate);
+
     return (
-        <div>
-            <h1>Attendance Page</h1>
+        <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="100vh"
+            bgcolor="#f5f5f5"
+        >
+            <Stack spacing={3} sx={{p: 3, maxWidth: 600, mx: "auto"}}>
+                {/* Clock Section */}
+                <Card>
+                    <CardContent>
+                        <Stack spacing={2}>
+                            <Typography variant="h6">Attendance</Typography>
 
-            {loading && <p>Loading...</p>}
+                            {session ? (
+                                <>
+                                    <Typography>
+                                        Clock In: {dayjs(session.clockIn).format("HH:mm:ss")}
+                                    </Typography>
+                                    <Typography>Duration: {durationText}</Typography>
 
-            {!loading && session && (
-                <pre>{JSON.stringify(session, null, 2)}</pre>
-            )}
+                                    <Button
+                                        variant="contained"
+                                        color="secondary"
+                                        onClick={handleClockOut}
+                                        disabled={loading}
+                                    >
+                                        {loading && <CircularProgress size={20} sx={{mr: 1}}/>}
+                                        Clock Out
+                                    </Button>
+                                </>
+                            ) : (
+                                <>
+                                    <Typography>
+                                        Clock In: --
+                                    </Typography>
+                                    <Typography>Duration: --</Typography>
 
-            {!loading && !session && <p>No active session</p>}
-        </div>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={handleClockIn}
+                                        disabled={loading}
+                                    >
+                                        {loading && <CircularProgress size={20} sx={{mr: 1}}/>}
+                                        Clock In
+                                    </Button>
+                                </>
+                            )}
+                        </Stack>
+                    </CardContent>
+                </Card>
+
+                {/* Today Progress */}
+                <Card>
+                    <CardContent>
+                        <Stack spacing={1}>
+                            <Typography variant="h6">Today</Typography>
+                            <Typography>
+                                Hours: <Box component="span" fontWeight="bold">{todayHours}</Box> / {todayMostHours}h
+                            </Typography>
+                            <Typography>
+                                Salary: <Box component="span" fontWeight="bold">{todaySalary}</Box> / {todayMostSalary}
+                            </Typography>
+                        </Stack>
+                    </CardContent>
+                </Card>
+
+                {/* Monthly Preview */}
+                <Card>
+                    <CardContent>
+                        <Stack spacing={2}>
+                            <Typography variant="h6">Monthly</Typography>
+                            <Button variant="outlined" onClick={handleOpenPreview}>
+                                Preview Month
+                            </Button>
+                        </Stack>
+                    </CardContent>
+                </Card>
+
+                {/* Dialog */}
+                <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
+                    <DialogTitle>Monthly Summary</DialogTitle>
+                    <DialogContent>
+                        {monthSummary ? (
+                            <Stack spacing={1} sx={{mt: 1}}>
+                                <Typography>
+                                    Time: {monthSummary.year}/{monthSummary.month.toString().padStart(2, '0')}
+                                </Typography>
+                                <Typography>
+                                    Total Minutes: {monthSummary.totalMinutes} ({monthSummary.totalHours?.toFixed(2)}h)
+                                </Typography>
+                                <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
+                                <Typography fontWeight="bold">Total Salary: {formatCurrency(monthSummary.salaryAmount)}</Typography>
+                            </Stack>
+                        ) : (
+                            <Typography>No data</Typography>
+                        )}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpen(false)}>Close</Button>
+                    </DialogActions>
+                </Dialog>
+
+                {/* Error Snackbar */}
+                <Snackbar
+                    open={!!error}
+                    autoHideDuration={4000}
+                    onClose={() => setError(null)}
+                >
+                    <Alert severity="error" onClose={() => setError(null)}>
+                        {error}
+                    </Alert>
+                </Snackbar>
+
+                {/* Success Snackbar */}
+                <Snackbar
+                    open={!!success}
+                    autoHideDuration={3000}
+                    onClose={() => setSuccess(null)}
+                >
+                    <Alert severity="success" onClose={() => setSuccess(null)}>
+                        {success}
+                    </Alert>
+                </Snackbar>
+            </Stack>
+        </Box>
     );
 }
