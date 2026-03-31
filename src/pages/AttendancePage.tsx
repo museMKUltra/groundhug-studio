@@ -12,7 +12,6 @@ export default function AttendancePage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log("fetching data")
             try {
                 const data = await getActiveSession();
                 setSession(data);

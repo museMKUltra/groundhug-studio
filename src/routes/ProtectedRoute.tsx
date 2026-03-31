@@ -7,8 +7,6 @@ export default function ProtectedRoute({children}: {
 
     const token = localStorage.getItem("access_token");
 
-    console.log("location", location)
-
     if (!token) {
         return (
             <Navigate
