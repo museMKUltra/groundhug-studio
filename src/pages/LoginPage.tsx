@@ -77,6 +77,11 @@ export default function LoginPage() {
         }
     };
 
+    function onSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+        e.preventDefault();
+        handleSubmit();
+    }
+
     return (
         <>
             {alert && (
@@ -114,41 +119,43 @@ export default function LoginPage() {
                             <Tab label="Register" value="register"/>
                         </Tabs>
 
-                        <Stack spacing={2}>
-                            <Collapse in={mode === "register"}>
+                        <Box component="form" onSubmit={onSubmit}>
+                            <Stack spacing={2}>
+                                <Collapse in={mode === "register"}>
+                                    <TextField
+                                        label="Name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        fullWidth
+                                    />
+                                </Collapse>
+
                                 <TextField
-                                    label="Name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
+                                    label="Email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     fullWidth
                                 />
-                            </Collapse>
 
-                            <TextField
-                                label="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                fullWidth
-                            />
+                                <TextField
+                                    label="Password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    fullWidth
+                                />
 
-                            <TextField
-                                label="Password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                fullWidth
-                            />
-
-                            <Button
-                                variant="contained"
-                                onClick={handleSubmit}
-                                disabled={loading}
-                                fullWidth
-                                size="large"
-                            >
-                                {isLogin ? "Login" : "Register"}
-                            </Button>
-                        </Stack>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    disabled={loading}
+                                    fullWidth
+                                    size="large"
+                                >
+                                    {isLogin ? "Login" : "Register"}
+                                </Button>
+                            </Stack>
+                        </Box>
                     </CardContent>
                 </Card>
             </Box>
