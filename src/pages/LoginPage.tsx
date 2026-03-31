@@ -87,7 +87,6 @@ export default function LoginPage() {
                     open={true}
                     autoHideDuration={5000}
                     onClose={() => setAlert(null)}
-                    anchorOrigin={{vertical: "top", horizontal: "center"}}
                 >
                     <Alert severity={alert.type} onClose={() => setAlert(null)}>
                         {alert.message}
