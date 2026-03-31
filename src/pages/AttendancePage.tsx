@@ -137,8 +137,7 @@ export default function AttendancePage() {
             display="flex"
             justifyContent="center"
             alignItems="center"
-            minHeight="100vh"
-            bgcolor="#f5f5f5"
+            flex={1}
         >
             <Stack spacing={3} sx={{p: 3, maxWidth: 600, mx: "auto"}}>
                 {/* Clock Section */}

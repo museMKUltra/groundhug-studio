@@ -1,8 +1,9 @@
 import {Route, Routes} from "react-router-dom";
-import LoginPage from "@/pages/LoginPage";
-import AttendancePage from "@/pages/AttendancePage";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import GuestRoute from "@/routes/GuestRoute.tsx";
+import LoginPage from "@/pages/LoginPage";
+import AttendancePage from "@/pages/AttendancePage";
+import MainLayout from "@/layouts/MainLayout.tsx";
 
 export default function AppRoutes() {
     return (
@@ -17,7 +18,9 @@ export default function AppRoutes() {
                 path="/attendance"
                 element={
                     <ProtectedRoute>
-                        <AttendancePage/>
+                        <MainLayout>
+                            <AttendancePage/>
+                        </MainLayout>
                     </ProtectedRoute>
                 }
             />
