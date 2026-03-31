@@ -1,28 +1,31 @@
+type Status = "ACTIVE" | "COMPLETED" | "DRAFT" | string;
+
 interface Label {
     id: number;
     name: string;
     color: string;
 }
 
-interface Session {
+export interface Session {
     id: number;
     clockIn: string;
     clockOut: string | null;
     workDate: string;
     workMinutes: number | null;
-    status: "ACTIVE" | "COMPLETED" | "DRAFT" | string;
+    status: Status;
     description: string | null;
     label: Label;
 }
 
-interface Summary {
+export interface Summary {
     id: string | null;
     year: number;
     month: number;
     hourlyRate: number;
     totalMinutes: number;
-    salaryAmont: number;
-    totalHours: number;
+    totalHours?: number;
+    salaryAmount: number;
+    status?: Status;
 }
 
 export interface ActiveSessionResponse {
