@@ -1,4 +1,4 @@
-import {Route, Routes} from "react-router-dom";
+import {Navigate, Route, Routes} from "react-router-dom";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import GuestRoute from "@/routes/GuestRoute.tsx";
 import LoginPage from "@/pages/LoginPage";
@@ -9,6 +9,8 @@ import AuthLayout from "@/layouts/AuthLayout.tsx";
 export default function AppRoutes() {
     return (
         <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+
             <Route path="/login" element={
                 <GuestRoute>
                     <AuthLayout>
