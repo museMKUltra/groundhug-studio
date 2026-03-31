@@ -38,11 +38,6 @@ export default function LoginPage() {
     const from = location.state?.from?.pathname || "/attendance";
 
     const isLogin = mode === "login";
-    const reset = () => {
-        setName("");
-        setEmail("");
-        setPassword("");
-    }
     const handleSubmit = async () => {
         try {
             if (mode === "login") {
@@ -52,7 +47,8 @@ export default function LoginPage() {
             } else {
                 await register(name, email, password);
 
-                reset();
+                setName("");
+                setPassword("");
                 setMode("login");
                 setAlert({
                     type: "success",
@@ -62,6 +58,7 @@ export default function LoginPage() {
         } catch (err: unknown) {
             const error = err as AxiosError<{
                 error?: string
+                name?: string
                 email?: string
                 password?: string
             }>;
@@ -70,9 +67,10 @@ export default function LoginPage() {
                 type: "error",
                 message:
                     error.response?.data?.error
+                    || error.response?.data?.name
                     || error.response?.data?.email
                     || error.response?.data?.password
-                    || "email or password is incorrect"
+                    || "Email or Password is incorrect."
             });
         }
     };
@@ -87,7 +85,7 @@ export default function LoginPage() {
             {alert && (
                 <Snackbar
                     open={true}
-                    autoHideDuration={3000}
+                    autoHideDuration={5000}
                     onClose={() => setAlert(null)}
                     anchorOrigin={{vertical: "top", horizontal: "center"}}
                 >
