@@ -8,22 +8,32 @@ type Props = {
     labels: Label[];
     onClose: () => void;
     onCreate: (data: CreateLabelRequest) => Promise<void>;
-    onUpdate: (id: number, label: Label) => void;
-    onDelete: (id: number) => void;
+    onUpdate: (id: number, label: Label) => Promise<void>;
+    onDelete: (id: number) => Promise<void>;
     onError: (err: unknown) => void;
 };
 
 export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, onDelete, onError}: Props) {
+    const [loading, SetLoading] = useState<boolean>(false);
     const [editingId, setEditingId] = useState<number | "new" | null>(null);
     const [draft, setDraft] = useState<Label | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const startEdit = (label: Label) => {
         setEditingId(label.id);
+        setDeletingId(null);
+        setDraft(label);
+    };
+
+    const startDelete = (label: Label) => {
+        setEditingId(label.id);
+        setDeletingId(label.id);
         setDraft(label);
     };
 
     const startCreate = () => {
         setEditingId("new");
+        setDeletingId(null);
         setDraft({
             id: 0, // temporary
             name: "",
@@ -33,26 +43,44 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
 
     const cancelEdit = () => {
         setEditingId(null);
+        setDeletingId(null);
         setDraft(null);
     };
 
     const confirmEdit = async () => {
         if (!draft) return;
 
+        if (deletingId === draft.id) {
+            try {
+                SetLoading(true);
+                await onDelete(draft.id);
+                cancelEdit();
+            } catch (e) {
+                onError(e);
+            } finally {
+                SetLoading(false);
+            }
+            return;
+        }
+
         if (!draft.name.trim()) return;
 
         try {
+            SetLoading(true);
             if (editingId === "new") {
                 await onCreate({
                     name: draft.name,
                     color: draft.color,
                 });
+                cancelEdit();
             } else {
-                onUpdate(draft.id, draft);
+                await onUpdate(draft.id, draft);
                 cancelEdit();
             }
         } catch (e) {
             onError(e);
+        } finally {
+            SetLoading(false);
         }
     };
 
@@ -62,9 +90,9 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
 
             <DialogContent>
                 <Stack spacing={2} mt={1}>
-                    {/* Existing labels */}
                     {labels.map((label) => {
                         const isEditing = editingId === label.id;
+                        const isDeleting = deletingId === label.id;
                         const current = isEditing && draft ? draft : label;
 
                         return (
@@ -74,7 +102,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                 <TextField
                                     value={current.name}
                                     size="small"
-                                    disabled={!isEditing}
+                                    disabled={!isEditing || isDeleting}
                                     onChange={(e) =>
                                         setDraft((prev) =>
                                             prev ? {...prev, name: e.target.value} : prev
@@ -86,7 +114,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                 <input
                                     type="color"
                                     value={current.color}
-                                    disabled={!isEditing}
+                                    disabled={!isEditing || isDeleting}
                                     onChange={(e) =>
                                         setDraft((prev) =>
                                             prev ? {...prev, color: e.target.value} : prev
@@ -97,28 +125,44 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                         height: 40,
                                         border: "none",
                                         background: "none",
-                                        cursor: isEditing ? "pointer" : "not-allowed",
+                                        cursor: isEditing && !isDeleting ? "pointer" : "not-allowed",
                                     }}
                                 />
 
                                 {isEditing ? (
                                     <>
-                                        <Button size="small" variant="contained" onClick={confirmEdit}>
+                                        <Button
+                                            disabled={loading}
+                                            size="small"
+                                            variant="contained"
+                                            color={isDeleting ? "error" : "primary"}
+                                            onClick={confirmEdit}
+                                        >
                                             Save
                                         </Button>
-                                        <Button size="small" onClick={cancelEdit}>
+                                        <Button
+                                            disabled={loading}
+                                            size="small"
+                                            color={isDeleting ? "error" : "primary"}
+                                            onClick={cancelEdit}
+                                        >
                                             Cancel
                                         </Button>
                                     </>
                                 ) : (
                                     <>
-                                        <Button size="small" onClick={() => startEdit(label)}>
+                                        <Button
+                                            disabled={loading}
+                                            size="small"
+                                            onClick={() => startEdit(label)}
+                                        >
                                             Edit
                                         </Button>
                                         <Button
+                                            disabled={loading}
                                             size="small"
                                             color="error"
-                                            onClick={() => onDelete(label.id)}
+                                            onClick={() => startDelete(label)}
                                         >
                                             Delete
                                         </Button>
@@ -128,7 +172,6 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                         );
                     })}
 
-                    {/* Inline Create Row */}
                     {editingId === "new" && draft && (
                         <Box display="flex" alignItems="center" gap={1}>
                             <LabelChip label={draft}/>
@@ -159,18 +202,30 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                 }}
                             />
 
-                            <Button size="small" variant="contained" onClick={confirmEdit}>
+                            <Button
+                                disabled={loading}
+                                size="small"
+                                variant="contained"
+                                onClick={confirmEdit}
+                            >
                                 Save
                             </Button>
-                            <Button size="small" onClick={cancelEdit}>
+                            <Button
+                                disabled={loading}
+                                size="small"
+                                onClick={cancelEdit}
+                            >
                                 Cancel
                             </Button>
                         </Box>
                     )}
 
-                    {/* Add Button */}
                     {editingId !== "new" && (
-                        <Button variant="outlined" onClick={startCreate}>
+                        <Button
+                            disabled={loading}
+                            variant="outlined"
+                            onClick={startCreate}
+                        >
                             + Add Label
                         </Button>
                     )}
