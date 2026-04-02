@@ -27,6 +27,10 @@ export default function LabelSelect({labels, value, onChange, onManage,}: Props)
             }}
             fullWidth
         >
+            <MenuItem value="">
+                <em>None</em>
+            </MenuItem>
+
             {labels.map((label) => (
                 <MenuItem key={label.id} value={label.id}>
                     <LabelChip label={label}/>
