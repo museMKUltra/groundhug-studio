@@ -136,6 +136,8 @@ export default function AttendancePage() {
     const todaySalary = formatCurrency(todaySummary?.salaryAmount || 0);
     const todayMostSalary = formatCurrency(todayMostHours * hourlyRate);
 
+    const isActive = !!session;
+
     return (
         <Box
             display="flex"
@@ -150,41 +152,26 @@ export default function AttendancePage() {
                         <Stack spacing={2}>
                             <Typography variant="h6">Attendance</Typography>
 
-                            {session ? (
-                                <>
-                                    <Typography>
-                                        Clock In: {dayjs(session.clockIn).format("HH:mm:ss")}
-                                    </Typography>
-                                    <Typography>Duration: {durationText}</Typography>
+                            <Typography>
+                                Clock In:{" "}
+                                {isActive
+                                    ? dayjs(session.clockIn).format("HH:mm:ss")
+                                    : "--"}
+                            </Typography>
 
-                                    <Button
-                                        variant="contained"
-                                        color="secondary"
-                                        onClick={handleClockOut}
-                                        disabled={loading}
-                                    >
-                                        {loading && <CircularProgress size={20} sx={{mr: 1}}/>}
-                                        Clock Out
-                                    </Button>
-                                </>
-                            ) : (
-                                <>
-                                    <Typography>
-                                        Clock In: --
-                                    </Typography>
-                                    <Typography>Duration: --</Typography>
+                            <Typography>
+                                Duration: {isActive ? durationText : "--"}
+                            </Typography>
 
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        onClick={handleClockIn}
-                                        disabled={loading}
-                                    >
-                                        {loading && <CircularProgress size={20} sx={{mr: 1}}/>}
-                                        Clock In
-                                    </Button>
-                                </>
-                            )}
+                            <Button
+                                variant="contained"
+                                color={isActive ? "secondary" : "primary"}
+                                onClick={isActive ? handleClockOut : handleClockIn}
+                                disabled={sessionLoading}
+                            >
+                                {sessionLoading && <CircularProgress size={20} sx={{mr: 1}}/>}
+                                {isActive ? "Clock Out" : "Clock In"}
+                            </Button>
                         </Stack>
                     </CardContent>
                 </Card>
