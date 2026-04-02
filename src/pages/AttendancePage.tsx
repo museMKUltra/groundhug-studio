@@ -17,15 +17,17 @@ import {
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import {useSessions, useSummary} from "@/features/attendance/hooks.ts";
-import type {Session, Summary} from "@/features/attendance/types";
+import type {Summary} from "@/features/attendance/types";
 import type {AxiosError} from "axios";
 
 dayjs.extend(duration);
 
 export default function AttendancePage() {
     const {
+        session,
+        todaySummary,
         loading: sessionLoading,
-        getActiveSession,
+        handleActiveSession,
         clockIn,
         clockOut,
     } = useSessions();
@@ -35,8 +37,6 @@ export default function AttendancePage() {
         getWorkSummaryPreview,
     } = useSummary();
 
-    const [session, setSession] = useState<Session | null>(null);
-    const [todaySummary, setTodaySummary] = useState<Summary | null>(null);
     const [monthSummary, setMonthSummary] = useState<Summary | null>(null);
     const [open, setOpen] = useState(false);
     const [now, setNow] = useState<number>(() => Date.now());
@@ -47,10 +47,6 @@ export default function AttendancePage() {
 
     const year = dayjs().year();
     const month = dayjs().month() + 1;
-
-    const normalizeSession = (active: boolean, session: Session | null) => {
-        return active ? session : null;
-    };
 
     const handleError = (err: unknown) => {
         const error = err as AxiosError<{
@@ -67,9 +63,7 @@ export default function AttendancePage() {
     useEffect(() => {
         const init = async () => {
             try {
-                const res = await getActiveSession();
-                setSession(normalizeSession(res.active, res.session));
-                setTodaySummary(res?.summary);
+                await handleActiveSession();
             } catch (e) {
                 handleError(e);
             }
@@ -85,10 +79,7 @@ export default function AttendancePage() {
 
     const handleClockIn = async () => {
         try {
-            const res = await clockIn();
-            setSession(normalizeSession(res.active, res.session));
-            setTodaySummary(res?.summary);
-            setSuccess("Clock in success");
+            await clockIn();
         } catch (e) {
             handleError(e);
         }
@@ -96,10 +87,7 @@ export default function AttendancePage() {
 
     const handleClockOut = async () => {
         try {
-            const res = await clockOut();
-            setSession(normalizeSession(res.active, res.session));
-            setTodaySummary(res?.summary);
-            setSuccess("Clock out success");
+            await clockOut();
         } catch (e) {
             handleError(e);
         }

@@ -1,14 +1,11 @@
-import { useState } from "react";
-import {
-    getActiveSessionApi,
-    clockInApi,
-    clockOutApi,
-    getWorkSummaryPreviewApi,
-    confirmWorkSummaryApi,
-} from "./api.ts";
+import {useState} from "react";
+import {clockInApi, clockOutApi, confirmWorkSummaryApi, getActiveSessionApi, getWorkSummaryPreviewApi,} from "./api.ts";
+import type {Session, Summary} from "./types";
 
 export const useSessions = () => {
     const [loading, setLoading] = useState(false);
+    const [session, setSession] = useState<Session | null>(null);
+    const [todaySummary, setTodaySummary] = useState<Summary | null>(null);
 
     const withLoading = async <T>(fn: () => Promise<T>): Promise<T> => {
         setLoading(true);
@@ -19,14 +16,37 @@ export const useSessions = () => {
         }
     };
 
+    const normalizeSession = (active: boolean, session: Session | null) => {
+        return active ? session : null;
+    };
+
     const getActiveSession = () => withLoading(getActiveSessionApi);
 
-    const clockIn = () => withLoading(clockInApi);
+    const handleActiveSession = async () => {
+        const res = await getActiveSession();
+        setSession(normalizeSession(res.active, res.session));
+        setTodaySummary(res?.summary);
+    };
 
-    const clockOut = () => withLoading(clockOutApi);
+    const clockIn = async () => {
+        const res = await withLoading(clockInApi);
+        setSession(normalizeSession(res.active, res.session));
+        setTodaySummary(res?.summary);
+    };
+
+    const clockOut = async () => {
+        const res = await withLoading(clockOutApi);
+        setSession(normalizeSession(res.active, res.session));
+        setTodaySummary(res?.summary);
+    };
 
     return {
         loading,
+        session,
+        setSession,
+        todaySummary,
+        setTodaySummary,
+        handleActiveSession,
         getActiveSession,
         clockIn,
         clockOut,
