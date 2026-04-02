@@ -16,7 +16,10 @@ import {
 } from "@mui/material";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import {useSessions, useSummary} from "@/features/attendance/hooks.ts";
+import {useLabels, useSessions, useSummary} from "@/features/attendance/hooks.ts";
+import LabelSelect from "@/components/LabelSelect.tsx";
+import LabelDialog from "@/components/LabelDialog.tsx";
+
 import type {AxiosError} from "axios";
 
 dayjs.extend(duration);
@@ -36,6 +39,16 @@ export default function AttendancePage() {
         loading: summaryLoading,
         previewSummary,
     } = useSummary();
+
+    const {
+        labels,
+        createLabel,
+        updateLabel,
+        deleteLabel,
+    } = useLabels();
+
+    const [labelId, setLabelId] = useState<number | "">("");
+    const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
     const [open, setOpen] = useState(false);
     const [now, setNow] = useState<number>(() => Date.now());
@@ -148,6 +161,22 @@ export default function AttendancePage() {
                             <Typography>
                                 Duration: {isActive ? durationText : "--"}
                             </Typography>
+
+                            <LabelSelect
+                                labels={labels}
+                                value={labelId}
+                                onChange={setLabelId}
+                                onManage={() => setOpenLabelDialog(true)}
+                            />
+                            <LabelDialog
+                                open={openLabelDialog}
+                                labels={labels}
+                                onClose={() => setOpenLabelDialog(false)}
+                                onCreate={createLabel}
+                                onUpdate={updateLabel}
+                                onDelete={deleteLabel}
+                                onError={handleError}
+                            />
 
                             <Button
                                 variant="contained"
