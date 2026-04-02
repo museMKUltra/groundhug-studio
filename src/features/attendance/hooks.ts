@@ -55,6 +55,7 @@ export const useSessions = () => {
 
 export const useSummary = () => {
     const [loading, setLoading] = useState(false);
+    const [monthSummary, setMonthSummary] = useState<Summary | null>(null);
 
     const withLoading = async <T>(fn: () => Promise<T>): Promise<T> => {
         setLoading(true);
@@ -71,9 +72,15 @@ export const useSummary = () => {
     const confirmWorkSummary = (summaryId: string) =>
         withLoading(() => confirmWorkSummaryApi(summaryId));
 
+    const previewSummary = async (year: number, month: number) => {
+        const res = await getWorkSummaryPreview(year, month);
+        setMonthSummary(res);
+    };
+
     return {
         loading,
-        getWorkSummaryPreview,
+        monthSummary,
         confirmWorkSummary,
+        previewSummary,
     };
 };

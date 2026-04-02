@@ -17,7 +17,6 @@ import {
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import {useSessions, useSummary} from "@/features/attendance/hooks.ts";
-import type {Summary} from "@/features/attendance/types";
 import type {AxiosError} from "axios";
 
 dayjs.extend(duration);
@@ -33,11 +32,11 @@ export default function AttendancePage() {
     } = useSessions();
 
     const {
+        monthSummary,
         loading: summaryLoading,
-        getWorkSummaryPreview,
+        previewSummary,
     } = useSummary();
 
-    const [monthSummary, setMonthSummary] = useState<Summary | null>(null);
     const [open, setOpen] = useState(false);
     const [now, setNow] = useState<number>(() => Date.now());
 
@@ -95,8 +94,7 @@ export default function AttendancePage() {
 
     const handleOpenPreview = async () => {
         try {
-            const res = await getWorkSummaryPreview(year, month);
-            setMonthSummary(res);
+            await previewSummary(year, month);
             setOpen(true);
         } catch (e) {
             handleError(e);
