@@ -12,6 +12,7 @@ import {
     DialogTitle,
     Snackbar,
     Stack,
+    TextField,
     Typography,
 } from "@mui/material";
 import dayjs from "dayjs";
@@ -52,6 +53,8 @@ export default function AttendancePage() {
 
     const [open, setOpen] = useState(false);
     const [now, setNow] = useState<number>(() => Date.now());
+
+    const [description, setDescription] = useState("");
 
     // error handling
     const [error, setError] = useState<string | null>(null);
@@ -176,6 +179,16 @@ export default function AttendancePage() {
                                 onUpdate={updateLabel}
                                 onDelete={deleteLabel}
                                 onError={handleError}
+                            />
+
+                            {/* Description */}
+                            <TextField
+                                label="Description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                fullWidth
+                                multiline
+                                minRows={2}
                             />
 
                             <Button
