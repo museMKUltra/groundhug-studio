@@ -39,8 +39,8 @@ axiosInstance.interceptors.response.use(
                 return axiosInstance(originalRequest);
             } catch {
                 // logout fallback
-                // localStorage.removeItem("access_token");
-                // window.location.href = "/login";
+                localStorage.removeItem("access_token");
+                window.location.href = "/login";
             }
         }
 
