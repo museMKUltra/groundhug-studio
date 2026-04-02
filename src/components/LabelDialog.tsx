@@ -1,4 +1,5 @@
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField,} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import {useState} from "react";
 import type {CreateLabelRequest, Label} from "@/features/attendance/types";
 import LabelChip from "./LabelChip";
@@ -224,9 +225,10 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                         <Button
                             disabled={loading}
                             variant="outlined"
+                            startIcon={<AddIcon fontSize="small"/>}
                             onClick={startCreate}
                         >
-                            + Add Label
+                            Add Label
                         </Button>
                     )}
                 </Stack>

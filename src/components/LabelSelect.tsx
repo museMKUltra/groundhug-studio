@@ -1,4 +1,5 @@
-import {MenuItem, TextField} from "@mui/material";
+import {ListItemIcon, ListItemText, MenuItem, TextField} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import type {Label} from "./LabelChip";
 import LabelChip from "./LabelChip";
 
@@ -9,7 +10,7 @@ type Props = {
     onManage?: () => void;
 };
 
-export default function LabelSelect({labels, value, onChange, onManage,}: Props) {
+export default function LabelSelect({labels, value, onChange, onManage}: Props) {
     return (
         <TextField
             select
@@ -38,7 +39,12 @@ export default function LabelSelect({labels, value, onChange, onManage,}: Props)
             ))}
 
             {onManage && (
-                <MenuItem value="manage">➕ Manage Labels</MenuItem>
+                <MenuItem value="manage">
+                    <ListItemIcon>
+                        <EditIcon fontSize="small"/>
+                    </ListItemIcon>
+                    <ListItemText primary="Manage Labels"/>
+                </MenuItem>
             )}
         </TextField>
     );
