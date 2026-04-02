@@ -1,18 +1,18 @@
 import axios from "@/api/axios";
-import type {ActiveSessionResponse, Summary, Label, CreateLabelRequest} from "./types";
+import type {ActiveSessionResponse, Summary, Label, CreateLabelRequest, ClockInAndOutRequest} from "./types";
 
 export const getActiveSessionApi = async () => {
     const res = await axios.get<ActiveSessionResponse>("/attendance/active-session");
     return res.data;
 };
 
-export const clockInApi = async () => {
-    const res = await axios.post<ActiveSessionResponse>("/attendance/clock-in");
+export const clockInApi = async (data?: ClockInAndOutRequest ) => {
+    const res = await axios.post<ActiveSessionResponse>("/attendance/clock-in", data);
     return res.data;
 };
 
-export const clockOutApi = async () => {
-    const res = await axios.post<ActiveSessionResponse>("/attendance/clock-out");
+export const clockOutApi = async (data?: ClockInAndOutRequest ) => {
+    const res = await axios.post<ActiveSessionResponse>("/attendance/clock-out", data);
     return res.data;
 };
 

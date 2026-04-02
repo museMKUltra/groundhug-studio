@@ -10,7 +10,7 @@ import {
     getWorkSummaryPreviewApi,
     updateLabelApi,
 } from "./api.ts";
-import type {CreateLabelRequest, Label, Session, Summary} from "./types";
+import type {ClockInAndOutRequest, CreateLabelRequest, Label, Session, Summary} from "./types";
 
 export const useSessions = () => {
     const [loading, setLoading] = useState(false);
@@ -38,14 +38,14 @@ export const useSessions = () => {
         setTodaySummary(res?.summary);
     };
 
-    const clockIn = async () => {
-        const res = await withLoading(clockInApi);
+    const clockIn = async (data?: ClockInAndOutRequest) => {
+        const res = await withLoading(() => clockInApi(data));
         setSession(normalizeSession(res.active, res.session));
         setTodaySummary(res?.summary);
     };
 
-    const clockOut = async () => {
-        const res = await withLoading(clockOutApi);
+    const clockOut = async (data?: ClockInAndOutRequest) => {
+        const res = await withLoading(() => clockOutApi(data));
         setSession(normalizeSession(res.active, res.session));
         setTodaySummary(res?.summary);
     };

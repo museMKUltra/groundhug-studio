@@ -38,3 +38,8 @@ export interface CreateLabelRequest {
     name: string;
     color: string;
 }
+
+export interface ClockInAndOutRequest {
+    labelId?: number;
+    description?: string;
+}

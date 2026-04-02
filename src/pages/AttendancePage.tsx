@@ -22,6 +22,7 @@ import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
 
 import type {AxiosError} from "axios";
+import type {ClockInAndOutRequest} from "@/features/attendance/types.ts";
 
 dayjs.extend(duration);
 
@@ -92,9 +93,21 @@ export default function AttendancePage() {
         return () => clearInterval(timer);
     }, []);
 
+    const getClockInAndOutRequest = (): ClockInAndOutRequest | null => {
+        const request = {} as ClockInAndOutRequest;
+        if (labelId) {
+            request['labelId'] = labelId;
+        }
+        if (description.trim()) {
+            request['description'] = description;
+        }
+        return Object.keys(request).length > 0 ? request : null;
+    }
+
     const handleClockIn = async () => {
         try {
-            await clockIn();
+            const request = getClockInAndOutRequest();
+            await (request ? clockIn(request) : clockIn());
         } catch (e) {
             handleError(e);
         }
@@ -102,7 +115,8 @@ export default function AttendancePage() {
 
     const handleClockOut = async () => {
         try {
-            await clockOut();
+            const request = getClockInAndOutRequest();
+            await (request ? clockOut(request) : clockOut());
         } catch (e) {
             handleError(e);
         }
