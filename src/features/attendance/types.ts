@@ -1,6 +1,6 @@
 type Status = "ACTIVE" | "COMPLETED" | "DRAFT" | string;
 
-interface Label {
+export interface Label {
     id: number;
     name: string;
     color: string;
@@ -32,4 +32,9 @@ export interface ActiveSessionResponse {
     active: boolean;
     session: Session | null;
     summary: Summary | null;
+}
+
+export interface CreateLabelRequest {
+    name: string;
+    color: string;
 }
