@@ -5,9 +5,9 @@ import {
     clockOutApi,
     getWorkSummaryPreviewApi,
     confirmWorkSummaryApi,
-} from "./api";
+} from "./api.ts";
 
-export const useAttendance = () => {
+export const useSessions = () => {
     const [loading, setLoading] = useState(false);
 
     const withLoading = async <T>(fn: () => Promise<T>): Promise<T> => {
@@ -25,6 +25,26 @@ export const useAttendance = () => {
 
     const clockOut = () => withLoading(clockOutApi);
 
+    return {
+        loading,
+        getActiveSession,
+        clockIn,
+        clockOut,
+    };
+};
+
+export const useSummary = () => {
+    const [loading, setLoading] = useState(false);
+
+    const withLoading = async <T>(fn: () => Promise<T>): Promise<T> => {
+        setLoading(true);
+        try {
+            return await fn();
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const getWorkSummaryPreview = (year: number, month: number) =>
         withLoading(() => getWorkSummaryPreviewApi(year, month));
 
@@ -33,9 +53,6 @@ export const useAttendance = () => {
 
     return {
         loading,
-        getActiveSession,
-        clockIn,
-        clockOut,
         getWorkSummaryPreview,
         confirmWorkSummary,
     };

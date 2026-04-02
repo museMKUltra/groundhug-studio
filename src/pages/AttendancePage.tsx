@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import {useAttendance} from "@/features/attendance/hooks";
+import {useSessions, useSummary} from "@/features/attendance/hooks.ts";
 import type {Session, Summary} from "@/features/attendance/types";
 import type {AxiosError} from "axios";
 
@@ -24,12 +24,16 @@ dayjs.extend(duration);
 
 export default function AttendancePage() {
     const {
-        loading,
+        loading: sessionLoading,
         getActiveSession,
         clockIn,
         clockOut,
+    } = useSessions();
+
+    const {
+        loading: summaryLoading,
         getWorkSummaryPreview,
-    } = useAttendance();
+    } = useSummary();
 
     const [session, setSession] = useState<Session | null>(null);
     const [todaySummary, setTodaySummary] = useState<Summary | null>(null);
@@ -205,7 +209,11 @@ export default function AttendancePage() {
                     <CardContent>
                         <Stack spacing={2}>
                             <Typography variant="h6">Monthly</Typography>
-                            <Button variant="outlined" onClick={handleOpenPreview}>
+                            <Button
+                                variant="outlined"
+                                onClick={handleOpenPreview}
+                                disabled={summaryLoading}
+                            >
                                 Preview Month
                             </Button>
                         </Stack>
@@ -225,7 +233,8 @@ export default function AttendancePage() {
                                     Total Minutes: {monthSummary.totalMinutes} ({monthSummary.totalHours?.toFixed(2)}h)
                                 </Typography>
                                 <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
-                                <Typography fontWeight="bold">Total Salary: {formatCurrency(monthSummary.salaryAmount)}</Typography>
+                                <Typography fontWeight="bold">Total
+                                    Salary: {formatCurrency(monthSummary.salaryAmount)}</Typography>
                             </Stack>
                         ) : (
                             <Typography>No data</Typography>
