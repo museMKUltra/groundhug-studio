@@ -98,7 +98,9 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
 
                         return (
                             <Box key={label.id} display="flex" alignItems="center" gap={1}>
-                                <LabelChip label={current}/>
+                                <Box sx={{flex: 1}}>
+                                    <LabelChip label={current}/>
+                                </Box>
 
                                 <TextField
                                     value={current.name}
@@ -109,7 +111,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                             prev ? {...prev, name: e.target.value} : prev
                                         )
                                     }
-                                    sx={{flex: 1}}
+                                    sx={{maxWidth: 220}}
                                 />
 
                                 <input
@@ -175,7 +177,9 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
 
                     {editingId === "new" && draft && (
                         <Box display="flex" alignItems="center" gap={1}>
-                            <LabelChip label={draft}/>
+                            <Box sx={{flex: 1}}>
+                                <LabelChip label={draft}/>
+                            </Box>
 
                             <TextField
                                 value={draft.name}
@@ -185,7 +189,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                 onChange={(e) =>
                                     setDraft({...draft, name: e.target.value})
                                 }
-                                sx={{flex: 1}}
+                                sx={{maxWidth: 220}}
                             />
 
                             <input
@@ -225,7 +229,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                         <Button
                             disabled={loading}
                             variant="outlined"
-                            startIcon={<AddIcon fontSize="small"/>}
+                            endIcon={<AddIcon fontSize="small"/>}
                             onClick={startCreate}
                         >
                             Add Label
