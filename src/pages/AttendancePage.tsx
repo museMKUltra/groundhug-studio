@@ -20,6 +20,7 @@ import duration from "dayjs/plugin/duration";
 import {useLabels, useSessions, useSummary} from "@/features/attendance/hooks.ts";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
+import Sessions from "@/components/Sessions.tsx";
 
 import type {AxiosError} from "axios";
 import type {ClockInAndOutRequest} from "@/features/attendance/types.ts";
@@ -95,14 +96,10 @@ export default function AttendancePage() {
 
     const getClockInAndOutRequest = (): ClockInAndOutRequest | null => {
         const request = {} as ClockInAndOutRequest;
-        if (labelId) {
-            request['labelId'] = labelId;
-        }
-        if (description.trim()) {
-            request['description'] = description;
-        }
+        if (labelId) request.labelId = labelId;
+        if (description.trim()) request.description = description;
         return Object.keys(request).length > 0 ? request : null;
-    }
+    };
 
     const handleClockIn = async () => {
         try {
@@ -156,147 +153,149 @@ export default function AttendancePage() {
     const isActive = !!session;
 
     return (
-        <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            flex={1}
-        >
-            <Stack spacing={3} sx={{p: 3, maxWidth: 600, mx: "auto"}}>
-                {/* Clock Section */}
-                <Card>
-                    <CardContent>
-                        <Stack spacing={2}>
-                            <Typography variant="h6">Attendance</Typography>
+        <Stack spacing={3} sx={{p: 3, width: "80%", mx: "auto"}}>
+            {/* Today */}
+            <Card>
+                <CardContent>
+                    <Stack spacing={1}>
+                        <Typography variant="h6">Today</Typography>
+                        <Typography>
+                            Hours: <Box component="span" fontWeight="bold">{todayHours}</Box> / {todayMostHours}h
+                        </Typography>
+                        <Typography>
+                            Salary: <Box component="span" fontWeight="bold">{todaySalary}</Box> / {todayMostSalary}
+                        </Typography>
+                    </Stack>
+                </CardContent>
+            </Card>
 
-                            <Typography>
-                                Clock In:{" "}
-                                {isActive
-                                    ? dayjs(session.clockIn).format("HH:mm:ss")
-                                    : "--"}
-                            </Typography>
-
-                            <Typography>
-                                Duration: {isActive ? durationText : "--"}
-                            </Typography>
-
-                            <LabelSelect
-                                labels={labels}
-                                value={labelId}
-                                onChange={setLabelId}
-                                onManage={() => setOpenLabelDialog(true)}
-                            />
-                            <LabelDialog
-                                open={openLabelDialog}
-                                labels={labels}
-                                onClose={() => setOpenLabelDialog(false)}
-                                onCreate={createLabel}
-                                onUpdate={updateLabel}
-                                onDelete={deleteLabel}
-                                onError={handleError}
-                            />
-
-                            {/* Description */}
-                            <TextField
-                                label="Description"
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                fullWidth
-                                multiline
-                                minRows={2}
-                            />
-
-                            <Button
-                                variant="contained"
-                                color={isActive ? "secondary" : "primary"}
-                                onClick={isActive ? handleClockOut : handleClockIn}
-                                disabled={sessionLoading}
-                            >
-                                {sessionLoading && <CircularProgress size={20} sx={{mr: 1}}/>}
-                                {isActive ? "Clock Out" : "Clock In"}
-                            </Button>
-                        </Stack>
-                    </CardContent>
-                </Card>
-
-                {/* Today Progress */}
-                <Card>
-                    <CardContent>
-                        <Stack spacing={1}>
-                            <Typography variant="h6">Today</Typography>
-                            <Typography>
-                                Hours: <Box component="span" fontWeight="bold">{todayHours}</Box> / {todayMostHours}h
-                            </Typography>
-                            <Typography>
-                                Salary: <Box component="span" fontWeight="bold">{todaySalary}</Box> / {todayMostSalary}
-                            </Typography>
-                        </Stack>
-                    </CardContent>
-                </Card>
-
-                {/* Monthly Preview */}
-                <Card>
-                    <CardContent>
-                        <Stack spacing={2}>
-                            <Typography variant="h6">Monthly</Typography>
-                            <Button
-                                variant="outlined"
-                                onClick={handleOpenPreview}
-                                disabled={summaryLoading}
-                            >
-                                Preview Month
-                            </Button>
-                        </Stack>
-                    </CardContent>
-                </Card>
-
-                {/* Dialog */}
-                <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-                    <DialogTitle>Monthly Summary</DialogTitle>
-                    <DialogContent>
-                        {monthSummary ? (
-                            <Stack spacing={1} sx={{mt: 1}}>
-                                <Typography>
-                                    Time: {monthSummary.year}/{monthSummary.month.toString().padStart(2, '0')}
-                                </Typography>
-                                <Typography>
-                                    Total Minutes: {monthSummary.totalMinutes} ({monthSummary.totalHours?.toFixed(2)}h)
-                                </Typography>
-                                <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
-                                <Typography fontWeight="bold">Total
-                                    Salary: {formatCurrency(monthSummary.salaryAmount)}</Typography>
+            {/* Main Layout */}
+            <Box display="flex" gap={3} alignItems="flex-start">
+                {/* LEFT: Timeline */}
+                <Box flex={2}>
+                    <Card>
+                        <CardContent>
+                            <Stack spacing={2}>
+                               <Sessions />
                             </Stack>
-                        ) : (
-                            <Typography>No data</Typography>
-                        )}
-                    </DialogContent>
-                    <DialogActions>
-                        <Button onClick={() => setOpen(false)}>Close</Button>
-                    </DialogActions>
-                </Dialog>
+                        </CardContent>
+                    </Card>
+                </Box>
 
-                {/* Error Snackbar */}
-                <Snackbar
-                    open={!!error}
-                    autoHideDuration={4000}
-                    onClose={() => setError(null)}
-                >
-                    <Alert severity="error" onClose={() => setError(null)}>
-                        {error}
-                    </Alert>
-                </Snackbar>
+                {/* RIGHT */}
+                <Box flex={1}>
+                    <Stack spacing={3}>
+                        {/* Attendance */}
+                        <Card>
+                            <CardContent>
+                                <Stack spacing={2}>
+                                    <Typography variant="h6">Attendance</Typography>
 
-                {/* Success Snackbar */}
-                <Snackbar
-                    open={!!success}
-                    autoHideDuration={3000}
-                    onClose={() => setSuccess(null)}
-                >
-                    <Alert severity="success" onClose={() => setSuccess(null)}>
-                        {success}
-                    </Alert>
-                </Snackbar>
-            </Stack>
-        </Box>
+                                    <Typography>
+                                        Clock In: {isActive ? dayjs(session.clockIn).format("HH:mm:ss") : "--"}
+                                    </Typography>
+
+                                    <Typography>
+                                        Duration: {isActive ? durationText : "--"}
+                                    </Typography>
+
+                                    <LabelSelect
+                                        labels={labels}
+                                        value={labelId}
+                                        onChange={setLabelId}
+                                        onManage={() => setOpenLabelDialog(true)}
+                                    />
+
+                                    <LabelDialog
+                                        open={openLabelDialog}
+                                        labels={labels}
+                                        onClose={() => setOpenLabelDialog(false)}
+                                        onCreate={createLabel}
+                                        onUpdate={updateLabel}
+                                        onDelete={deleteLabel}
+                                        onError={handleError}
+                                    />
+
+                                    <TextField
+                                        label="Description"
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}
+                                        fullWidth
+                                        multiline
+                                        minRows={2}
+                                    />
+
+                                    <Button
+                                        variant="contained"
+                                        color={isActive ? "secondary" : "primary"}
+                                        onClick={isActive ? handleClockOut : handleClockIn}
+                                        disabled={sessionLoading}
+                                    >
+                                        {sessionLoading && <CircularProgress size={20} sx={{mr: 1}}/>}
+                                        {isActive ? "Clock Out" : "Clock In"}
+                                    </Button>
+                                </Stack>
+                            </CardContent>
+                        </Card>
+
+                        {/* Monthly Preview */}
+                        <Card>
+                            <CardContent>
+                                <Stack spacing={2}>
+                                    <Typography variant="h6">Monthly</Typography>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={handleOpenPreview}
+                                        disabled={summaryLoading}
+                                    >
+                                        Preview Month
+                                    </Button>
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    </Stack>
+                </Box>
+            </Box>
+
+            {/* Dialog */}
+            <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
+                <DialogTitle>Monthly Summary</DialogTitle>
+                <DialogContent>
+                    {monthSummary ? (
+                        <Stack spacing={1} sx={{mt: 1}}>
+                            <Typography>
+                                Time: {monthSummary.year}/{monthSummary.month.toString().padStart(2, '0')}
+                            </Typography>
+                            <Typography>
+                                Total Minutes: {monthSummary.totalMinutes} ({monthSummary.totalHours?.toFixed(2)}h)
+                            </Typography>
+                            <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
+                            <Typography fontWeight="bold">
+                                Total Salary: {formatCurrency(monthSummary.salaryAmount)}
+                            </Typography>
+                        </Stack>
+                    ) : (
+                        <Typography>No data</Typography>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpen(false)}>Close</Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Error */}
+            <Snackbar open={!!error} autoHideDuration={4000} onClose={() => setError(null)}>
+                <Alert severity="error" onClose={() => setError(null)}>
+                    {error}
+                </Alert>
+            </Snackbar>
+
+            {/* Success */}
+            <Snackbar open={!!success} autoHideDuration={3000} onClose={() => setSuccess(null)}>
+                <Alert severity="success" onClose={() => setSuccess(null)}>
+                    {success}
+                </Alert>
+            </Snackbar>
+        </Stack>
     );
 }
