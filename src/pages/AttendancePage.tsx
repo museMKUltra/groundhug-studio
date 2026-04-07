@@ -136,7 +136,8 @@ export default function AttendancePage() {
         const start = dayjs(session.clockIn);
         const diff = dayjs(now).diff(start);
         const d = dayjs.duration(diff);
-        return `${d.hours()}h ${d.minutes()}m ${d.seconds()}s`;
+        const hours = d.days() * 24 + d.hours();
+        return `${hours}h ${d.minutes()}m ${d.seconds()}s`;
     }, [session, now]);
 
     const formatCurrency = (value: number) =>
