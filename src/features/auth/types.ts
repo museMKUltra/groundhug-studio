@@ -6,3 +6,10 @@ export interface LoginRequest {
 export interface AuthResponse {
     token: string;
 }
+
+export interface MeResponse {
+    id: number;
+    name: string;
+    email: string;
+    hourlyRate: number;
+}
