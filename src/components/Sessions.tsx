@@ -7,6 +7,7 @@ import {
     DialogContent,
     DialogTitle,
     IconButton,
+    Stack,
     TextField,
     Typography
 } from "@mui/material";
@@ -14,11 +15,15 @@ import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {useSessionContext} from "@/features/attendance/SessionContext";
+import LabelChip from "@/components/LabelChip.tsx";
+import type {Label} from "@/features/attendance/types";
 
 type Session = {
     id: number;
     clockIn: string;
     clockOut: string;
+    description: string | null;
+    label: Label | null;
 };
 
 export default function Sessions() {
@@ -58,17 +63,17 @@ export default function Sessions() {
 
     // dialog
     const [selected, setSelected] = useState<Session | null>(null);
+    const [editLabel, setEditLabel] = useState<Label | null>(null);
+    const [editDescription, setEditDescription] = useState<string>("");
     const [editIn, setEditIn] = useState("");
     const [editOut, setEditOut] = useState("");
 
     const handleOpenDialog = (s: Session) => {
         setSelected(s);
+        setEditLabel(s.label || null);
+        setEditDescription(s.description || "");
         setEditIn(dayjs(s.clockIn).format("YYYY-MM-DDTHH:mm"));
         setEditOut(dayjs(s.clockOut).format("YYYY-MM-DDTHH:mm"));
-    };
-
-    const handleSave = () => {
-        setSelected(null);
     };
 
     const today = dayjs();
@@ -193,7 +198,7 @@ export default function Sessions() {
                                                     right: 4,
                                                     top: `${top}%`,
                                                     height: `${height}%`,
-                                                    bgcolor: "primary.main",
+                                                    bgcolor: s?.label?.color || "primary.main",
                                                     borderRadius: 1,
                                                     opacity: 0.8,
                                                     cursor: "pointer",
@@ -210,7 +215,12 @@ export default function Sessions() {
 
             {/* EDIT DIALOG */}
             <Dialog open={!!selected} onClose={() => setSelected(null)}>
-                <DialogTitle>Edit Session</DialogTitle>
+                <DialogTitle>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                        <span>Session</span>
+                        {editLabel && <LabelChip label={editLabel}/>}
+                    </Stack>
+                </DialogTitle>
 
                 <DialogContent sx={{pt: 2}}>
                     <TextField
@@ -220,6 +230,7 @@ export default function Sessions() {
                         margin="normal"
                         value={editIn}
                         onChange={(e) => setEditIn(e.target.value)}
+                        disabled
                     />
 
                     <TextField
@@ -229,14 +240,26 @@ export default function Sessions() {
                         margin="normal"
                         value={editOut}
                         onChange={(e) => setEditOut(e.target.value)}
+                        disabled
                     />
+
+                    {
+                        editDescription &&
+                        <TextField
+                            label="Description"
+                            fullWidth
+                            margin="normal"
+                            value={editDescription}
+                            onChange={(e) => setEditDescription(e.target.value)}
+                            disabled
+                            multiline
+                            minRows={2}
+                        />
+                    }
                 </DialogContent>
 
                 <DialogActions>
-                    <Button onClick={() => setSelected(null)}>Cancel</Button>
-                    <Button variant="contained" onClick={handleSave}>
-                        Save
-                    </Button>
+                    <Button onClick={() => setSelected(null)}>Close</Button>
                 </DialogActions>
             </Dialog>
         </>
