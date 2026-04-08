@@ -1,4 +1,4 @@
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {
     Box,
     Button,
@@ -13,6 +13,7 @@ import {
 import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import {useSessions} from "@/features/attendance/hooks.ts";
 
 type Session = {
     id: number;
@@ -21,16 +22,22 @@ type Session = {
 };
 
 export default function Sessions() {
-    const [sessions, setSessions] = useState<Session[]>([
-        {id: 1, clockIn: "2026-04-01T09:00:00", clockOut: "2026-04-01T12:00:00"},
-        {id: 2, clockIn: "2026-04-01T13:00:00", clockOut: "2026-04-01T18:00:00"},
-        {id: 3, clockIn: "2026-04-02T10:00:00", clockOut: "2026-04-02T15:30:00"},
-        {id: 4, clockIn: "2026-04-03T08:30:00", clockOut: "2026-04-03T11:00:00"},
-        {id: 5, clockIn: "2026-04-03T14:30:00", clockOut: "2026-04-04T02:00:00"},
-    ]);
+    const {periodSessions, handlePeriodSessions} = useSessions();
 
-    const getMonday = () => dayjs().startOf("week").add(1, "day");
-    const [weekStart, setWeekStart] = useState(getMonday);
+    const getMonday = (d = dayjs()) => d.startOf("week").add(1, "day");
+    const formatDate = (d: dayjs.Dayjs) => d.format("YYYY-MM-DD");
+
+    const [weekStart, setWeekStart] = useState(() => getMonday());
+
+    const endDate = useMemo(
+        () => weekStart.add(7, "day"),
+        [weekStart]
+    );
+
+    const weekEnd = useMemo(
+        () => weekStart.add(6, "day"),
+        [weekStart]
+    );
 
     const weekDays = useMemo(() => {
         return Array.from({length: 7}).map((_, i) =>
@@ -38,11 +45,18 @@ export default function Sessions() {
         );
     }, [weekStart]);
 
+    useEffect(() => {
+        handlePeriodSessions(
+            formatDate(weekStart),
+            formatDate(endDate)
+        );
+    }, [weekStart]);
+
     const prevWeek = () => setWeekStart(prev => prev.subtract(7, "day"));
     const nextWeek = () => setWeekStart(prev => prev.add(7, "day"));
     const goToday = () => setWeekStart(getMonday());
 
-    // dialog state
+    // dialog
     const [selected, setSelected] = useState<Session | null>(null);
     const [editIn, setEditIn] = useState("");
     const [editOut, setEditOut] = useState("");
@@ -54,20 +68,6 @@ export default function Sessions() {
     };
 
     const handleSave = () => {
-        if (!selected) return;
-
-        setSessions(prev =>
-            prev.map(s =>
-                s.id === selected.id
-                    ? {
-                        ...s,
-                        clockIn: dayjs(editIn).format("YYYY-MM-DDTHH:mm:ss"),
-                        clockOut: dayjs(editOut).format("YYYY-MM-DDTHH:mm:ss"),
-                    }
-                    : s
-            )
-        );
-
         setSelected(null);
     };
 
@@ -78,12 +78,16 @@ export default function Sessions() {
             {/* HEADER */}
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
                 <Box>
-                    <IconButton onClick={prevWeek}><ChevronLeftIcon/></IconButton>
-                    <IconButton onClick={nextWeek}><ChevronRightIcon/></IconButton>
+                    <IconButton onClick={prevWeek}>
+                        <ChevronLeftIcon/>
+                    </IconButton>
+                    <IconButton onClick={nextWeek}>
+                        <ChevronRightIcon/>
+                    </IconButton>
                 </Box>
 
                 <Typography variant="h6">
-                    {weekStart.format("MMM DD")} - {weekStart.add(6, "day").format("MMM DD")}
+                    {weekStart.format("MMM DD")} - {weekEnd.format("MMM DD")}
                 </Typography>
 
                 <Button size="small" variant="outlined" onClick={goToday}>
@@ -112,7 +116,7 @@ export default function Sessions() {
 
                 {/* RIGHT */}
                 <Box flex={1}>
-                    {/* DAYS */}
+                    {/* DAYS HEADER */}
                     <Box display="grid" gridTemplateColumns="repeat(7, 1fr)" mb={1}>
                         {weekDays.map((d) => (
                             <Typography
@@ -120,7 +124,9 @@ export default function Sessions() {
                                 variant="caption"
                                 textAlign="center"
                                 sx={{
-                                    color: d.isSame(today, "day") ? "primary.main" : "text.secondary",
+                                    color: d.isSame(today, "day")
+                                        ? "primary.main"
+                                        : "text.secondary",
                                     fontWeight: d.isSame(today, "day") ? 600 : 400,
                                 }}
                             >
@@ -135,7 +141,7 @@ export default function Sessions() {
                             const dayStart = day.startOf("day");
                             const dayEnd = day.endOf("day");
 
-                            const daySessions = sessions
+                            const daySessions = periodSessions
                                 .map((s) => {
                                     const start = dayjs(s.clockIn);
                                     const end = dayjs(s.clockOut);
