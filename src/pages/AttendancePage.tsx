@@ -190,7 +190,7 @@ export default function AttendancePage() {
             {/* Main Layout */}
             <Box display="flex" gap={3} alignItems="flex-start">
                 {/* LEFT: Timeline */}
-                <Box flex={2}>
+                <Box flex={2} sx={{display: {xs: "none", md: "block"}}}>
                     <Card>
                         <CardContent>
                             <Stack spacing={2}>
