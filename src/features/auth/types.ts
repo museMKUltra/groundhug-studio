@@ -13,3 +13,11 @@ export interface MeResponse {
     email: string;
     hourlyRate: number;
 }
+
+export type User = {
+    sub: string;
+    name: string;
+    email: string;
+    role: string;
+    exp: number;
+};

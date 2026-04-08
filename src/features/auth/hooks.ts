@@ -1,14 +1,8 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {loginApi, meApi} from "./api";
+import type {User} from "./types";
 import {jwtDecode} from "jwt-decode";
-
-type User = {
-    sub: string;
-    name: string;
-    email: string;
-    role: string;
-    exp: number;
-};
+import {useAuthContext} from "./useAuthContext";
 
 export const useAuth = () => {
     const [loading, setLoading] = useState(false);
@@ -26,21 +20,17 @@ export const useAuth = () => {
         }
     };
 
-    const [hourlyRate, setHourlyRate] = useState<number>(0);
+    const {user, hourlyRate, setUser, updateUser, setHourlyRate} = useAuthContext();
+
+    useEffect(() => {
+        setUser(getUserFromToken());
+    }, [])
+
     const setMe = async () => {
         const me = await meApi();
 
         setHourlyRate(me.hourlyRate);
     }
-
-    const [user, setUser] = useState<User | null>(getUserFromToken());
-
-    const updateUser = (updates: Partial<User>) => {
-        setUser(prev => {
-            if (!prev) return prev;
-            return {...prev, ...updates};
-        });
-    };
 
     const login = async (email: string, password: string) => {
         setLoading(true);

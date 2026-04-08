@@ -5,11 +5,12 @@ import LoginPage from "@/pages/LoginPage";
 import AttendancePage from "@/pages/AttendancePage";
 import MainLayout from "@/layouts/MainLayout.tsx";
 import AuthLayout from "@/layouts/AuthLayout.tsx";
+import {AuthProvider} from "@/features/auth/AuthProvider.tsx";
 
 export default function AppRoutes() {
     return (
         <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Navigate to="/login" replace/>}/>
 
             <Route path="/login" element={
                 <GuestRoute>
@@ -23,9 +24,11 @@ export default function AppRoutes() {
                 path="/attendance"
                 element={
                     <ProtectedRoute>
-                        <MainLayout>
-                            <AttendancePage/>
-                        </MainLayout>
+                        <AuthProvider>
+                            <MainLayout>
+                                <AttendancePage/>
+                            </MainLayout>
+                        </AuthProvider>
                     </ProtectedRoute>
                 }
             />
