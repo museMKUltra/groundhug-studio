@@ -1,5 +1,15 @@
 import {useMemo, useState} from "react";
-import {Box, IconButton, Typography} from "@mui/material";
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    TextField,
+    Typography
+} from "@mui/material";
 import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -11,16 +21,16 @@ type Session = {
 };
 
 export default function Sessions() {
-    const mockSessions: Session[] = [
+    const [sessions, setSessions] = useState<Session[]>([
         {id: 1, clockIn: "2026-04-01T09:00:00", clockOut: "2026-04-01T12:00:00"},
         {id: 2, clockIn: "2026-04-01T13:00:00", clockOut: "2026-04-01T18:00:00"},
         {id: 3, clockIn: "2026-04-02T10:00:00", clockOut: "2026-04-02T15:30:00"},
         {id: 4, clockIn: "2026-04-03T08:30:00", clockOut: "2026-04-03T11:00:00"},
-    ];
+        {id: 5, clockIn: "2026-04-03T14:30:00", clockOut: "2026-04-04T02:00:00"},
+    ]);
 
-    const [weekStart, setWeekStart] = useState(() =>
-        dayjs().startOf("week").add(1, "day")
-    );
+    const getMonday = () => dayjs().startOf("week").add(1, "day");
+    const [weekStart, setWeekStart] = useState(getMonday);
 
     const weekDays = useMemo(() => {
         return Array.from({length: 7}).map((_, i) =>
@@ -28,42 +38,63 @@ export default function Sessions() {
         );
     }, [weekStart]);
 
-    const sessionsByDay = useMemo(() => {
-        const map: Record<string, Session[]> = {};
-        mockSessions.forEach((s) => {
-            const date = dayjs(s.clockIn).format("YYYY-MM-DD");
-            if (!map[date]) map[date] = [];
-            map[date].push(s);
-        });
-        return map;
-    }, []);
-
     const prevWeek = () => setWeekStart(prev => prev.subtract(7, "day"));
     const nextWeek = () => setWeekStart(prev => prev.add(7, "day"));
+    const goToday = () => setWeekStart(getMonday());
+
+    // dialog state
+    const [selected, setSelected] = useState<Session | null>(null);
+    const [editIn, setEditIn] = useState("");
+    const [editOut, setEditOut] = useState("");
+
+    const handleOpenDialog = (s: Session) => {
+        setSelected(s);
+        setEditIn(dayjs(s.clockIn).format("YYYY-MM-DDTHH:mm"));
+        setEditOut(dayjs(s.clockOut).format("YYYY-MM-DDTHH:mm"));
+    };
+
+    const handleSave = () => {
+        if (!selected) return;
+
+        setSessions(prev =>
+            prev.map(s =>
+                s.id === selected.id
+                    ? {
+                        ...s,
+                        clockIn: dayjs(editIn).format("YYYY-MM-DDTHH:mm:ss"),
+                        clockOut: dayjs(editOut).format("YYYY-MM-DDTHH:mm:ss"),
+                    }
+                    : s
+            )
+        );
+
+        setSelected(null);
+    };
+
+    const today = dayjs();
 
     return (
         <>
             {/* HEADER */}
             <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                <IconButton onClick={prevWeek}><ChevronLeftIcon/></IconButton>
+                <Box>
+                    <IconButton onClick={prevWeek}><ChevronLeftIcon/></IconButton>
+                    <IconButton onClick={nextWeek}><ChevronRightIcon/></IconButton>
+                </Box>
+
                 <Typography variant="h6">
                     {weekStart.format("MMM DD")} - {weekStart.add(6, "day").format("MMM DD")}
                 </Typography>
-                <IconButton onClick={nextWeek}><ChevronRightIcon/></IconButton>
+
+                <Button size="small" variant="outlined" onClick={goToday}>
+                    Today
+                </Button>
             </Box>
 
-            {/* MAIN LAYOUT */}
+            {/* MAIN */}
             <Box display="flex">
-                {/* ⬅️ LEFT TIMELINE */}
-                <Box
-                    sx={{
-                        width: 24,
-                        height: 390,
-                        position: "relative",
-                        top: 32,
-                        mr: 1,
-                    }}
-                >
+                {/* TIMELINE */}
+                <Box sx={{width: 24, height: 390, position: "relative", top: 32, mr: 1}}>
                     {[0, 6, 12, 18, 24].map((h) => (
                         <Box
                             key={h}
@@ -79,12 +110,20 @@ export default function Sessions() {
                     ))}
                 </Box>
 
-                {/* RIGHT CONTENT */}
+                {/* RIGHT */}
                 <Box flex={1}>
-                    {/* DAYS HEADER */}
+                    {/* DAYS */}
                     <Box display="grid" gridTemplateColumns="repeat(7, 1fr)" mb={1}>
                         {weekDays.map((d) => (
-                            <Typography key={d.toString()} variant="caption" textAlign="center">
+                            <Typography
+                                key={d.toString()}
+                                variant="caption"
+                                textAlign="center"
+                                sx={{
+                                    color: d.isSame(today, "day") ? "primary.main" : "text.secondary",
+                                    fontWeight: d.isSame(today, "day") ? 600 : 400,
+                                }}
+                            >
                                 {d.format("ddd DD")}
                             </Typography>
                         ))}
@@ -93,12 +132,33 @@ export default function Sessions() {
                     {/* GRID */}
                     <Box display="grid" gridTemplateColumns="repeat(7, 1fr)" gap={1}>
                         {weekDays.map((day) => {
-                            const dateKey = day.format("YYYY-MM-DD");
-                            const daySessions = sessionsByDay[dateKey] || [];
+                            const dayStart = day.startOf("day");
+                            const dayEnd = day.endOf("day");
+
+                            const daySessions = sessions
+                                .map((s) => {
+                                    const start = dayjs(s.clockIn);
+                                    const end = dayjs(s.clockOut);
+
+                                    if (end.isBefore(dayStart) || start.isAfter(dayEnd)) return null;
+
+                                    const renderStart = start.isBefore(dayStart) ? dayStart : start;
+                                    const renderEnd = end.isAfter(dayEnd) ? dayEnd : end;
+
+                                    return {
+                                        ...s,
+                                        renderStart,
+                                        renderEnd,
+                                    };
+                                })
+                                .filter(Boolean) as (Session & {
+                                renderStart: dayjs.Dayjs;
+                                renderEnd: dayjs.Dayjs;
+                            })[];
 
                             return (
                                 <Box
-                                    key={dateKey}
+                                    key={day.toString()}
                                     sx={{
                                         position: "relative",
                                         height: 400,
@@ -108,8 +168,8 @@ export default function Sessions() {
                                     }}
                                 >
                                     {daySessions.map((s) => {
-                                        const start = dayjs(s.clockIn);
-                                        const end = dayjs(s.clockOut);
+                                        const start = s.renderStart;
+                                        const end = s.renderEnd;
 
                                         const startMin = start.hour() * 60 + start.minute();
                                         const endMin = end.hour() * 60 + end.minute();
@@ -119,7 +179,8 @@ export default function Sessions() {
 
                                         return (
                                             <Box
-                                                key={s.id}
+                                                key={`${s.id}-${start.toISOString()}`}
+                                                onClick={() => handleOpenDialog(s)}
                                                 sx={{
                                                     position: "absolute",
                                                     left: 4,
@@ -129,6 +190,7 @@ export default function Sessions() {
                                                     bgcolor: "primary.main",
                                                     borderRadius: 1,
                                                     opacity: 0.8,
+                                                    cursor: "pointer",
                                                 }}
                                             />
                                         );
@@ -139,6 +201,38 @@ export default function Sessions() {
                     </Box>
                 </Box>
             </Box>
+
+            {/* EDIT DIALOG */}
+            <Dialog open={!!selected} onClose={() => setSelected(null)}>
+                <DialogTitle>Edit Session</DialogTitle>
+
+                <DialogContent sx={{pt: 2}}>
+                    <TextField
+                        label="Clock In"
+                        type="datetime-local"
+                        fullWidth
+                        margin="normal"
+                        value={editIn}
+                        onChange={(e) => setEditIn(e.target.value)}
+                    />
+
+                    <TextField
+                        label="Clock Out"
+                        type="datetime-local"
+                        fullWidth
+                        margin="normal"
+                        value={editOut}
+                        onChange={(e) => setEditOut(e.target.value)}
+                    />
+                </DialogContent>
+
+                <DialogActions>
+                    <Button onClick={() => setSelected(null)}>Cancel</Button>
+                    <Button variant="contained" onClick={handleSave}>
+                        Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </>
     );
 }
