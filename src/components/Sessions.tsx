@@ -13,7 +13,7 @@ import {
 import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {useSessions} from "@/features/attendance/hooks.ts";
+import {useSessionContext} from "@/features/attendance/SessionContext";
 
 type Session = {
     id: number;
@@ -22,7 +22,7 @@ type Session = {
 };
 
 export default function Sessions() {
-    const {periodSessions, handlePeriodSessions} = useSessions();
+    const {periodSessions, fetchPeriodSessions} = useSessionContext();
 
     const getMonday = (d = dayjs()) => d.startOf("week").add(1, "day");
     const formatDate = (d: dayjs.Dayjs) => d.format("YYYY-MM-DD");
@@ -46,7 +46,7 @@ export default function Sessions() {
     }, [weekStart]);
 
     useEffect(() => {
-        handlePeriodSessions(
+        fetchPeriodSessions(
             formatDate(weekStart),
             formatDate(endDate)
         );
