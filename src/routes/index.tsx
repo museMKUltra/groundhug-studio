@@ -5,7 +5,6 @@ import LoginPage from "@/pages/LoginPage";
 import AttendancePage from "@/pages/AttendancePage";
 import MainLayout from "@/layouts/MainLayout.tsx";
 import AuthLayout from "@/layouts/AuthLayout.tsx";
-import {AuthProvider} from "@/features/auth/AuthProvider.tsx";
 
 export default function AppRoutes() {
     return (
@@ -24,11 +23,9 @@ export default function AppRoutes() {
                 path="/attendance"
                 element={
                     <ProtectedRoute>
-                        <AuthProvider>
-                            <MainLayout>
-                                <AttendancePage/>
-                            </MainLayout>
-                        </AuthProvider>
+                        <MainLayout>
+                            <AttendancePage/>
+                        </MainLayout>
                     </ProtectedRoute>
                 }
             />
