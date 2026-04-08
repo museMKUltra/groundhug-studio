@@ -8,6 +8,8 @@ import {
     DialogContent,
     DialogTitle,
     IconButton,
+    ListItemIcon,
+    ListItemText,
     Menu,
     MenuItem,
     Snackbar,
@@ -16,6 +18,7 @@ import {
     Typography
 } from "@mui/material";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
@@ -64,7 +67,7 @@ export default function Header() {
     const {update} = useUsers();
     const {createEmployeeRate} = useEmployeeRate();
 
-    const handleOpenProfile = () => {
+    const handleOpenSettings = () => {
         handleMenuClose();
         setName(user?.name || "");
         setEmail(user?.email || "");
@@ -72,7 +75,7 @@ export default function Header() {
         setOpenDialog(true);
     };
 
-    const handleCloseProfile = () => {
+    const handleCloseSettings = () => {
         setOpenDialog(false);
     };
 
@@ -80,7 +83,7 @@ export default function Header() {
         setOpenSnackbar(false);
     };
 
-    const handleSaveProfile = async () => {
+    const handleSaveSettings = async () => {
         try {
             if (name !== user?.name) {
                 await update(name);
@@ -123,20 +126,26 @@ export default function Header() {
                         open={openMenu}
                         onClose={handleMenuClose}
                     >
-                        <MenuItem onClick={handleOpenProfile}>
-                            Profile
+                        <MenuItem onClick={handleOpenSettings}>
+                            <ListItemIcon>
+                                <SettingsIcon fontSize="small"/>
+                            </ListItemIcon>
+                            <ListItemText>Settings</ListItemText>
                         </MenuItem>
 
                         <MenuItem onClick={handleLogout}>
-                            <LogoutIcon fontSize="small"/>
+                            <ListItemIcon>
+                                <LogoutIcon fontSize="small"/>
+                            </ListItemIcon>
+                            <ListItemText>Logout</ListItemText>
                         </MenuItem>
                     </Menu>
                 </Toolbar>
             </AppBar>
 
-            {/* Profile Dialog */}
-            <Dialog open={openDialog} onClose={handleCloseProfile}>
-                <DialogTitle>Profile</DialogTitle>
+            {/* Settings Dialog */}
+            <Dialog open={openDialog} onClose={handleCloseSettings}>
+                <DialogTitle>Settings</DialogTitle>
 
                 <DialogContent sx={{pt: 2}}>
                     <TextField
@@ -166,10 +175,10 @@ export default function Header() {
                 </DialogContent>
 
                 <DialogActions>
-                    <Button onClick={handleCloseProfile}>
+                    <Button onClick={handleCloseSettings}>
                         Cancel
                     </Button>
-                    <Button variant="contained" onClick={handleSaveProfile}>
+                    <Button variant="contained" onClick={handleSaveSettings}>
                         Save
                     </Button>
                 </DialogActions>
