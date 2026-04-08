@@ -24,10 +24,12 @@ import Sessions from "@/components/Sessions.tsx";
 
 import type {AxiosError} from "axios";
 import type {ClockInAndOutRequest} from "@/features/attendance/types.ts";
+import {useAuth} from "@/features/auth/hooks.ts";
 
 dayjs.extend(duration);
 
 export default function AttendancePage() {
+    const {user, hourlyRate} = useAuth();
     const {
         session,
         todaySummary,
@@ -61,9 +63,6 @@ export default function AttendancePage() {
     // error handling
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
-
-    const year = dayjs().year();
-    const month = dayjs().month() + 1;
 
     const handleError = (err: unknown) => {
         const error = err as AxiosError<{
@@ -121,6 +120,10 @@ export default function AttendancePage() {
 
     const handleOpenPreview = async () => {
         try {
+            if (todaySummary === null) {
+                return;
+            }
+            const {year, month} = todaySummary;
             await previewSummary(year, month);
             setOpen(true);
         } catch (e) {
@@ -146,19 +149,31 @@ export default function AttendancePage() {
 
     const todayHours = (todaySummary?.totalHours || 0).toFixed(2);
     const todayMostHours = 4;
-    const hourlyRate = (todaySummary?.hourlyRate || 0);
     const todaySalary = formatCurrency(todaySummary?.salaryAmount || 0);
     const todayMostSalary = formatCurrency(todayMostHours * hourlyRate);
 
     const isActive = !!session;
+    const userName = user?.name || "";
+
+    function today() {
+        if (todaySummary === null) {
+            return "";
+        }
+        const {year, month, date} = todaySummary;
+
+        return dayjs(`${year}-${month}-${date}`).format("YYYY-MM-DD");
+    }
 
     return (
         <Stack spacing={3} sx={{p: 3, width: "80%", mx: "auto"}}>
+            <Typography>
+                Hi, <Box component="span" fontWeight="bold">{userName}</Box>. Keep going!
+            </Typography>
             {/* Today */}
             <Card>
                 <CardContent>
                     <Stack spacing={1}>
-                        <Typography variant="h6">Today</Typography>
+                        <Typography variant="h6">Today's Process ({today()}) </Typography>
                         <Typography>
                             Hours: <Box component="span" fontWeight="bold">{todayHours}</Box> / {todayMostHours}h
                         </Typography>
@@ -176,7 +191,7 @@ export default function AttendancePage() {
                     <Card>
                         <CardContent>
                             <Stack spacing={2}>
-                               <Sessions />
+                                <Sessions/>
                             </Stack>
                         </CardContent>
                     </Card>

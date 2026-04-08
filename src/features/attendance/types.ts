@@ -21,6 +21,7 @@ export interface Summary {
     id: string | null;
     year: number;
     month: number;
+    date: number;
     hourlyRate: number;
     totalMinutes: number;
     totalHours?: number;
