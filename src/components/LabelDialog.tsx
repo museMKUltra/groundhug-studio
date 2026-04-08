@@ -229,7 +229,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                         <Button
                             disabled={loading}
                             variant="outlined"
-                            endIcon={<AddIcon fontSize="small"/>}
+                            startIcon={<AddIcon fontSize="small"/>}
                             onClick={startCreate}
                         >
                             Add Label

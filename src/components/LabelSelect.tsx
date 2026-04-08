@@ -1,5 +1,5 @@
-import {ListItemIcon, MenuItem, TextField} from "@mui/material";
-import EditSquare from "@mui/icons-material/EditSquare";
+import {ListItemIcon, ListItemText, MenuItem, TextField} from "@mui/material";
+import BorderColorIcon from '@mui/icons-material/BorderColor';
 import type {Label} from "./LabelChip";
 import LabelChip from "./LabelChip";
 
@@ -30,7 +30,7 @@ export default function LabelSelect({labels, value, onChange, onManage}: Props) 
         >
             <MenuItem value="">
                 <em>
-                    <LabelChip label={{id: 0, name: "None", color: "#eeeeee"}}/>
+                    <LabelChip label={{id: 0, name: "None", color: "#ffffff"}}/>
                 </em>
             </MenuItem>
 
@@ -42,10 +42,12 @@ export default function LabelSelect({labels, value, onChange, onManage}: Props) 
 
             {onManage && (
                 <MenuItem value="manage">
-                    <LabelChip label={{id: 0, name: "Manage Labels", color: "#ffffff"}}/>
                     <ListItemIcon>
-                        <EditSquare fontSize="small"/>
+                        <BorderColorIcon fontSize="small"/>
                     </ListItemIcon>
+                    <ListItemText>
+                        Manage Labels
+                    </ListItemText>
                 </MenuItem>
             )}
         </TextField>
