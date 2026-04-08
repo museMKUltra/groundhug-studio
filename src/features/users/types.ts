@@ -4,8 +4,12 @@ export interface RegisterRequest {
     password: string;
 }
 
-export interface RegisterResponse {
+export interface UserResponse {
     id: string;
     name: string;
     email: string;
+}
+
+export interface UpdateRequest {
+    name: string;
 }

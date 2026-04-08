@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {registerApi} from "./api";
+import {registerApi, updateApi} from "./api";
 
 export const useUsers = () => {
     const [loading, setLoading] = useState(false);
@@ -14,8 +14,19 @@ export const useUsers = () => {
         }
     };
 
+    const update = async (name: string) => {
+        setLoading(true);
+        try {
+            const data = await updateApi({name});
+            return data;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return {
-        register,
         loading,
+        register,
+        update,
     };
 };
