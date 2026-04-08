@@ -1,17 +1,25 @@
 import axios from "@/api/axios";
-import type {ActiveSessionResponse, Summary, Label, CreateLabelRequest, ClockInAndOutRequest} from "./types";
+import type {
+    ActiveSessionResponse,
+    ClockInAndOutRequest,
+    CreateLabelRequest,
+    EmployeeRateRequest,
+    EmployeeRateResponse,
+    Label,
+    Summary
+} from "./types";
 
 export const getActiveSessionApi = async () => {
     const res = await axios.get<ActiveSessionResponse>("/attendance/active-session");
     return res.data;
 };
 
-export const clockInApi = async (data?: ClockInAndOutRequest ) => {
+export const clockInApi = async (data?: ClockInAndOutRequest) => {
     const res = await axios.post<ActiveSessionResponse>("/attendance/clock-in", data);
     return res.data;
 };
 
-export const clockOutApi = async (data?: ClockInAndOutRequest ) => {
+export const clockOutApi = async (data?: ClockInAndOutRequest) => {
     const res = await axios.post<ActiveSessionResponse>("/attendance/clock-out", data);
     return res.data;
 };
@@ -51,4 +59,9 @@ export const updateLabelApi = async (
 
 export const deleteLabelApi = async (id: number) => {
     await axios.delete(`/attendance/labels/${id}`);
+};
+
+export const createEmployeeRateApi = async (data: EmployeeRateRequest) => {
+    const res = await axios.post<EmployeeRateResponse>("/employee-rates", data);
+    return res.data;
 };

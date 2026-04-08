@@ -43,3 +43,14 @@ export interface ClockInAndOutRequest {
     labelId?: number;
     description?: string;
 }
+
+export interface EmployeeRateRequest {
+    hourlyRate: number;
+}
+
+export interface EmployeeRateResponse {
+    id: number;
+    hourlyRate: number;
+    effectiveFrom: string;
+    effectiveTo: string | null;
+}

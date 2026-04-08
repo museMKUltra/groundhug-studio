@@ -3,6 +3,7 @@ import {
     clockInApi,
     clockOutApi,
     confirmWorkSummaryApi,
+    createEmployeeRateApi,
     createLabelApi,
     deleteLabelApi,
     getActiveSessionApi,
@@ -144,5 +145,23 @@ export const useLabels = () => {
         createLabel,
         updateLabel,
         deleteLabel,
+    };
+};
+
+export const useEmployeeRate = () => {
+    const [loading, setLoading] = useState(false);
+
+    const createEmployeeRate = async (hourlyRate: number) => {
+        setLoading(true);
+        try {
+            return await createEmployeeRateApi({hourlyRate});
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return {
+        loading,
+        createEmployeeRate,
     };
 };
