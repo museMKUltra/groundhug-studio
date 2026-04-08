@@ -1,4 +1,5 @@
 import {
+    Alert,
     AppBar,
     Box,
     Button,
@@ -10,7 +11,6 @@ import {
     Menu,
     MenuItem,
     Snackbar,
-    Alert,
     TextField,
     Toolbar,
     Typography
@@ -25,7 +25,7 @@ import {useEmployeeRate} from "@/features/attendance/hooks";
 import type {AxiosError} from "axios";
 
 export default function Header() {
-    const {logout, user, hourlyRate, setMe} = useAuth();
+    const {logout, user, hourlyRate, setMe, updateUser, setHourlyRate} = useAuth();
     const navigate = useNavigate();
 
     // menu state
@@ -84,14 +84,15 @@ export default function Header() {
         try {
             if (name !== user?.name) {
                 await update(name);
+                updateUser({name});
             }
 
             if (rate !== hourlyRate) {
                 await createEmployeeRate(rate);
+                setHourlyRate(rate);
             }
 
             setOpenDialog(false);
-            setMe();
         } catch (err: unknown) {
             const error = err as AxiosError<{
                 error?: string

@@ -34,6 +34,14 @@ export const useAuth = () => {
     }
 
     const [user, setUser] = useState<User | null>(getUserFromToken());
+
+    const updateUser = (updates: Partial<User>) => {
+        setUser(prev => {
+            if (!prev) return prev;
+            return {...prev, ...updates};
+        });
+    };
+
     const login = async (email: string, password: string) => {
         setLoading(true);
         try {
@@ -60,6 +68,8 @@ export const useAuth = () => {
         loading,
         user,
         hourlyRate,
-        setMe
+        setMe,
+        updateUser,
+        setHourlyRate,
     };
 };
