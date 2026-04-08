@@ -173,7 +173,10 @@ export default function AttendancePage() {
             <Card>
                 <CardContent>
                     <Stack spacing={1}>
-                        <Typography variant="h6">Today's Process ({today()}) </Typography>
+                        <Typography variant="h6">Today's Process</Typography>
+                        <Typography>
+                            Date: {today()}
+                        </Typography>
                         <Typography>
                             Hours: <Box component="span" fontWeight="bold">{todayHours}</Box> / {todayMostHours}h
                         </Typography>
