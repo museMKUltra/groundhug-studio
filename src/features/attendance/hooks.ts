@@ -8,6 +8,7 @@ import {
     deleteLabelApi,
     getActiveSessionApi,
     getLabelsApi,
+    getPeriodSessionsApi,
     getWorkSummaryPreviewApi,
     updateLabelApi,
 } from "./api.ts";
@@ -16,6 +17,7 @@ import type {ClockInAndOutRequest, CreateLabelRequest, Label, Session, Summary} 
 export const useSessions = () => {
     const [loading, setLoading] = useState(false);
     const [session, setSession] = useState<Session | null>(null);
+    const [periodSessions, setPeriodSessions] = useState<Session[]>([]);
     const [todaySummary, setTodaySummary] = useState<Summary | null>(null);
 
     const withLoading = async <T>(fn: () => Promise<T>): Promise<T> => {
@@ -51,6 +53,11 @@ export const useSessions = () => {
         setTodaySummary(res?.summary);
     };
 
+    const handlePeriodSessions = async (startDate: string, endDate: string) => {
+        const res = await getPeriodSessionsApi(startDate, endDate);
+        setPeriodSessions(res);
+    }
+
     return {
         loading,
         session,
@@ -61,6 +68,8 @@ export const useSessions = () => {
         getActiveSession,
         clockIn,
         clockOut,
+        periodSessions,
+        handlePeriodSessions
     };
 };
 

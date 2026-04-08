@@ -29,6 +29,8 @@ export interface Summary {
     status?: Status;
 }
 
+export type PeriodSessionsResponse = Session[];
+
 export interface ActiveSessionResponse {
     active: boolean;
     session: Session | null;

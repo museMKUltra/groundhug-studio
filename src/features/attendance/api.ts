@@ -6,8 +6,16 @@ import type {
     EmployeeRateRequest,
     EmployeeRateResponse,
     Label,
+    PeriodSessionsResponse,
     Summary
 } from "./types";
+
+export const getPeriodSessionsApi = async (startDate: string, endDate: string) => {
+    const res = await axios.get<PeriodSessionsResponse>("/attendance/period-sessions", {
+        params: {startDate, endDate}
+    });
+    return res.data;
+};
 
 export const getActiveSessionApi = async () => {
     const res = await axios.get<ActiveSessionResponse>("/attendance/active-session");
