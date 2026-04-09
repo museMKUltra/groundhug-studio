@@ -27,12 +27,16 @@ type Session = {
 };
 
 export default function Sessions() {
-    const {periodSessions, fetchPeriodSessions} = useSessionContext();
-
-    const getMonday = (d = dayjs()) => d.startOf("week").add(1, "day");
-    const formatDate = (d: dayjs.Dayjs) => d.format("YYYY-MM-DD");
-
-    const [weekStart, setWeekStart] = useState(() => getMonday());
+    const {
+        periodSessions,
+        updatePeriodSessions,
+        weekStart,
+        setStartTime,
+        setEndTime,
+        prevWeek,
+        nextWeek,
+        goToday
+    } = useSessionContext();
 
     const endDate = useMemo(
         () => weekStart.add(7, "day"),
@@ -51,15 +55,10 @@ export default function Sessions() {
     }, [weekStart]);
 
     useEffect(() => {
-        fetchPeriodSessions(
-            formatDate(weekStart),
-            formatDate(endDate)
-        );
+        setStartTime(weekStart);
+        setEndTime(endDate);
+        updatePeriodSessions();
     }, [weekStart]);
-
-    const prevWeek = () => setWeekStart(prev => prev.subtract(7, "day"));
-    const nextWeek = () => setWeekStart(prev => prev.add(7, "day"));
-    const goToday = () => setWeekStart(getMonday());
 
     // dialog
     const [selected, setSelected] = useState<Session | null>(null);

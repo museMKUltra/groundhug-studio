@@ -1,10 +1,18 @@
 import {createContext, useContext} from "react";
 import type {Session} from "./types";
+import dayjs from "dayjs";
 
 export type SessionContextType = {
     periodSessions: Session[];
     loading: boolean;
     fetchPeriodSessions: (startDate: string, endDate: string) => Promise<void>;
+    updatePeriodSessions: () => Promise<void>;
+    setStartTime: (startTime: dayjs.Dayjs | null) => void;
+    setEndTime: (endTime: dayjs.Dayjs | null) => void;
+    weekStart: dayjs.Dayjs;
+    prevWeek: () => void;
+    nextWeek: () => void;
+    goToday: () => void;
 };
 
 export const SessionContext = createContext<SessionContextType | null>(null);
