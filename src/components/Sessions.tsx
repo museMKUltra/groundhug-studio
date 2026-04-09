@@ -1,21 +1,10 @@
 import {useEffect, useMemo, useState} from "react";
-import {
-    Box,
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    IconButton,
-    Stack,
-    TextField,
-    Typography
-} from "@mui/material";
+import {Box, Button, IconButton, Typography} from "@mui/material";
 import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {useSessionContext} from "@/features/attendance/SessionContext";
-import LabelChip from "@/components/LabelChip.tsx";
+import SessionDialog from "@/components/SessionDialog";
 import type {Label} from "@/features/attendance/types";
 
 type Session = {
@@ -62,17 +51,9 @@ export default function Sessions() {
 
     // dialog
     const [selected, setSelected] = useState<Session | null>(null);
-    const [editLabel, setEditLabel] = useState<Label | null>(null);
-    const [editDescription, setEditDescription] = useState<string>("");
-    const [editIn, setEditIn] = useState("");
-    const [editOut, setEditOut] = useState("");
 
     const handleOpenDialog = (s: Session) => {
         setSelected(s);
-        setEditLabel(s.label || null);
-        setEditDescription(s.description || "");
-        setEditIn(dayjs(s.clockIn).format("YYYY-MM-DDTHH:mm"));
-        setEditOut(dayjs(s.clockOut).format("YYYY-MM-DDTHH:mm"));
     };
 
     const today = dayjs();
@@ -213,54 +194,10 @@ export default function Sessions() {
             </Box>
 
             {/* EDIT DIALOG */}
-            <Dialog open={!!selected} onClose={() => setSelected(null)}>
-                <DialogTitle>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                        <span>Session</span>
-                        {editLabel && <LabelChip label={editLabel}/>}
-                    </Stack>
-                </DialogTitle>
-
-                <DialogContent sx={{pt: 2}}>
-                    <TextField
-                        label="Clock In"
-                        type="datetime-local"
-                        fullWidth
-                        margin="normal"
-                        value={editIn}
-                        onChange={(e) => setEditIn(e.target.value)}
-                        disabled
-                    />
-
-                    <TextField
-                        label="Clock Out"
-                        type="datetime-local"
-                        fullWidth
-                        margin="normal"
-                        value={editOut}
-                        onChange={(e) => setEditOut(e.target.value)}
-                        disabled
-                    />
-
-                    {
-                        editDescription &&
-                        <TextField
-                            label="Description"
-                            fullWidth
-                            margin="normal"
-                            value={editDescription}
-                            onChange={(e) => setEditDescription(e.target.value)}
-                            disabled
-                            multiline
-                            minRows={2}
-                        />
-                    }
-                </DialogContent>
-
-                <DialogActions>
-                    <Button onClick={() => setSelected(null)}>Close</Button>
-                </DialogActions>
-            </Dialog>
+            <SessionDialog
+                session={selected}
+                onClose={() => setSelected(null)}
+            />
         </>
     );
 }
