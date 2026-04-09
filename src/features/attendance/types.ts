@@ -37,6 +37,13 @@ export interface ActiveSessionResponse {
     summary: Summary | null;
 }
 
+export interface UpdateSessionRequest {
+    clockIn?: string;
+    clockOut?: string;
+    labelId?: number;
+    description?: string;
+}
+
 export interface CreateLabelRequest {
     name: string;
     color: string;

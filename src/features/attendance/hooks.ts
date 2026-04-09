@@ -10,9 +10,9 @@ import {
     getLabelsApi,
     getPeriodSessionsApi,
     getWorkSummaryPreviewApi,
-    updateLabelApi,
+    updateLabelApi, updateSessionApi,
 } from "./api.ts";
-import type {ClockInAndOutRequest, CreateLabelRequest, Label, Session, Summary} from "./types";
+import type {ClockInAndOutRequest, CreateLabelRequest, Label, Session, Summary, UpdateSessionRequest} from "./types";
 
 export const useSessions = () => {
     const [loading, setLoading] = useState(false);
@@ -58,6 +58,10 @@ export const useSessions = () => {
         setPeriodSessions(res);
     }
 
+    const updateSession = async (id: number, data: UpdateSessionRequest) => {
+        return await updateSessionApi(id, data);
+    }
+
     return {
         loading,
         session,
@@ -69,7 +73,8 @@ export const useSessions = () => {
         clockIn,
         clockOut,
         periodSessions,
-        handlePeriodSessions
+        handlePeriodSessions,
+        updateSession,
     };
 };
 

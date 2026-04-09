@@ -1,13 +1,15 @@
 import axios from "@/api/axios";
 import type {
     ActiveSessionResponse,
+    UpdateSessionRequest,
     ClockInAndOutRequest,
     CreateLabelRequest,
     EmployeeRateRequest,
     EmployeeRateResponse,
     Label,
     PeriodSessionsResponse,
-    Summary
+    Summary,
+    Session,
 } from "./types";
 
 export const getPeriodSessionsApi = async (startDate: string, endDate: string) => {
@@ -19,6 +21,14 @@ export const getPeriodSessionsApi = async (startDate: string, endDate: string) =
 
 export const getActiveSessionApi = async () => {
     const res = await axios.get<ActiveSessionResponse>("/attendance/active-session");
+    return res.data;
+};
+
+export const updateSessionApi = async (
+    id: number,
+    data: UpdateSessionRequest
+) => {
+    const res = await axios.put<Session>(`/attendance/sessions/${id}`, data);
     return res.data;
 };
 
