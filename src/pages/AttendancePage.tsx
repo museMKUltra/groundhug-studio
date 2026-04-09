@@ -55,7 +55,7 @@ export default function AttendancePage() {
 
     const {showError, showSuccess} = useSnackbar();
 
-    const [labelId, setLabelId] = useState<number | "">("");
+    const [labelId, setLabelId] = useState<number>(0);
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
     const [open, setOpen] = useState(false);
