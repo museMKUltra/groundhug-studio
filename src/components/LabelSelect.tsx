@@ -28,7 +28,7 @@ export default function LabelSelect({labels, value, onChange, onManage}: Props) 
             }}
             fullWidth
         >
-            <MenuItem value="">
+            <MenuItem value="0">
                 <em>
                     <LabelChip label={{id: 0, name: "None", color: "#ffffff"}}/>
                 </em>
