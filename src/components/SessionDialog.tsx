@@ -1,8 +1,13 @@
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
 import dayjs from "dayjs";
 import {useEffect, useState} from "react";
-import LabelChip from "@/components/LabelChip.tsx";
+import type {AxiosError} from "axios";
+import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {Label} from "@/features/attendance/types";
+import {useLabels} from "@/features/attendance/hooks.ts";
+import LabelChip from "@/components/LabelChip.tsx";
+import LabelSelect from "@/components/LabelSelect.tsx";
+import LabelDialog from "@/components/LabelDialog.tsx";
 
 type Session = {
     id: number;
@@ -44,6 +49,32 @@ export default function SessionDialog({session, onClose}: Props) {
         setEditOut(sessionOut);
     }, [sessionOut]);
 
+    const {
+        labels,
+        createLabel,
+        updateLabel,
+        deleteLabel,
+    } = useLabels();
+    const [labelId, setLabelId] = useState<number | "">("");
+    const [openLabelDialog, setOpenLabelDialog] = useState(false);
+
+    const isDeletedLabel = !!editLabel && !labels.some(l => l.id === editLabel.id);
+    const labelsWithDeleted = isDeletedLabel ? [...labels, editLabel] : labels;
+
+    useEffect(() => {
+        setLabelId(sessionLabel?.id || 0);
+    }, [sessionLabel]);
+
+    const {showError, showSuccess} = useSnackbar();
+    const handleError = (err: unknown) => {
+        const error = err as AxiosError<{
+            error?: string
+        }>;
+
+        console.error(error);
+        showError(error?.response?.data?.error || "Something went wrong");
+    };
+
     return (
         <Dialog open={!!session} onClose={onClose}>
             <DialogTitle>
@@ -70,6 +101,24 @@ export default function SessionDialog({session, onClose}: Props) {
                     margin="normal"
                     value={editOut}
                     disabled
+                />
+
+                <LabelSelect
+                    labels={labelsWithDeleted}
+                    value={labelId}
+                    onChange={setLabelId}
+                    onManage={() => setOpenLabelDialog(true)}
+                />
+
+                <LabelDialog
+                    open={openLabelDialog}
+                    labels={labels}
+                    onClose={() => setOpenLabelDialog(false)}
+                    onCreate={createLabel}
+                    onUpdate={updateLabel}
+                    onDelete={deleteLabel}
+                    onError={handleError}
+                    onSuccess={showSuccess}
                 />
 
                 <TextField
