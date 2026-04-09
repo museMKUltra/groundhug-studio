@@ -29,7 +29,7 @@ import {useAuth} from "@/features/auth/hooks.ts";
 dayjs.extend(duration);
 
 export default function AttendancePage() {
-    const {goToday, updatePeriodSessions} = useSessionContext();
+    const {goDay} = useSessionContext();
     const {user, hourlyRate} = useAuth();
     const {
         session,
@@ -117,8 +117,11 @@ export default function AttendancePage() {
             const request = getClockInAndOutRequest();
             await clockOut(request);
             showSuccess("Clock out successful");
-            goToday();
-            updatePeriodSessions();
+
+            const workDate = session?.workDate;
+            if (workDate) {
+                goDay(dayjs(workDate));
+            }
         } catch (e) {
             handleError(e);
         }

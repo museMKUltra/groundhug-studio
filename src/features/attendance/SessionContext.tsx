@@ -14,6 +14,7 @@ export type SessionContextType = {
     prevWeek: () => void;
     nextWeek: () => void;
     goToday: () => void;
+    goDay: (day: dayjs.Dayjs) => void;
 };
 
 export const SessionContext = createContext<SessionContextType | null>(null);

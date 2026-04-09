@@ -18,6 +18,7 @@ export const SessionProvider = ({children}: { children: React.ReactNode }) => {
     const prevWeek = () => setWeekStart(prev => prev.subtract(7, "day"));
     const nextWeek = () => setWeekStart(prev => prev.add(7, "day"));
     const goToday = () => setWeekStart(getMonday());
+    const goDay = (day: dayjs.Dayjs) => setWeekStart(getMonday(day));
 
     const fetchPeriodSessions = async (startDate: string, endDate: string) => {
         setLoading(true);
@@ -61,6 +62,7 @@ export const SessionProvider = ({children}: { children: React.ReactNode }) => {
                 prevWeek,
                 nextWeek,
                 goToday,
+                goDay,
             }}
         >
             {children}
