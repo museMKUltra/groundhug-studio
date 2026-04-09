@@ -21,6 +21,7 @@ import {useLabels, useSessions, useSummary} from "@/features/attendance/hooks.ts
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
 import Sessions from "@/components/Sessions.tsx";
+import {useSessionContext} from "@/features/attendance/SessionContext";
 
 import type {AxiosError} from "axios";
 import type {ClockInAndOutRequest} from "@/features/attendance/types.ts";
@@ -29,6 +30,7 @@ import {useAuth} from "@/features/auth/hooks.ts";
 dayjs.extend(duration);
 
 export default function AttendancePage() {
+    const {goToday, updatePeriodSessions} = useSessionContext();
     const {user, hourlyRate} = useAuth();
     const {
         session,
@@ -113,6 +115,8 @@ export default function AttendancePage() {
         try {
             const request = getClockInAndOutRequest();
             await (request ? clockOut(request) : clockOut());
+            goToday();
+            updatePeriodSessions();
         } catch (e) {
             handleError(e);
         }
