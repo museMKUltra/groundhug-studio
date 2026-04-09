@@ -233,6 +233,7 @@ export default function AttendancePage() {
                                         onUpdate={updateLabel}
                                         onDelete={deleteLabel}
                                         onError={handleError}
+                                        onSuccess={showSuccess}
                                     />
 
                                     <TextField

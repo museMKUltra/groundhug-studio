@@ -12,9 +12,10 @@ type Props = {
     onUpdate: (id: number, label: Label) => Promise<void>;
     onDelete: (id: number) => Promise<void>;
     onError: (err: unknown) => void;
+    onSuccess: (message: string) => void;
 };
 
-export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, onDelete, onError}: Props) {
+export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, onDelete, onError, onSuccess}: Props) {
     const [loading, SetLoading] = useState<boolean>(false);
     const [editingId, setEditingId] = useState<number | "new" | null>(null);
     const [draft, setDraft] = useState<Label | null>(null);
@@ -55,6 +56,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
             try {
                 SetLoading(true);
                 await onDelete(draft.id);
+                onSuccess("Label deleted successfully");
                 cancelEdit();
             } catch (e) {
                 onError(e);
@@ -73,9 +75,11 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                     name: draft.name,
                     color: draft.color,
                 });
+                onSuccess("Label created successfully");
                 cancelEdit();
             } else {
                 await onUpdate(draft.id, draft);
+                onSuccess("Label updated successfully");
                 cancelEdit();
             }
         } catch (e) {
