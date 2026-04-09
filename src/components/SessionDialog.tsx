@@ -1,6 +1,6 @@
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
 import dayjs from "dayjs";
-import {useEffect, useRef, useState} from "react";
+import {useRef, useState} from "react";
 import type {AxiosError} from "axios";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {Label, Session as UpdatedSession, UpdateSessionRequest} from "@/features/attendance/types";
@@ -25,15 +25,10 @@ type Props = {
 
 export default function SessionDialog({session, onClose, onSave}: Props) {
     const sessionLabel = session?.label || null;
+    const sessionLabelId = sessionLabel?.id || 0;
     const sessionDescription = session?.description || "";
     const sessionIn = session?.clockIn ? dayjs(session?.clockIn).format("YYYY-MM-DDTHH:mm") : "";
     const sessionOut = session?.clockOut ? dayjs(session?.clockOut).format("YYYY-MM-DDTHH:mm") : "";
-
-    const [editLabel, setEditLabel] = useState<Label | null>(sessionLabel);
-
-    useEffect(() => {
-        setEditLabel(sessionLabel);
-    }, [sessionLabel]);
 
     const editRef = useRef<Partial<{
         clockIn: string;
@@ -48,11 +43,10 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         updateLabel,
         deleteLabel,
     } = useLabels();
-    const [sessionLabelId, setSessionLabelId] = useState<number>(sessionLabel?.id || 0);
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
-    const isDeletedLabel = !!editLabel && !labels.some(l => l.id === editLabel.id);
-    const labelsWithDeleted = isDeletedLabel ? [...labels, editLabel] : labels;
+    const isDeletedLabel = sessionLabel && !labels.some(l => l.id === sessionLabelId);
+    const labelsWithDeleted = isDeletedLabel ? [...labels, sessionLabel] : labels;
 
     const {showError, showSuccess} = useSnackbar();
     const handleError = (err: unknown) => {
@@ -107,7 +101,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             <DialogTitle>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <span>Session</span>
-                    {editLabel && <LabelChip label={editLabel}/>}
+                    {sessionLabel && <LabelChip label={sessionLabel}/>}
                 </Stack>
             </DialogTitle>
 
@@ -136,9 +130,8 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
 
                 <LabelSelect
                     labels={labelsWithDeleted}
-                    value={sessionLabelId}
+                    defaultValue={sessionLabelId}
                     onChange={(val) => {
-                        setSessionLabelId(val);
                         editRef.current.labelId = val;
                     }}
                     onManage={() => setOpenLabelDialog(true)}

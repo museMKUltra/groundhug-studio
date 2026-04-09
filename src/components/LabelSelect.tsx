@@ -5,17 +5,19 @@ import LabelChip from "./LabelChip";
 
 type Props = {
     labels: Label[];
-    value: number | "";
+    value?: number;
+    defaultValue?: number;
     onChange: (value: number) => void;
     onManage?: () => void;
 };
 
-export default function LabelSelect({labels, value, onChange, onManage}: Props) {
+export default function LabelSelect({labels, value, defaultValue = 0, onChange, onManage}: Props) {
     return (
         <TextField
             select
             label="Label"
             value={value}
+            defaultValue={defaultValue}
             onChange={(e) => {
                 const val = e.target.value;
 
