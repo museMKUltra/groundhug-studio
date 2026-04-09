@@ -147,9 +147,10 @@ export default function AttendancePage() {
             maximumFractionDigits: 0,
         }).format(value);
 
-    const todayHours = (todaySummary?.totalHours || 0).toFixed(2);
+    const todayHours = todaySummary?.totalHours || 0;
+    const displayTodayHours = todayHours.toFixed(2);
     const todayMostHours = 4;
-    const todaySalary = formatCurrency(todaySummary?.salaryAmount || 0);
+    const todaySalary = formatCurrency(todayHours * hourlyRate);
     const todayMostSalary = formatCurrency(todayMostHours * hourlyRate);
 
     const isActive = !!session;
@@ -178,7 +179,7 @@ export default function AttendancePage() {
                             From: {today()}
                         </Typography>
                         <Typography>
-                            Hours: <Box component="span" fontWeight="bold">{todayHours}</Box> / {todayMostHours}h
+                            Hours: <Box component="span" fontWeight="bold">{displayTodayHours}</Box> / {todayMostHours}h
                         </Typography>
                         <Typography>
                             Salary: <Box component="span" fontWeight="bold">{todaySalary}</Box> / {todayMostSalary}
