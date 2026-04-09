@@ -19,6 +19,7 @@ export default function Sessions() {
     const {
         periodSessions,
         updatePeriodSessions,
+        updateSession,
         weekStart,
         setStartTime,
         setEndTime,
@@ -197,6 +198,7 @@ export default function Sessions() {
             <SessionDialog
                 session={selected}
                 onClose={() => setSelected(null)}
+                onSave={updateSession}
             />
         </>
     );

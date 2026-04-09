@@ -36,6 +36,13 @@ export const SessionProvider = ({children}: { children: React.ReactNode }) => {
         await fetchPeriodSessions(startDate, endDate);
     };
 
+    const updateSession = async (session: Session) => {
+        if (session == null) {
+            return;
+        }
+        setPeriodSessions(prev => prev.map(s => s.id === session.id ? session : s));
+    };
+
     return (
         <SessionContext.Provider
             value={{
@@ -43,6 +50,7 @@ export const SessionProvider = ({children}: { children: React.ReactNode }) => {
                 loading,
                 fetchPeriodSessions,
                 updatePeriodSessions,
+                updateSession,
                 setStartTime: (v) => {
                     startTime.current = v;
                 },

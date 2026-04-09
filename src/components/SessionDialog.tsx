@@ -1,10 +1,10 @@
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
 import dayjs from "dayjs";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import type {AxiosError} from "axios";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
-import type {Label} from "@/features/attendance/types";
-import {useLabels} from "@/features/attendance/hooks.ts";
+import type {Label, Session as UpdatedSession, UpdateSessionRequest} from "@/features/attendance/types";
+import {useLabels, useSessions} from "@/features/attendance/hooks.ts";
 import LabelChip from "@/components/LabelChip.tsx";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
@@ -20,34 +20,27 @@ type Session = {
 type Props = {
     session: Session | null;
     onClose: () => void;
+    onSave: (session: UpdatedSession) => void;
 };
 
-export default function SessionDialog({session, onClose}: Props) {
+export default function SessionDialog({session, onClose, onSave}: Props) {
     const sessionLabel = session?.label || null;
     const sessionDescription = session?.description || "";
     const sessionIn = session?.clockIn ? dayjs(session?.clockIn).format("YYYY-MM-DDTHH:mm") : "";
     const sessionOut = session?.clockOut ? dayjs(session?.clockOut).format("YYYY-MM-DDTHH:mm") : "";
 
-    const [editLabel, setEditLabel] = useState<Label | null>(null);
-    const [editDescription, setEditDescription] = useState("");
-    const [editIn, setEditIn] = useState("");
-    const [editOut, setEditOut] = useState("");
+    const [editLabel, setEditLabel] = useState<Label | null>(sessionLabel);
 
     useEffect(() => {
         setEditLabel(sessionLabel);
     }, [sessionLabel]);
 
-    useEffect(() => {
-        setEditDescription(sessionDescription);
-    }, [sessionDescription]);
-
-    useEffect(() => {
-        setEditIn(sessionIn);
-    }, [sessionIn]);
-
-    useEffect(() => {
-        setEditOut(sessionOut);
-    }, [sessionOut]);
+    const editRef = useRef<Partial<{
+        clockIn: string;
+        clockOut: string;
+        labelId: number;
+        description: string;
+    }>>({});
 
     const {
         labels,
@@ -55,15 +48,11 @@ export default function SessionDialog({session, onClose}: Props) {
         updateLabel,
         deleteLabel,
     } = useLabels();
-    const [labelId, setLabelId] = useState<number | "">("");
+    const [sessionLabelId, setSessionLabelId] = useState<number>(sessionLabel?.id || 0);
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
     const isDeletedLabel = !!editLabel && !labels.some(l => l.id === editLabel.id);
     const labelsWithDeleted = isDeletedLabel ? [...labels, editLabel] : labels;
-
-    useEffect(() => {
-        setLabelId(sessionLabel?.id || 0);
-    }, [sessionLabel]);
 
     const {showError, showSuccess} = useSnackbar();
     const handleError = (err: unknown) => {
@@ -75,8 +64,46 @@ export default function SessionDialog({session, onClose}: Props) {
         showError(error?.response?.data?.error || "Something went wrong");
     };
 
+    const {updateSession} = useSessions();
+
+    const handleSave = async () => {
+        const {clockIn, clockOut, labelId, description} = editRef.current;
+        const request = {} as UpdateSessionRequest;
+
+        if (clockIn !== undefined) {
+            request.clockIn = dayjs(clockIn).toISOString();
+        }
+
+        if (clockOut !== undefined) {
+            request.clockOut = dayjs(clockOut).toISOString();
+        }
+
+        if (labelId !== undefined) {
+            request.labelId = labelId;
+        }
+
+        if (description !== undefined) {
+            request.description = description;
+        }
+
+        try {
+            const id = session?.id;
+            if (!id) {
+                return;
+            }
+
+            const updatedSession = await updateSession(id, request);
+
+            onSave(updatedSession);
+            onClose();
+        } catch (error) {
+            console.error(error);
+            handleError(error);
+        }
+    }
+
     return (
-        <Dialog open={!!session} onClose={onClose}>
+        <Dialog key={session?.id ?? 0} open={!!session} onClose={onClose}>
             <DialogTitle>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <span>Session</span>
@@ -90,8 +117,10 @@ export default function SessionDialog({session, onClose}: Props) {
                     type="datetime-local"
                     fullWidth
                     margin="normal"
-                    value={editIn}
-                    disabled
+                    defaultValue={sessionIn}
+                    onChange={(e) => {
+                        editRef.current.clockIn = e.target.value;
+                    }}
                 />
 
                 <TextField
@@ -99,14 +128,19 @@ export default function SessionDialog({session, onClose}: Props) {
                     type="datetime-local"
                     fullWidth
                     margin="normal"
-                    value={editOut}
-                    disabled
+                    defaultValue={sessionOut}
+                    onChange={(e) => {
+                        editRef.current.clockOut = e.target.value;
+                    }}
                 />
 
                 <LabelSelect
                     labels={labelsWithDeleted}
-                    value={labelId}
-                    onChange={setLabelId}
+                    value={sessionLabelId}
+                    onChange={(val) => {
+                        setSessionLabelId(val);
+                        editRef.current.labelId = val;
+                    }}
                     onManage={() => setOpenLabelDialog(true)}
                 />
 
@@ -125,15 +159,18 @@ export default function SessionDialog({session, onClose}: Props) {
                     label="Description"
                     fullWidth
                     margin="normal"
-                    value={editDescription}
-                    disabled
+                    defaultValue={sessionDescription}
+                    onChange={(e) => {
+                        editRef.current.description = e.target.value;
+                    }}
                     multiline
                     minRows={2}
                 />
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose}>Close</Button>
+                <Button onClick={onClose}>Cancel</Button>
+                <Button variant="contained" onClick={handleSave}>Save</Button>
             </DialogActions>
         </Dialog>
     );
