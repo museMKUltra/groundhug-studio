@@ -53,7 +53,7 @@ export default function AttendancePage() {
         deleteLabel,
     } = useLabels();
 
-    const {showError} = useSnackbar();
+    const {showError, showSuccess} = useSnackbar();
 
     const [labelId, setLabelId] = useState<number | "">("");
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
@@ -100,6 +100,7 @@ export default function AttendancePage() {
         try {
             const request = getClockInAndOutRequest();
             await (request ? clockIn(request) : clockIn());
+            showSuccess("Clock in successful");
         } catch (e) {
             handleError(e);
         }
@@ -109,6 +110,7 @@ export default function AttendancePage() {
         try {
             const request = getClockInAndOutRequest();
             await (request ? clockOut(request) : clockOut());
+            showSuccess("Clock out successful");
             goToday();
             updatePeriodSessions();
         } catch (e) {
