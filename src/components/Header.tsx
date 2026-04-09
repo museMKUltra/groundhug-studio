@@ -1,5 +1,4 @@
 import {
-    Alert,
     AppBar,
     Box,
     Button,
@@ -12,11 +11,11 @@ import {
     ListItemText,
     Menu,
     MenuItem,
-    Snackbar,
     TextField,
     Toolbar,
     Typography
 } from "@mui/material";
+import {useSnackbar} from "@/context/SnackbarContext.ts";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -30,6 +29,7 @@ import type {AxiosError} from "axios";
 export default function Header() {
     const {logout, user, hourlyRate, setMe, updateUser, setHourlyRate} = useAuth();
     const navigate = useNavigate();
+    const {showError} = useSnackbar();
 
     // menu state
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -37,10 +37,6 @@ export default function Header() {
 
     // dialog state
     const [openDialog, setOpenDialog] = useState(false);
-
-    // snackbar state
-    const [error, setError] = useState<string>("");
-    const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -60,6 +56,7 @@ export default function Header() {
         setMe();
     }, []);
 
+
     const [name, setName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [rate, setRate] = useState<number>(0);
@@ -77,10 +74,6 @@ export default function Header() {
 
     const handleCloseSettings = () => {
         setOpenDialog(false);
-    };
-
-    const handleCloseSnackbar = () => {
-        setOpenSnackbar(false);
     };
 
     const handleSaveSettings = async () => {
@@ -102,10 +95,9 @@ export default function Header() {
                 name?: string
             }>;
             console.error(error);
-            setError(error?.response?.data?.name
+            showError(error?.response?.data?.name
                 || error?.response?.data?.error
                 || "Something went wrong");
-            setOpenSnackbar(true);
         }
     };
 
@@ -184,20 +176,6 @@ export default function Header() {
                 </DialogActions>
             </Dialog>
 
-            {/* Error Snackbar */}
-            <Snackbar
-                open={openSnackbar}
-                autoHideDuration={4000}
-                onClose={handleCloseSnackbar}
-            >
-                <Alert
-                    onClose={handleCloseSnackbar}
-                    severity="error"
-                    variant="filled"
-                >
-                    {error}
-                </Alert>
-            </Snackbar>
         </>
     );
 }

@@ -2,15 +2,14 @@ import {useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useAuth} from "@/features/auth/hooks";
 import {useUsers} from "@/features/users/hooks.ts";
+import {useSnackbar} from "@/context/SnackbarContext.ts";
 
 import {
-    Alert,
     Box,
     Button,
     Card,
     CardContent,
     Collapse,
-    Snackbar,
     Stack,
     Tab,
     Tabs,
@@ -24,11 +23,7 @@ export default function LoginPage() {
     const location = useLocation();
     const {login, loading} = useAuth();
     const {register} = useUsers();
-
-    const [alert, setAlert] = useState<{
-        type: "success" | "error";
-        message: string;
-    } | null>(null);
+    const {showError, showSuccess} = useSnackbar();
 
     const [mode, setMode] = useState<"login" | "register">("login");
     const [name, setName] = useState("");
@@ -50,10 +45,7 @@ export default function LoginPage() {
                 setName("");
                 setPassword("");
                 setMode("login");
-                setAlert({
-                    type: "success",
-                    message: "Register successful. Please login.",
-                });
+                showSuccess("Register successful. Please login.");
             }
         } catch (err: unknown) {
             const error = err as AxiosError<{
@@ -63,15 +55,13 @@ export default function LoginPage() {
                 password?: string
             }>;
 
-            setAlert({
-                type: "error",
-                message:
-                    error.response?.data?.error
-                    || error.response?.data?.name
-                    || error.response?.data?.email
-                    || error.response?.data?.password
-                    || "Email or Password is incorrect."
-            });
+            showError(
+                error.response?.data?.error
+                || error.response?.data?.name
+                || error.response?.data?.email
+                || error.response?.data?.password
+                || "Email or Password is incorrect."
+            );
         }
     };
 
@@ -82,17 +72,6 @@ export default function LoginPage() {
 
     return (
         <>
-            {alert && (
-                <Snackbar
-                    open={true}
-                    autoHideDuration={5000}
-                    onClose={() => setAlert(null)}
-                >
-                    <Alert severity={alert.type} onClose={() => setAlert(null)}>
-                        {alert.message}
-                    </Alert>
-                </Snackbar>
-            )}
             <Card sx={{width: 400, borderRadius: 3, boxShadow: 3}}>
                 <CardContent>
                     <Typography variant="h5" textAlign="center" mb={2}>

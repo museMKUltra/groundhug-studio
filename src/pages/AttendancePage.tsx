@@ -1,6 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
 import {
-    Alert,
     Box,
     Button,
     Card,
@@ -10,11 +9,11 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    Snackbar,
     Stack,
     TextField,
     Typography,
 } from "@mui/material";
+import {useSnackbar} from "@/context/SnackbarContext.ts";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import {useLabels, useSessions, useSummary} from "@/features/attendance/hooks.ts";
@@ -54,6 +53,8 @@ export default function AttendancePage() {
         deleteLabel,
     } = useLabels();
 
+    const {showError} = useSnackbar();
+
     const [labelId, setLabelId] = useState<number | "">("");
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
@@ -62,20 +63,13 @@ export default function AttendancePage() {
 
     const [description, setDescription] = useState("");
 
-    // error handling
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
-
     const handleError = (err: unknown) => {
         const error = err as AxiosError<{
             error?: string
-            name?: string
-            email?: string
-            password?: string
         }>;
 
         console.error(error);
-        setError(error?.response?.data?.error || "Something went wrong");
+        showError(error?.response?.data?.error || "Something went wrong");
     };
 
     useEffect(() => {
@@ -306,19 +300,6 @@ export default function AttendancePage() {
                 </DialogActions>
             </Dialog>
 
-            {/* Error */}
-            <Snackbar open={!!error} autoHideDuration={4000} onClose={() => setError(null)}>
-                <Alert severity="error" onClose={() => setError(null)}>
-                    {error}
-                </Alert>
-            </Snackbar>
-
-            {/* Success */}
-            <Snackbar open={!!success} autoHideDuration={3000} onClose={() => setSuccess(null)}>
-                <Alert severity="success" onClose={() => setSuccess(null)}>
-                    {success}
-                </Alert>
-            </Snackbar>
         </Stack>
     );
 }
