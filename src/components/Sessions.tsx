@@ -168,6 +168,7 @@ export default function Sessions() {
 
                                         const top = (startMin / 1440) * 100;
                                         const height = Math.max(((endMin - startMin) / 1440) * 100, 1);
+                                        const color = s?.label?.color || 'white';
 
                                         return (
                                             <Box
@@ -179,7 +180,7 @@ export default function Sessions() {
                                                     right: 4,
                                                     top: `${top}%`,
                                                     height: `${height}%`,
-                                                    bgcolor: s?.label?.color || "primary.main",
+                                                    bgcolor: color,
                                                     borderRadius: 1,
                                                     opacity: 0.8,
                                                     cursor: "pointer",
