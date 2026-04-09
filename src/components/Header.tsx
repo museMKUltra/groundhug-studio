@@ -29,7 +29,7 @@ import type {AxiosError} from "axios";
 export default function Header() {
     const {logout, user, hourlyRate, setMe, updateUser, setHourlyRate} = useAuth();
     const navigate = useNavigate();
-    const {showError} = useSnackbar();
+    const {showError, showSuccess} = useSnackbar();
 
     // menu state
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -78,16 +78,18 @@ export default function Header() {
 
     const handleSaveSettings = async () => {
         try {
-            if (name !== user?.name) {
-                await update(name);
-                updateUser({name});
-            }
+            const trimmedName = name.trim();
+            const nameChanged = trimmedName && trimmedName !== user?.name;
+            const rateChanged = rate !== hourlyRate;
 
-            if (rate !== hourlyRate) {
-                await createEmployeeRate(rate);
-                setHourlyRate(rate);
-            }
+            await Promise.all([
+                nameChanged ? update(trimmedName).then(() => updateUser({name: trimmedName})) : Promise.resolve(),
+                rateChanged ? createEmployeeRate(rate).then(() => setHourlyRate(rate)) : Promise.resolve(),
+            ]);
 
+            if (nameChanged || rateChanged) {
+                showSuccess("Settings saved");
+            }
             setOpenDialog(false);
         } catch (err: unknown) {
             const error = err as AxiosError<{
