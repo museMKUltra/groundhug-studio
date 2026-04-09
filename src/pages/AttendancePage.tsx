@@ -89,17 +89,23 @@ export default function AttendancePage() {
         return () => clearInterval(timer);
     }, []);
 
-    const getClockInAndOutRequest = (): ClockInAndOutRequest | null => {
-        const request = {} as ClockInAndOutRequest;
-        if (labelId) request.labelId = labelId;
-        if (description.trim()) request.description = description;
-        return Object.keys(request).length > 0 ? request : null;
+    const getClockInAndOutRequest = (): ClockInAndOutRequest => {
+        const request = {
+            labelId,
+        } as ClockInAndOutRequest;
+
+        const trimmedDescription = description.trim();
+        if (trimmedDescription) {
+            request.description = trimmedDescription;
+        }
+
+        return request;
     };
 
     const handleClockIn = async () => {
         try {
             const request = getClockInAndOutRequest();
-            await (request ? clockIn(request) : clockIn());
+            await clockIn(request);
             showSuccess("Clock in successful");
         } catch (e) {
             handleError(e);
@@ -109,7 +115,7 @@ export default function AttendancePage() {
     const handleClockOut = async () => {
         try {
             const request = getClockInAndOutRequest();
-            await (request ? clockOut(request) : clockOut());
+            await clockOut(request);
             showSuccess("Clock out successful");
             goToday();
             updatePeriodSessions();
