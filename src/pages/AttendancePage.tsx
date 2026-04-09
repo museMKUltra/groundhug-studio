@@ -175,7 +175,7 @@ export default function AttendancePage() {
                     <Stack spacing={1}>
                         <Typography variant="h6">Today's Process</Typography>
                         <Typography>
-                            Date: {today()}
+                            From: {today()}
                         </Typography>
                         <Typography>
                             Hours: <Box component="span" fontWeight="bold">{todayHours}</Box> / {todayMostHours}h
