@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {Box, Button, IconButton, Typography} from "@mui/material";
+import {Box, Button, IconButton, Tooltip, Typography} from "@mui/material";
 import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -54,7 +54,6 @@ export default function Sessions({onRefresh}: Props) {
         updatePeriodSessions();
     }, [weekStart]);
 
-    // dialog
     const [selected, setSelected] = useState<Session | null>(null);
 
     const handleOpenDialog = (s: Session) => {
@@ -175,21 +174,66 @@ export default function Sessions({onRefresh}: Props) {
                                         const color = s?.label?.color || 'white';
 
                                         return (
-                                            <Box
+                                            <Tooltip
                                                 key={`${s.id}-${start.toISOString()}`}
-                                                onClick={() => handleOpenDialog(s)}
-                                                sx={{
-                                                    position: "absolute",
-                                                    left: 4,
-                                                    right: 4,
-                                                    top: `${top}%`,
-                                                    height: `${height}%`,
-                                                    bgcolor: color,
-                                                    borderRadius: 1,
-                                                    opacity: 0.8,
-                                                    cursor: "pointer",
-                                                }}
-                                            />
+                                                placement="top"
+                                                arrow
+                                                enterDelay={300}
+                                                title={
+                                                    <Box>
+                                                        <Typography variant="caption" fontWeight={600}>
+                                                            {start.format("HH:mm")} - {end.format("HH:mm")}
+                                                        </Typography>
+
+                                                        {s.label && (
+                                                            <Typography
+                                                                variant="caption"
+                                                                display="block"
+                                                                sx={{opacity: 0.8}}
+                                                            >
+                                                                Label: {s.label.name}
+                                                            </Typography>
+                                                        )}
+
+                                                        {s.description && (
+                                                            <Typography
+                                                                variant="caption"
+                                                                display="block"
+                                                                sx={{
+                                                                    maxWidth: 200,
+                                                                    display: "-webkit-box",
+                                                                    WebkitLineClamp: 2,
+                                                                    WebkitBoxOrient: "vertical",
+                                                                    overflow: "hidden",
+                                                                    textOverflow: "ellipsis",
+                                                                    opacity: 0.7
+                                                                }}
+                                                            >
+                                                                {s.description}
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                }
+                                            >
+                                                <Box
+                                                    onClick={() => handleOpenDialog(s)}
+                                                    sx={{
+                                                        position: "absolute",
+                                                        left: 4,
+                                                        right: 4,
+                                                        top: `${top}%`,
+                                                        height: `${height}%`,
+                                                        bgcolor: color,
+                                                        borderRadius: 1,
+                                                        opacity: 0.85,
+                                                        cursor: "pointer",
+                                                        transition: "0.2s",
+                                                        '&:hover': {
+                                                            opacity: 1,
+                                                        }
+                                                    }}
+                                                />
+                                            </Tooltip>
                                         );
                                     })}
                                 </Box>
