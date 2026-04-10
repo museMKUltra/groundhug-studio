@@ -245,6 +245,7 @@ export default function Sessions({onRefresh}: Props) {
 
             {/* EDIT DIALOG */}
             <SessionDialog
+                key={selected?.id ?? 0}
                 session={selected}
                 onClose={() => setSelected(null)}
                 onSave={(session, needRefresh) => {

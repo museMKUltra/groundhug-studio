@@ -1,11 +1,21 @@
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Stack,
+    TextField
+} from "@mui/material";
 import dayjs from "dayjs";
-import {useRef, useState} from "react";
+import {useMemo, useState} from "react";
 import type {AxiosError} from "axios";
+
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {Label, Session as UpdatedSession, UpdateSessionRequest} from "@/features/attendance/types";
 import {useSessions} from "@/features/attendance/hooks.ts";
 import {useLabelContext} from "@/features/attendance/LabelContext";
+
 import LabelChip from "@/components/LabelChip.tsx";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
@@ -24,87 +34,96 @@ type Props = {
     onSave: (session: UpdatedSession, needRefresh: boolean) => void;
 };
 
+type FormState = {
+    clockIn: string;
+    clockOut: string;
+    labelId: number;
+    description: string;
+};
+
 export default function SessionDialog({session, onClose, onSave}: Props) {
-    const sessionLabel = session?.label || null;
-    const sessionLabelId = sessionLabel?.id || 0;
-    const sessionDescription = session?.description || "";
-    const sessionIn = session?.clockIn ? dayjs(session?.clockIn).format("YYYY-MM-DDTHH:mm") : "";
-    const sessionOut = session?.clockOut ? dayjs(session?.clockOut).format("YYYY-MM-DDTHH:mm") : "";
-
-    const editRef = useRef<Partial<{
-        clockIn: string;
-        clockOut: string;
-        labelId: number;
-        description: string;
-    }>>({});
-
-    const resetEdit = () => {
-        editRef.current = {};
-    }
-
     const {labels, createLabel, updateLabel, deleteLabel} = useLabelContext();
+    const {updateSession} = useSessions();
+    const {showError, showSuccess} = useSnackbar();
+
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
-    const isDeletedLabel = sessionLabel && !labels.some(l => l.id === sessionLabelId);
-    const labelsWithDeleted = isDeletedLabel ? [...labels, sessionLabel] : labels;
+    const initialForm = useMemo<FormState>(() => ({
+        clockIn: session?.clockIn
+            ? dayjs(session.clockIn).format("YYYY-MM-DDTHH:mm")
+            : "",
+        clockOut: session?.clockOut
+            ? dayjs(session.clockOut).format("YYYY-MM-DDTHH:mm")
+            : "",
+        labelId: session?.label?.id || 0,
+        description: session?.description || "",
+    }), [session]);
 
-    const {showError, showSuccess} = useSnackbar();
+    // ✅ controlled form
+    const [form, setForm] = useState<FormState>(initialForm);
+
+    const handleChange = <K extends keyof FormState>(key: K, value: FormState[K]) => {
+        setForm(prev => ({...prev, [key]: value}));
+    };
+
     const handleError = (err: unknown) => {
-        const error = err as AxiosError<{
-            error?: string
-        }>;
-
+        const error = err as AxiosError<{ error?: string }>;
         console.error(error);
         showError(error?.response?.data?.error || "Something went wrong");
     };
 
-    const {updateSession} = useSessions();
-
     const handleSave = async () => {
-        const {clockIn, clockOut, labelId, description} = editRef.current;
-        const request = {} as UpdateSessionRequest;
+        if (!session?.id) return;
 
-        if (clockIn !== undefined) {
-            request.clockIn = dayjs(clockIn).toISOString();
+        const request: UpdateSessionRequest = {};
+
+        // ✅ compute diff here
+        if (form.clockIn && form.clockIn !== initialForm.clockIn) {
+            request.clockIn = dayjs(form.clockIn).toISOString();
         }
 
-        if (clockOut !== undefined) {
-            request.clockOut = dayjs(clockOut).toISOString();
+        if (form.clockOut && form.clockOut !== initialForm.clockOut) {
+            request.clockOut = dayjs(form.clockOut).toISOString();
         }
 
-        if (labelId !== undefined) {
-            request.labelId = labelId;
+        if (form.labelId !== initialForm.labelId) {
+            request.labelId = form.labelId;
         }
 
-        if (description !== undefined) {
-            request.description = description;
+        if (form.description !== initialForm.description) {
+            request.description = form.description;
+        }
+
+        const hasChanged = Object.keys(request).length > 0;
+        if (!hasChanged) {
+            onClose();
+            return;
         }
 
         try {
-            const id = session?.id;
-            if (!id) {
-                return;
-            }
+            const updatedSession = await updateSession(session.id, request);
+            const needRefresh = Boolean(request.clockIn || request.clockOut);
 
-            const hasChanged = Object.keys(request).length > 0;
-            if (hasChanged) {
-                const updatedSession = await updateSession(id, request);
-                const needRefresh = Boolean(request.clockIn || request.clockOut);
-
-                onSave(updatedSession, needRefresh);
-                showSuccess("Session updated successfully");
-            }
-
-            resetEdit()
+            onSave(updatedSession, needRefresh);
+            showSuccess("Session updated successfully");
             onClose();
         } catch (error) {
-            console.error(error);
             handleError(error);
         }
-    }
+    };
+
+    const sessionLabel = session?.label || null;
+    const isDeletedLabel =
+        sessionLabel && !labels.some(l => l.id === sessionLabel.id);
+    const labelsWithDeleted = isDeletedLabel
+        ? [...labels, sessionLabel]
+        : labels;
 
     return (
-        <Dialog key={session?.id ?? 0} open={!!session} onClose={onClose}>
+        <Dialog
+            open={!!session}
+            onClose={onClose}
+        >
             <DialogTitle>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <span>Session</span>
@@ -118,10 +137,8 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     type="datetime-local"
                     fullWidth
                     margin="normal"
-                    defaultValue={sessionIn}
-                    onChange={(e) => {
-                        editRef.current.clockIn = e.target.value;
-                    }}
+                    value={form.clockIn}
+                    onChange={(e) => handleChange("clockIn", e.target.value)}
                 />
 
                 <TextField
@@ -129,18 +146,14 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     type="datetime-local"
                     fullWidth
                     margin="normal"
-                    defaultValue={sessionOut}
-                    onChange={(e) => {
-                        editRef.current.clockOut = e.target.value;
-                    }}
+                    value={form.clockOut}
+                    onChange={(e) => handleChange("clockOut", e.target.value)}
                 />
 
                 <LabelSelect
                     labels={labelsWithDeleted}
-                    defaultValue={sessionLabelId}
-                    onChange={(val) => {
-                        editRef.current.labelId = val;
-                    }}
+                    value={form.labelId}
+                    onChange={(val) => handleChange("labelId", val)}
                     onManage={() => setOpenLabelDialog(true)}
                 />
 
@@ -159,10 +172,8 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     label="Description"
                     fullWidth
                     margin="normal"
-                    defaultValue={sessionDescription}
-                    onChange={(e) => {
-                        editRef.current.description = e.target.value;
-                    }}
+                    value={form.description}
+                    onChange={(e) => handleChange("description", e.target.value)}
                     multiline
                     minRows={2}
                 />
@@ -170,7 +181,9 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
 
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
-                <Button variant="contained" onClick={handleSave}>Save</Button>
+                <Button variant="contained" onClick={handleSave}>
+                    Save
+                </Button>
             </DialogActions>
         </Dialog>
     );
