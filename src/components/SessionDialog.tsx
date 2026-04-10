@@ -38,6 +38,10 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         description: string;
     }>>({});
 
+    const resetEdit = () => {
+        editRef.current = {};
+    }
+
     const {labels, createLabel, updateLabel, deleteLabel} = useLabelContext();
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
@@ -82,9 +86,13 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                 return;
             }
 
-            const updatedSession = await updateSession(id, request);
+            const hasChanged = Object.keys(request).length > 0;
+            if (hasChanged) {
+                const updatedSession = await updateSession(id, request);
+                onSave(updatedSession);
+            }
 
-            onSave(updatedSession);
+            resetEdit()
             onClose();
         } catch (error) {
             console.error(error);
