@@ -90,6 +90,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             if (hasChanged) {
                 const updatedSession = await updateSession(id, request);
                 onSave(updatedSession);
+                showSuccess("Session updated successfully");
             }
 
             resetEdit()
