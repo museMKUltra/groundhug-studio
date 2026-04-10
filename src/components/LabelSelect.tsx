@@ -1,5 +1,5 @@
-import {ListItemIcon, ListItemText, MenuItem, TextField} from "@mui/material";
-import BorderColorIcon from '@mui/icons-material/BorderColor';
+import {IconButton, MenuItem, Stack, TextField} from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
 import type {Label} from "./LabelChip";
 import LabelChip from "./LabelChip";
 
@@ -13,45 +13,33 @@ type Props = {
 
 export default function LabelSelect({labels, value, defaultValue = 0, onChange, onManage}: Props) {
     return (
-        <TextField
-            select
-            label="Label"
-            value={value}
-            defaultValue={defaultValue}
-            onChange={(e) => {
-                const val = e.target.value;
-
-                if (val === "manage") {
-                    onManage?.();
-                    return;
-                }
-
-                onChange(Number(val));
-            }}
-            fullWidth
-        >
-            <MenuItem value="0">
-                <em>
-                    <LabelChip label={{id: 0, name: "None", color: "#ffffff"}}/>
-                </em>
-            </MenuItem>
-
-            {labels.map((label) => (
-                <MenuItem key={label.id} value={label.id}>
-                    <LabelChip label={label}/>
+        <Stack direction="row" spacing={1} alignItems="center">
+            <TextField
+                select
+                label="Label"
+                value={value}
+                defaultValue={defaultValue}
+                onChange={(e) => onChange(Number(e.target.value))}
+                fullWidth
+            >
+                <MenuItem value={0}>
+                    <em>
+                        <LabelChip label={{id: 0, name: "None", color: "#ffffff"}}/>
+                    </em>
                 </MenuItem>
-            ))}
+
+                {labels.map((label) => (
+                    <MenuItem key={label.id} value={label.id}>
+                        <LabelChip label={label}/>
+                    </MenuItem>
+                ))}
+            </TextField>
 
             {onManage && (
-                <MenuItem value="manage">
-                    <ListItemIcon>
-                        <BorderColorIcon fontSize="small"/>
-                    </ListItemIcon>
-                    <ListItemText>
-                        Manage Labels
-                    </ListItemText>
-                </MenuItem>
+                <IconButton size="small" onClick={onManage}>
+                    <EditIcon fontSize="small"/>
+                </IconButton>
             )}
-        </TextField>
+        </Stack>
     );
 }
