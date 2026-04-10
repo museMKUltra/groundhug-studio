@@ -6,6 +6,7 @@ import AttendancePage from "@/pages/AttendancePage";
 import MainLayout from "@/layouts/MainLayout.tsx";
 import AuthLayout from "@/layouts/AuthLayout.tsx";
 import {SessionProvider} from "@/features/attendance/SessionProvider";
+import {LabelProvider} from "@/features/attendance/LabelProvider";
 
 export default function AppRoutes() {
     return (
@@ -25,9 +26,11 @@ export default function AppRoutes() {
                 element={
                     <ProtectedRoute>
                         <MainLayout>
-                            <SessionProvider>
-                                <AttendancePage/>
-                            </SessionProvider>
+                            <LabelProvider>
+                                <SessionProvider>
+                                    <AttendancePage/>
+                                </SessionProvider>
+                            </LabelProvider>
                         </MainLayout>
                     </ProtectedRoute>
                 }

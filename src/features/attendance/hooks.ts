@@ -1,18 +1,15 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {
     clockInApi,
     clockOutApi,
     confirmWorkSummaryApi,
     createEmployeeRateApi,
-    createLabelApi,
-    deleteLabelApi,
     getActiveSessionApi,
-    getLabelsApi,
     getPeriodSessionsApi,
     getWorkSummaryPreviewApi,
-    updateLabelApi, updateSessionApi,
+    updateSessionApi,
 } from "./api.ts";
-import type {ClockInAndOutRequest, CreateLabelRequest, Label, Session, Summary, UpdateSessionRequest} from "./types";
+import type {ClockInAndOutRequest, Session, Summary, UpdateSessionRequest} from "./types";
 
 export const useSessions = () => {
     const [loading, setLoading] = useState(false);
@@ -107,58 +104,6 @@ export const useSummary = () => {
         monthSummary,
         confirmWorkSummary,
         previewSummary,
-    };
-};
-
-export const useLabels = () => {
-    const [labels, setLabels] = useState<Label[]>([]);
-    const [loading, setLoading] = useState(false);
-
-    const fetchLabels = async () => {
-        setLoading(true);
-        try {
-            const data = await getLabelsApi();
-            setLabels(data);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const createLabel = async (data: CreateLabelRequest) => {
-        const newLabel = await createLabelApi({
-            name: data.name,
-            color: data.color,
-        });
-
-        setLabels((prev) => [...prev, newLabel]);
-    };
-
-    const updateLabel = async (id: number, updated: Label) => {
-        const res = await updateLabelApi(id, {
-            name: updated.name,
-            color: updated.color,
-        });
-
-        setLabels((prev) =>
-            prev.map((l) => (l.id === id ? res : l))
-        );
-    };
-
-    const deleteLabel = async (id: number) => {
-        await deleteLabelApi(id);
-        setLabels((prev) => prev.filter((l) => l.id !== id));
-    };
-
-    useEffect(() => {
-        fetchLabels();
-    }, []);
-
-    return {
-        labels,
-        loading,
-        createLabel,
-        updateLabel,
-        deleteLabel,
     };
 };
 

@@ -16,7 +16,8 @@ import {
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
-import {useLabels, useSessions, useSummary} from "@/features/attendance/hooks.ts";
+import {useSessions, useSummary} from "@/features/attendance/hooks.ts";
+import {useLabelContext} from "@/features/attendance/LabelContext";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
 import Sessions from "@/components/Sessions.tsx";
@@ -46,12 +47,7 @@ export default function AttendancePage() {
         previewSummary,
     } = useSummary();
 
-    const {
-        labels,
-        createLabel,
-        updateLabel,
-        deleteLabel,
-    } = useLabels();
+    const {labels, createLabel, updateLabel, deleteLabel} = useLabelContext();
 
     const {showError, showSuccess} = useSnackbar();
 

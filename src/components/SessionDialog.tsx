@@ -4,7 +4,8 @@ import {useRef, useState} from "react";
 import type {AxiosError} from "axios";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {Label, Session as UpdatedSession, UpdateSessionRequest} from "@/features/attendance/types";
-import {useLabels, useSessions} from "@/features/attendance/hooks.ts";
+import {useSessions} from "@/features/attendance/hooks.ts";
+import {useLabelContext} from "@/features/attendance/LabelContext";
 import LabelChip from "@/components/LabelChip.tsx";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
@@ -37,12 +38,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         description: string;
     }>>({});
 
-    const {
-        labels,
-        createLabel,
-        updateLabel,
-        deleteLabel,
-    } = useLabels();
+    const {labels, createLabel, updateLabel, deleteLabel} = useLabelContext();
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
     const isDeletedLabel = sessionLabel && !labels.some(l => l.id === sessionLabelId);
