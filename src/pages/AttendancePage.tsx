@@ -200,7 +200,7 @@ export default function AttendancePage() {
                     <Card>
                         <CardContent>
                             <Stack spacing={2}>
-                                <Sessions/>
+                                <Sessions onRefresh={handleActiveSession}/>
                             </Stack>
                         </CardContent>
                     </Card>

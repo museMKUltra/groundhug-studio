@@ -15,7 +15,11 @@ type Session = {
     label: Label | null;
 };
 
-export default function Sessions() {
+type Props = {
+    onRefresh: () => void;
+};
+
+export default function Sessions({onRefresh}: Props) {
     const {
         periodSessions,
         updatePeriodSessions,
@@ -199,7 +203,12 @@ export default function Sessions() {
             <SessionDialog
                 session={selected}
                 onClose={() => setSelected(null)}
-                onSave={updateSession}
+                onSave={(session, needRefresh) => {
+                    updateSession(session);
+                    if (needRefresh) {
+                        onRefresh();
+                    }
+                }}
             />
         </>
     );

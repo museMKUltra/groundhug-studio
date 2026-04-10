@@ -21,7 +21,7 @@ type Session = {
 type Props = {
     session: Session | null;
     onClose: () => void;
-    onSave: (session: UpdatedSession) => void;
+    onSave: (session: UpdatedSession, needRefresh: boolean) => void;
 };
 
 export default function SessionDialog({session, onClose, onSave}: Props) {
@@ -89,7 +89,9 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             const hasChanged = Object.keys(request).length > 0;
             if (hasChanged) {
                 const updatedSession = await updateSession(id, request);
-                onSave(updatedSession);
+                const needRefresh = Boolean(request.clockIn || request.clockOut);
+
+                onSave(updatedSession, needRefresh);
                 showSuccess("Session updated successfully");
             }
 
