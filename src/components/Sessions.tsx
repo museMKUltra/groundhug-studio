@@ -4,6 +4,7 @@ import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {useSessionContext} from "@/features/attendance/SessionContext";
+import {useLabelContext} from "@/features/attendance/LabelContext";
 import SessionDialog from "@/components/SessionDialog";
 import type {Label} from "@/features/attendance/types";
 
@@ -31,6 +32,7 @@ export default function Sessions({onRefresh}: Props) {
         nextWeek,
         goToday
     } = useSessionContext();
+    const {labels} = useLabelContext();
 
     const endDate = useMemo(
         () => weekStart.add(7, "day"),
@@ -171,7 +173,8 @@ export default function Sessions({onRefresh}: Props) {
 
                                         const top = (startMin / 1440) * 100;
                                         const height = Math.max(((endMin - startMin) / 1440) * 100, 1);
-                                        const color = s?.label?.color || 'white';
+                                        const labelId = s?.label?.id;
+                                        const color = labelId && labels.find(l => l.id === labelId)?.color
 
                                         return (
                                             <Tooltip
@@ -223,7 +226,7 @@ export default function Sessions({onRefresh}: Props) {
                                                         right: 4,
                                                         top: `${top}%`,
                                                         height: `${height}%`,
-                                                        bgcolor: color,
+                                                        bgcolor: color || 'white',
                                                         borderRadius: 1,
                                                         opacity: 0.85,
                                                         cursor: "pointer",

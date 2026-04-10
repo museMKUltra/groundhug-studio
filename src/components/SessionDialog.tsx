@@ -118,6 +118,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
     const labelsWithDeleted = isDeletedLabel
         ? [...labels, sessionLabel]
         : labels;
+    const chipLabel = isDeletedLabel ? sessionLabel: labels.find(l => l.id === sessionLabel?.id);
 
     return (
         <Dialog
@@ -127,7 +128,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             <DialogTitle>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <span>Session</span>
-                    {sessionLabel && <LabelChip label={sessionLabel}/>}
+                    {chipLabel && <LabelChip label={chipLabel}/>}
                 </Stack>
             </DialogTitle>
 
