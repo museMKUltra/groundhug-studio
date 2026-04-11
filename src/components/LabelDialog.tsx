@@ -40,6 +40,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
             id: 0, // temporary
             name: "",
             color: "#1976d2",
+            isGlobal: false,
         });
     };
 
@@ -101,81 +102,89 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                         const current = isEditing && draft ? draft : label;
 
                         return (
-                            <Box key={label.id} display="flex" alignItems="center" gap={1}>
-                                <Box sx={{flex: 1}}>
-                                    <LabelChip label={current}/>
-                                </Box>
+                            label.isGlobal
+                                ? (
+                                    <Box key={label.id}>
+                                        <LabelChip label={current}/>
+                                    </Box>
+                                )
+                                : (
+                                    <Box key={label.id} display="flex" alignItems="center" gap={1}>
+                                        <Box sx={{flex: 1}}>
+                                            <LabelChip label={current}/>
+                                        </Box>
 
-                                <TextField
-                                    value={current.name}
-                                    size="small"
-                                    disabled={!isEditing || isDeleting}
-                                    onChange={(e) =>
-                                        setDraft((prev) =>
-                                            prev ? {...prev, name: e.target.value} : prev
-                                        )
-                                    }
-                                    sx={{maxWidth: 220}}
-                                />
+                                        <TextField
+                                            value={current.name}
+                                            size="small"
+                                            disabled={!isEditing || isDeleting}
+                                            onChange={(e) =>
+                                                setDraft((prev) =>
+                                                    prev ? {...prev, name: e.target.value} : prev
+                                                )
+                                            }
+                                            sx={{maxWidth: 220}}
+                                        />
 
-                                <input
-                                    type="color"
-                                    value={current.color}
-                                    disabled={!isEditing || isDeleting}
-                                    onChange={(e) =>
-                                        setDraft((prev) =>
-                                            prev ? {...prev, color: e.target.value} : prev
-                                        )
-                                    }
-                                    style={{
-                                        width: 40,
-                                        height: 40,
-                                        border: "none",
-                                        background: "none",
-                                        cursor: isEditing && !isDeleting ? "pointer" : "not-allowed",
-                                    }}
-                                />
+                                        <input
+                                            type="color"
+                                            value={current.color}
+                                            disabled={!isEditing || isDeleting}
+                                            onChange={(e) =>
+                                                setDraft((prev) =>
+                                                    prev ? {...prev, color: e.target.value} : prev
+                                                )
+                                            }
+                                            style={{
+                                                width: 40,
+                                                height: 40,
+                                                border: "none",
+                                                background: "none",
+                                                cursor: isEditing && !isDeleting ? "pointer" : "not-allowed",
+                                            }}
+                                        />
 
-                                {isEditing ? (
-                                    <>
-                                        <Button
-                                            disabled={loading}
-                                            size="small"
-                                            variant="contained"
-                                            color={isDeleting ? "error" : "primary"}
-                                            onClick={confirmEdit}
-                                        >
-                                            Save
-                                        </Button>
-                                        <Button
-                                            disabled={loading}
-                                            size="small"
-                                            color={isDeleting ? "error" : "primary"}
-                                            onClick={cancelEdit}
-                                        >
-                                            Cancel
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Button
-                                            disabled={loading}
-                                            size="small"
-                                            onClick={() => startEdit(label)}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            disabled={loading}
-                                            size="small"
-                                            color="error"
-                                            onClick={() => startDelete(label)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </>
-                                )}
-                            </Box>
+                                        {isEditing ? (
+                                            <>
+                                                <Button
+                                                    disabled={loading}
+                                                    size="small"
+                                                    variant="contained"
+                                                    color={isDeleting ? "error" : "primary"}
+                                                    onClick={confirmEdit}
+                                                >
+                                                    Save
+                                                </Button>
+                                                <Button
+                                                    disabled={loading}
+                                                    size="small"
+                                                    color={isDeleting ? "error" : "primary"}
+                                                    onClick={cancelEdit}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    disabled={loading}
+                                                    size="small"
+                                                    onClick={() => startEdit(label)}
+                                                >
+                                                    Edit
+                                                </Button>
+                                                <Button
+                                                    disabled={loading}
+                                                    size="small"
+                                                    color="error"
+                                                    onClick={() => startDelete(label)}
+                                                >
+                                                    Delete
+                                                </Button>
+                                            </>
+                                        )}
+                                    </Box>
+                                )
                         );
                     })}
 
