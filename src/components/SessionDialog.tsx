@@ -102,7 +102,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
 
         try {
             const updatedSession = await updateSession(session.id, request);
-            const needRefresh = Boolean(request.clockIn || request.clockOut);
+            const needRefresh = Boolean(request.clockIn || request.clockOut || request.labelId !== undefined);
 
             onSave(updatedSession, needRefresh);
             showSuccess("Session updated successfully");
