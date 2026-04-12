@@ -11,7 +11,7 @@ export const SessionProvider = ({children}: { children: React.ReactNode }) => {
     const [periodSessions, setPeriodSessions] = useState<Session[]>([]);
     const [loading, setLoading] = useState(false);
 
-    const getMonday = (d = dayjs()) => d.startOf("week").add(1, "day");
+    const getMonday = (d = dayjs()) => d.add(-1, "day").startOf("week").add(1, "day");
     const formatDate = (d: dayjs.Dayjs) => d.format("YYYY-MM-DD");
     const [weekStart, setWeekStart] = useState(() => getMonday());
 
