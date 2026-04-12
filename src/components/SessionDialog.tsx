@@ -11,6 +11,7 @@ import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {Session, UpdateSessionRequest} from "@/features/attendance/types";
 import {useSessions} from "@/features/attendance/hooks.ts";
 import {useLabelContext} from "@/features/attendance/LabelContext";
+import {getDuration} from "@/utils/duration";
 
 import LabelChip from "@/components/LabelChip.tsx";
 import LabelSelect from "@/components/LabelSelect.tsx";
@@ -29,15 +30,6 @@ type FormState = {
     labelId: number;
     description: string;
 };
-
-function getDuration(clockIn: string, clockOut: string) {
-    if (!clockIn || !clockOut) return "--";
-    const start = dayjs(clockIn);
-    const diff = dayjs(clockOut).diff(start);
-    const duration = dayjs.duration(diff);
-    const hours = duration.days() * 24 + duration.hours();
-    return `${hours}h ${duration.minutes()}m`;
-}
 
 export default function SessionDialog({session, onClose, onSave}: Props) {
     const {labels, createLabel, updateLabel, deleteLabel} = useLabelContext();
@@ -160,12 +152,12 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
 
     const sessionDuration = useMemo(() => {
         const {clockIn, clockOut} = session || {};
-        return getDuration(clockIn || "", clockOut || "");
+        return getDuration({clockIn: clockIn || "", clockOut: clockOut || ""});
     }, [session]);
 
     const formDuration = useMemo(() => {
         const {clockIn, clockOut} = form;
-        return getDuration(clockIn, clockOut);
+        return getDuration({clockIn, clockOut});
     }, [form]);
 
     return (
