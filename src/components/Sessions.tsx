@@ -171,7 +171,7 @@ export default function Sessions({onRefresh}: Props) {
                                         return (
                                             <Tooltip
                                                 key={`${s.id}-${start.toISOString()}`}
-                                                placement="top"
+                                                placement="left"
                                                 arrow
                                                 enterDelay={300}
                                                 title={
