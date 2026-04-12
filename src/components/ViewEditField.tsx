@@ -1,3 +1,4 @@
+import type {TextFieldProps} from "@mui/material";
 import {Box, TextField, Typography} from "@mui/material";
 
 type ViewEditFieldProps = {
@@ -12,6 +13,7 @@ type ViewEditFieldProps = {
     minRows?: number;
     renderView?: (value: string) => React.ReactNode;
     renderEdit?: (value: string) => React.ReactNode;
+    slotProps?: TextFieldProps["slotProps"];
 };
 
 export default function ViewEditField({
@@ -26,6 +28,7 @@ export default function ViewEditField({
                                           minRows,
                                           renderView,
                                           renderEdit,
+                                          slotProps,
                                       }: ViewEditFieldProps) {
     const highlight = isEditing && changed
         ? {backgroundColor: "rgba(255,255,0,0.08)", borderRadius: 1}
@@ -55,6 +58,7 @@ export default function ViewEditField({
         onChange={(e) => onChange?.(e.target.value)}
         multiline={multiline}
         minRows={minRows}
+        slotProps={slotProps}
     />;
 
     return (

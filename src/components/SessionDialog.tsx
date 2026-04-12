@@ -63,11 +63,32 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         labelId: form.labelId !== initialForm.labelId,
         description: form.description !== initialForm.description,
     };
-
     const hasChanged = Object.values(changed).some(Boolean);
+
+    const isSameMonth = (a: string, b: string) => {
+        return dayjs(a).isSame(dayjs(b), "month");
+    };
+
+    const isClockOutValid = (clockIn: string, clockOut: string) => {
+        return dayjs(clockOut).isAfter(dayjs(clockIn));
+    };
 
     const handleSave = async () => {
         if (!session?.id) return;
+
+        if (changed.clockIn && form.clockIn && session.clockIn) {
+            if (!isSameMonth(form.clockIn, session.clockIn)) {
+                showError("Clock In must stay within the same month");
+                return;
+            }
+        }
+
+        if (form.clockIn && form.clockOut) {
+            if (!isClockOutValid(form.clockIn, form.clockOut)) {
+                showError("Clock Out must be after Clock In");
+                return;
+            }
+        }
 
         const request: UpdateSessionRequest = {};
 
@@ -136,6 +157,12 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     changed={changed.clockIn}
                     size="small"
                     type="datetime-local"
+                    slotProps={{
+                        htmlInput: {
+                            min: dayjs(session?.clockIn).startOf("month").format("YYYY-MM-DDTHH:mm"),
+                            max: dayjs(session?.clockIn).endOf("month").format("YYYY-MM-DDTHH:mm"),
+                        }
+                    }}
                     onChange={(val) => handleChange("clockIn", val)}
                     renderView={(val) => (
                         <Typography sx={{lineHeight: "40px"}}>
@@ -151,6 +178,11 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     changed={changed.clockOut}
                     size="small"
                     type="datetime-local"
+                    slotProps={{
+                        htmlInput: {
+                            min: form.clockIn || undefined,
+                        }
+                    }}
                     onChange={(val) => handleChange("clockOut", val)}
                     renderView={(val) => (
                         <Typography sx={{lineHeight: "40px"}}>
