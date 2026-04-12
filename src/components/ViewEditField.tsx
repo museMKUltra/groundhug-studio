@@ -59,7 +59,7 @@ export default function ViewEditField({
         <Box
             sx={{
                 display: "grid",
-                gridTemplateColumns: "120px 1fr",
+                gridTemplateColumns: "120px 240px",
                 alignItems: "center",
                 px: 1,
                 py: 1,
