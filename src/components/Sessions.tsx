@@ -5,8 +5,9 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {useSessionContext} from "@/features/attendance/SessionContext";
 import {useLabelContext} from "@/features/attendance/LabelContext";
-import SessionDialog from "@/components/SessionDialog";
 import type {Session} from "@/features/attendance/types";
+import {getDuration} from "@/utils/duration";
+import SessionDialog from "@/components/SessionDialog";
 
 type Props = {
     onRefresh: () => void;
@@ -177,7 +178,10 @@ export default function Sessions({onRefresh}: Props) {
                                                 title={
                                                     <Box>
                                                         <Typography variant="caption" fontWeight={600}>
-                                                            {start.format("HH:mm")} - {end.format("HH:mm")}
+                                                            {start.format("HH:mm")} - {end.format("HH:mm")} ({getDuration({
+                                                            clockIn: s.clockIn,
+                                                            clockOut: s.clockOut || ""
+                                                        })})
                                                         </Typography>
 
                                                         {s.label && (
