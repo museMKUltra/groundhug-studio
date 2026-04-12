@@ -3,6 +3,10 @@ import dayjs from "dayjs";
 import {useMemo, useState} from "react";
 import type {AxiosError} from "axios";
 
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import CloseIcon from "@mui/icons-material/Close";
+
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {Session, UpdateSessionRequest} from "@/features/attendance/types";
 import {useSessions} from "@/features/attendance/hooks.ts";
@@ -130,6 +134,9 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
     };
 
     const handleCancelEdit = () => {
+        if (hasChanged) {
+            if (!window.confirm("Discard changes?")) return;
+        }
         setForm(initialForm);
         setIsEditing(false);
     };
@@ -145,11 +152,27 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
     return (
         <Dialog
             open={!!session}
-            onClose={onClose}
+            onClose={isEditing ? undefined : onClose}
         >
-            <DialogTitle>
-                <Stack direction="row" spacing={1} alignItems="center">
-                    <span>Session</span>
+            <DialogTitle sx={{pr: 1}}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                    <span>{isEditing ? "Edit Session" : "Session"}</span>
+
+                    <Stack direction="row" spacing={0.5}>
+                        {isEditing ? (
+                            <>
+                                <IconButton onClick={handleCancelEdit} size="small">
+                                    <CloseIcon/>
+                                </IconButton>
+                            </>
+                        ) : (
+                            <>
+                                <IconButton onClick={() => setIsEditing(true)} size="small">
+                                    <EditIcon/>
+                                </IconButton>
+                            </>
+                        )}
+                    </Stack>
                 </Stack>
             </DialogTitle>
 
@@ -236,25 +259,16 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             </DialogContent>
 
             <DialogActions>
-                {isEditing ? (
-                    <>
-                        <Button
-                            variant="contained"
-                            onClick={handleSave}
-                            disabled={!hasChanged || isLoading}
-                        >
-                            Save
-                        </Button>
-                        <Button onClick={handleCancelEdit}>Cancel</Button>
-                    </>
-                ) : (
-                    <>
-                        <Button variant="contained" onClick={() => setIsEditing(true)}>
-                            Edit
-                        </Button>
-                        <Button onClick={onClose}>Close</Button>
-                    </>
-                )}
+                {isEditing
+                    ? <Button
+                        variant="contained"
+                        onClick={handleSave}
+                        disabled={!hasChanged || isLoading}
+                    >
+                        Save
+                    </Button>
+                    : <Button onClick={onClose}>Close</Button>
+                }
             </DialogActions>
         </Dialog>
     );
