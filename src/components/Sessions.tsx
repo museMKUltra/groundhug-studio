@@ -190,7 +190,7 @@ export default function Sessions({onRefresh}: Props) {
                                                                 display="block"
                                                                 sx={{opacity: 0.8}}
                                                             >
-                                                                Label: {s.label.name}
+                                                                {s.label.name}
                                                             </Typography>
                                                         )}
 
