@@ -30,6 +30,15 @@ type FormState = {
     description: string;
 };
 
+function getDuration(clockIn: string, clockOut: string) {
+    if (!clockIn || !clockOut) return "--";
+    const start = dayjs(clockIn);
+    const diff = dayjs(clockOut).diff(start);
+    const duration = dayjs.duration(diff);
+    const hours = duration.days() * 24 + duration.hours();
+    return `${hours}h ${duration.minutes()}m`;
+}
+
 export default function SessionDialog({session, onClose, onSave}: Props) {
     const {labels, createLabel, updateLabel, deleteLabel} = useLabelContext();
     const {updateSession} = useSessions();
@@ -149,6 +158,16 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         : labels;
     const chipLabel = isDeletedLabel ? sessionLabel : labels.find(l => l.id === sessionLabel?.id);
 
+    const sessionDuration = useMemo(() => {
+        const {clockIn, clockOut} = session || {};
+        return getDuration(clockIn || "", clockOut || "");
+    }, [session]);
+
+    const formDuration = useMemo(() => {
+        const {clockIn, clockOut} = form;
+        return getDuration(clockIn, clockOut);
+    }, [form]);
+
     return (
         <Dialog
             open={!!session}
@@ -177,6 +196,24 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             </DialogTitle>
 
             <DialogContent sx={{pt: 2}}>
+                <ViewEditField
+                    label="Duration"
+                    value={""}
+                    isEditing={isEditing}
+                    size="small"
+                    renderEdit={() => (
+                        <Typography sx={{lineHeight: "40px"}}>
+                            {formDuration}
+                        </Typography>
+                    )}
+                    renderView={() => (
+                        <Typography sx={{lineHeight: "40px"}}>
+                            {sessionDuration}
+                        </Typography>
+                    )}
+                />
+
+
                 <ViewEditField
                     label="Clock In"
                     value={form.clockIn}
