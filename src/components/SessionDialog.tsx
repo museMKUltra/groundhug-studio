@@ -33,6 +33,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
 
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const initialForm = useMemo<FormState>(() => ({
         clockIn: session?.clockIn
@@ -114,6 +115,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         }
 
         try {
+            setIsLoading(true);
             const updatedSession = await updateSession(session.id, request);
             const needRefresh = Boolean(changed.clockIn || changed.clockOut || changed.labelId);
 
@@ -122,6 +124,8 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             setIsEditing(false);
         } catch (error) {
             handleError(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -234,7 +238,11 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             <DialogActions>
                 {isEditing ? (
                     <>
-                        <Button variant="contained" onClick={handleSave} disabled={!hasChanged}>
+                        <Button
+                            variant="contained"
+                            onClick={handleSave}
+                            disabled={!hasChanged || isLoading}
+                        >
                             Save
                         </Button>
                         <Button onClick={handleCancelEdit}>Cancel</Button>
