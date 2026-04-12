@@ -5,7 +5,6 @@ type ViewEditFieldProps = {
     label: string;
     value: string;
     isEditing: boolean;
-    changed?: boolean;
     onChange?: (val: string) => void;
     size?: "small" | "medium";
     type?: string;
@@ -20,7 +19,6 @@ export default function ViewEditField({
                                           label,
                                           value,
                                           isEditing,
-                                          changed,
                                           onChange,
                                           size,
                                           type = "text",
@@ -30,10 +28,6 @@ export default function ViewEditField({
                                           renderEdit,
                                           slotProps,
                                       }: ViewEditFieldProps) {
-    const highlight = isEditing && changed
-        ? {backgroundColor: "rgba(255,255,0,0.08)", borderRadius: 1}
-        : undefined;
-
     const viewElement = renderView
         ? (renderView(value))
         : (<Typography
@@ -74,7 +68,7 @@ export default function ViewEditField({
             <Typography variant="body2" color="text.secondary">
                 {label}
             </Typography>
-            {isEditing ? <Box sx={highlight}>{editElement}</Box> : viewElement}
+            {isEditing ? editElement : viewElement}
         </Box>
     );
 };

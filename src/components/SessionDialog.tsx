@@ -154,7 +154,6 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     label="Clock In"
                     value={form.clockIn}
                     isEditing={isEditing}
-                    changed={changed.clockIn}
                     size="small"
                     type="datetime-local"
                     slotProps={{
@@ -175,7 +174,6 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     label="Clock Out"
                     value={form.clockOut}
                     isEditing={isEditing}
-                    changed={changed.clockOut}
                     size="small"
                     type="datetime-local"
                     slotProps={{
@@ -196,7 +194,6 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     value={String(form.labelId)}
                     isEditing={isEditing}
                     size="small"
-                    changed={changed.labelId}
                     onChange={(val) => handleChange("labelId", Number(val))}
                     renderView={() =>
                         chipLabel ? <div><LabelChip label={chipLabel}/></div> : "--"
@@ -227,7 +224,6 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     label="Description"
                     value={form.description}
                     isEditing={isEditing}
-                    changed={changed.description}
                     size="small"
                     multiline
                     minRows={2}
