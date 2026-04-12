@@ -9,13 +9,16 @@ type Props = {
     defaultValue?: number;
     onChange: (value: number) => void;
     onManage?: () => void;
+    label?: string;
+    size?: "small" | "medium";
 };
 
-export default function LabelSelect({labels, value, defaultValue = 0, onChange, onManage}: Props) {
+export default function LabelSelect({labels, value, defaultValue = 0, onChange, onManage, label, size}: Props) {
     return (
         <TextField
             select
-            label="Label"
+            size={size}
+            label={label}
             value={value}
             defaultValue={defaultValue}
             onChange={(e) => {

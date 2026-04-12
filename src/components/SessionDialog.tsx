@@ -1,37 +1,22 @@
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Stack,
-    TextField
-} from "@mui/material";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography} from "@mui/material";
 import dayjs from "dayjs";
 import {useMemo, useState} from "react";
 import type {AxiosError} from "axios";
 
 import {useSnackbar} from "@/context/SnackbarContext.ts";
-import type {Label, Session as UpdatedSession, UpdateSessionRequest} from "@/features/attendance/types";
+import type {Session, UpdateSessionRequest} from "@/features/attendance/types";
 import {useSessions} from "@/features/attendance/hooks.ts";
 import {useLabelContext} from "@/features/attendance/LabelContext";
 
 import LabelChip from "@/components/LabelChip.tsx";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
-
-type Session = {
-    id: number;
-    clockIn: string;
-    clockOut: string;
-    description: string | null;
-    label: Label | null;
-};
+import ViewEditField from "@/components/ViewEditField.tsx";
 
 type Props = {
     session: Session | null;
     onClose: () => void;
-    onSave: (session: UpdatedSession, needRefresh: boolean) => void;
+    onSave: (session: Session, needRefresh: boolean) => void;
 };
 
 type FormState = {
@@ -47,6 +32,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
     const {showError, showSuccess} = useSnackbar();
 
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
 
     const initialForm = useMemo<FormState>(() => ({
         clockIn: session?.clockIn
@@ -59,7 +45,6 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         description: session?.description || "",
     }), [session]);
 
-    // ✅ controlled form
     const [form, setForm] = useState<FormState>(initialForm);
 
     const handleChange = <K extends keyof FormState>(key: K, value: FormState[K]) => {
@@ -72,44 +57,56 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         showError(error?.response?.data?.error || "Something went wrong");
     };
 
+    const changed = {
+        clockIn: form.clockIn !== initialForm.clockIn,
+        clockOut: form.clockOut !== initialForm.clockOut,
+        labelId: form.labelId !== initialForm.labelId,
+        description: form.description !== initialForm.description,
+    };
+
+    const hasChanged = Object.values(changed).some(Boolean);
+
     const handleSave = async () => {
         if (!session?.id) return;
 
         const request: UpdateSessionRequest = {};
 
-        // ✅ compute diff here
-        if (form.clockIn && form.clockIn !== initialForm.clockIn) {
+        if (changed.clockIn && form.clockIn) {
             request.clockIn = dayjs(form.clockIn).toISOString();
         }
 
-        if (form.clockOut && form.clockOut !== initialForm.clockOut) {
+        if (changed.clockOut && form.clockOut) {
             request.clockOut = dayjs(form.clockOut).toISOString();
         }
 
-        if (form.labelId !== initialForm.labelId) {
+        if (changed.labelId) {
             request.labelId = form.labelId;
         }
 
-        if (form.description !== initialForm.description) {
+        if (changed.description) {
             request.description = form.description;
         }
 
-        const hasChanged = Object.keys(request).length > 0;
         if (!hasChanged) {
-            onClose();
+            setIsEditing(false);
             return;
         }
 
         try {
             const updatedSession = await updateSession(session.id, request);
-            const needRefresh = Boolean(request.clockIn || request.clockOut || request.labelId !== undefined);
+            const needRefresh = Boolean(changed.clockIn || changed.clockOut || changed.labelId);
 
             onSave(updatedSession, needRefresh);
             showSuccess("Session updated successfully");
-            onClose();
+            setIsEditing(false);
         } catch (error) {
             handleError(error);
         }
+    };
+
+    const handleCancelEdit = () => {
+        setForm(initialForm);
+        setIsEditing(false);
     };
 
     const sessionLabel = session?.label || null;
@@ -118,7 +115,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
     const labelsWithDeleted = isDeletedLabel
         ? [...labels, sessionLabel]
         : labels;
-    const chipLabel = isDeletedLabel ? sessionLabel: labels.find(l => l.id === sessionLabel?.id);
+    const chipLabel = isDeletedLabel ? sessionLabel : labels.find(l => l.id === sessionLabel?.id);
 
     return (
         <Dialog
@@ -128,34 +125,59 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
             <DialogTitle>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <span>Session</span>
-                    {chipLabel && <LabelChip label={chipLabel}/>}
                 </Stack>
             </DialogTitle>
 
             <DialogContent sx={{pt: 2}}>
-                <TextField
+                <ViewEditField
                     label="Clock In"
-                    type="datetime-local"
-                    fullWidth
-                    margin="normal"
                     value={form.clockIn}
-                    onChange={(e) => handleChange("clockIn", e.target.value)}
-                />
-
-                <TextField
-                    label="Clock Out"
+                    isEditing={isEditing}
+                    changed={changed.clockIn}
+                    size="small"
                     type="datetime-local"
-                    fullWidth
-                    margin="normal"
-                    value={form.clockOut}
-                    onChange={(e) => handleChange("clockOut", e.target.value)}
+                    onChange={(val) => handleChange("clockIn", val)}
+                    renderView={(val) => (
+                        <Typography sx={{lineHeight: "40px"}}>
+                            {val ? dayjs(val).format("YYYY-MM-DD HH:mm") : "-"}
+                        </Typography>
+                    )}
                 />
 
-                <LabelSelect
-                    labels={labelsWithDeleted}
-                    value={form.labelId}
-                    onChange={(val) => handleChange("labelId", val)}
-                    onManage={() => setOpenLabelDialog(true)}
+                <ViewEditField
+                    label="Clock Out"
+                    value={form.clockOut}
+                    isEditing={isEditing}
+                    changed={changed.clockOut}
+                    size="small"
+                    type="datetime-local"
+                    onChange={(val) => handleChange("clockOut", val)}
+                    renderView={(val) => (
+                        <Typography sx={{lineHeight: "40px"}}>
+                            {val ? dayjs(val).format("YYYY-MM-DD HH:mm") : "-"}
+                        </Typography>
+                    )}
+                />
+
+                <ViewEditField
+                    label="Label"
+                    value={String(form.labelId)}
+                    isEditing={isEditing}
+                    size="small"
+                    changed={changed.labelId}
+                    onChange={(val) => handleChange("labelId", Number(val))}
+                    renderView={() =>
+                        chipLabel ? <div><LabelChip label={chipLabel}/></div> : "--"
+                    }
+                    renderEdit={() =>
+                        <LabelSelect
+                            size="small"
+                            labels={labelsWithDeleted}
+                            value={form.labelId}
+                            onChange={(val) => handleChange("labelId", val)}
+                            onManage={() => setOpenLabelDialog(true)}
+                        />
+                    }
                 />
 
                 <LabelDialog
@@ -169,22 +191,34 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     onSuccess={showSuccess}
                 />
 
-                <TextField
+                <ViewEditField
                     label="Description"
-                    fullWidth
-                    margin="normal"
                     value={form.description}
-                    onChange={(e) => handleChange("description", e.target.value)}
+                    isEditing={isEditing}
+                    changed={changed.description}
+                    size="small"
                     multiline
                     minRows={2}
+                    onChange={(val) => handleChange("description", val)}
                 />
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button variant="contained" onClick={handleSave}>
-                    Save
-                </Button>
+                {isEditing ? (
+                    <>
+                        <Button variant="contained" onClick={handleSave} disabled={!hasChanged}>
+                            Save
+                        </Button>
+                        <Button onClick={handleCancelEdit}>Cancel</Button>
+                    </>
+                ) : (
+                    <>
+                        <Button variant="contained" onClick={() => setIsEditing(true)}>
+                            Edit
+                        </Button>
+                        <Button onClick={onClose}>Close</Button>
+                    </>
+                )}
             </DialogActions>
         </Dialog>
     );

@@ -6,15 +6,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {useSessionContext} from "@/features/attendance/SessionContext";
 import {useLabelContext} from "@/features/attendance/LabelContext";
 import SessionDialog from "@/components/SessionDialog";
-import type {Label} from "@/features/attendance/types";
-
-type Session = {
-    id: number;
-    clockIn: string;
-    clockOut: string;
-    description: string | null;
-    label: Label | null;
-};
+import type {Session} from "@/features/attendance/types";
 
 type Props = {
     onRefresh: () => void;
@@ -253,6 +245,7 @@ export default function Sessions({onRefresh}: Props) {
                 onClose={() => setSelected(null)}
                 onSave={(session, needRefresh) => {
                     updateSession(session);
+                    setSelected(session);
                     if (needRefresh) {
                         onRefresh();
                     }
