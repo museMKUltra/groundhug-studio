@@ -1,33 +1,25 @@
-import {useEffect, useMemo, useState} from "react";
+import {useEffect, useState} from "react";
 import {
     Box,
     Button,
     Card,
     CardContent,
-    CircularProgress,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     Stack,
-    TextField,
     Typography,
 } from "@mui/material";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
-import type {ClockInAndOutRequest} from "@/features/attendance/types.ts";
 import {useSessions, useSummary} from "@/features/attendance/hooks.ts";
 import {useAuth} from "@/features/auth/hooks.ts";
-import {useSessionContext} from "@/features/attendance/SessionContext";
-import {useLabelContext} from "@/features/attendance/LabelContext";
-import {getDuration} from "@/utils/duration";
-import LabelSelect from "@/components/LabelSelect.tsx";
-import LabelDialog from "@/components/LabelDialog.tsx";
 import Sessions from "@/components/Sessions.tsx";
+import AttendanceCard from "@/components/AttendanceCard.tsx";
 
 export default function AttendancePage() {
-    const {goDay} = useSessionContext();
     const {user, hourlyRate} = useAuth();
     const {
         session,
@@ -44,23 +36,12 @@ export default function AttendancePage() {
         previewSummary,
     } = useSummary();
 
-    const {labels, createLabel, updateLabel, deleteLabel} = useLabelContext();
-
-    const {showError, showSuccess} = useSnackbar();
-
-    const [labelId, setLabelId] = useState<number>(0);
-    const [openLabelDialog, setOpenLabelDialog] = useState(false);
+    const {showError} = useSnackbar();
 
     const [open, setOpen] = useState(false);
-    const [now, setNow] = useState<number>(() => Date.now());
-
-    const [description, setDescription] = useState("");
 
     const handleError = (err: unknown) => {
-        const error = err as AxiosError<{
-            error?: string
-        }>;
-
+        const error = err as AxiosError<{ error?: string }>;
         console.error(error);
         showError(error?.response?.data?.error || "Something went wrong");
     };
@@ -77,49 +58,6 @@ export default function AttendancePage() {
         init();
     }, []);
 
-    useEffect(() => {
-        const timer = setInterval(() => setNow(Date.now()), 1000);
-        return () => clearInterval(timer);
-    }, []);
-
-    const getClockInAndOutRequest = (): ClockInAndOutRequest => {
-        const request = {
-            labelId,
-        } as ClockInAndOutRequest;
-
-        const trimmedDescription = description.trim();
-        if (trimmedDescription) {
-            request.description = trimmedDescription;
-        }
-
-        return request;
-    };
-
-    const handleClockIn = async () => {
-        try {
-            const request = getClockInAndOutRequest();
-            await clockIn(request);
-            showSuccess("Clock in successful");
-        } catch (e) {
-            handleError(e);
-        }
-    };
-
-    const handleClockOut = async () => {
-        try {
-            const request = getClockInAndOutRequest();
-            await clockOut(request);
-            showSuccess("Clock out successful");
-
-            const workDate = session?.workDate;
-            if (workDate) {
-                goDay(dayjs(workDate));
-            }
-        } catch (e) {
-            handleError(e);
-        }
-    };
-
     const handleOpenPreview = async () => {
         try {
             if (todaySummary === null) {
@@ -132,11 +70,6 @@ export default function AttendancePage() {
             handleError(e);
         }
     };
-
-    const durationText = useMemo(() => {
-        if (!session?.clockIn) return "-";
-        return getDuration({ clockIn: session.clockIn, clockOut: new Date(now).toISOString() }, true);
-    }, [session, now]);
 
     const formatCurrency = (value: number) =>
         new Intl.NumberFormat("zh-TW", {
@@ -151,7 +84,6 @@ export default function AttendancePage() {
     const todaySalary = formatCurrency(todayHours * hourlyRate);
     const todayMostSalary = formatCurrency(todayMostHours * hourlyRate);
 
-    const isActive = !!session;
     const userName = user?.name || "";
 
     function today() {
@@ -159,7 +91,6 @@ export default function AttendancePage() {
             return "";
         }
         const {year, month, date} = todaySummary;
-
         return dayjs(`${year}-${month}-${date}`).format("YYYY-MM-DD");
     }
 
@@ -203,58 +134,12 @@ export default function AttendancePage() {
                 <Box flex={1}>
                     <Stack spacing={3}>
                         {/* Attendance */}
-                        <Card>
-                            <CardContent>
-                                <Stack spacing={2}>
-                                    <Typography variant="h6">Attendance</Typography>
-
-                                    <Typography>
-                                        Clock In: {isActive ? dayjs(session.clockIn).format("HH:mm:ss") : "--"}
-                                    </Typography>
-
-                                    <Typography>
-                                        Duration: {isActive ? durationText : "--"}
-                                    </Typography>
-
-                                    <LabelSelect
-                                        labels={labels}
-                                        value={labelId}
-                                        onChange={setLabelId}
-                                        onManage={() => setOpenLabelDialog(true)}
-                                    />
-
-                                    <LabelDialog
-                                        open={openLabelDialog}
-                                        labels={labels}
-                                        onClose={() => setOpenLabelDialog(false)}
-                                        onCreate={createLabel}
-                                        onUpdate={updateLabel}
-                                        onDelete={deleteLabel}
-                                        onError={handleError}
-                                        onSuccess={showSuccess}
-                                    />
-
-                                    <TextField
-                                        label="Description"
-                                        value={description}
-                                        onChange={(e) => setDescription(e.target.value)}
-                                        fullWidth
-                                        multiline
-                                        minRows={2}
-                                    />
-
-                                    <Button
-                                        variant="contained"
-                                        color={isActive ? "secondary" : "primary"}
-                                        onClick={isActive ? handleClockOut : handleClockIn}
-                                        disabled={sessionLoading}
-                                    >
-                                        {sessionLoading && <CircularProgress size={20} sx={{mr: 1}}/>}
-                                        {isActive ? "Clock Out" : "Clock In"}
-                                    </Button>
-                                </Stack>
-                            </CardContent>
-                        </Card>
+                        <AttendanceCard
+                            session={session}
+                            sessionLoading={sessionLoading}
+                            clockIn={clockIn}
+                            clockOut={clockOut}
+                        />
 
                         {/* Monthly Preview */}
                         <Card>
