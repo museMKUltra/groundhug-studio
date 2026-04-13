@@ -5,22 +5,21 @@ dayjs.extend(duration);
 
 type Time = { clockIn: string, clockOut: string };
 
-export function getDuration(time: Time) {
+export function getDuration(time: Time, withSeconds: boolean = false) {
     const {clockIn, clockOut} = time;
-    if (!clockIn || !clockOut) {
-        return "--";
+    if (!clockIn || !clockOut) return "--";
+
+    const d = dayjs.duration(dayjs(clockOut).diff(dayjs(clockIn)));
+    const h = d.days() * 24 + d.hours();
+    const m = d.minutes();
+    const s = d.seconds();
+
+    if (withSeconds) {
+        if (h > 0) return `${h}h ${m}m ${s}s`;
+        if (m > 0) return `${m}m ${s}s`;
+        return `${s}s`;
     }
 
-    const start = dayjs(clockIn);
-    const diff = dayjs(clockOut).diff(start);
-    const duration = dayjs.duration(diff);
-    const hours = duration.days() * 24 + duration.hours();
-    const minutes = duration.minutes();
-    const hourText = `${hours}h`;
-    const minutesText = `${minutes}m`;
-
-    if (hours === 0) {
-        return `${minutesText}`;
-    }
-    return `${hourText} ${minutesText}`;
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
 }

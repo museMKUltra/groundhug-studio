@@ -15,19 +15,16 @@ import {
 } from "@mui/material";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
+import type {AxiosError} from "axios";
+import type {ClockInAndOutRequest} from "@/features/attendance/types.ts";
 import {useSessions, useSummary} from "@/features/attendance/hooks.ts";
+import {useAuth} from "@/features/auth/hooks.ts";
+import {useSessionContext} from "@/features/attendance/SessionContext";
 import {useLabelContext} from "@/features/attendance/LabelContext";
+import {getDuration} from "@/utils/duration";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
 import Sessions from "@/components/Sessions.tsx";
-import {useSessionContext} from "@/features/attendance/SessionContext";
-
-import type {AxiosError} from "axios";
-import type {ClockInAndOutRequest} from "@/features/attendance/types.ts";
-import {useAuth} from "@/features/auth/hooks.ts";
-
-dayjs.extend(duration);
 
 export default function AttendancePage() {
     const {goDay} = useSessionContext();
@@ -138,11 +135,7 @@ export default function AttendancePage() {
 
     const durationText = useMemo(() => {
         if (!session?.clockIn) return "-";
-        const start = dayjs(session.clockIn);
-        const diff = dayjs(now).diff(start);
-        const d = dayjs.duration(diff);
-        const hours = d.days() * 24 + d.hours();
-        return `${hours}h ${d.minutes()}m ${d.seconds()}s`;
+        return getDuration({ clockIn: session.clockIn, clockOut: new Date(now).toISOString() }, true);
     }, [session, now]);
 
     const formatCurrency = (value: number) =>
