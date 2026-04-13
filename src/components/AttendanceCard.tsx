@@ -1,13 +1,16 @@
 import {useEffect, useMemo, useState} from "react";
 import {
+    Box,
     Button,
     Card,
     CardContent,
     CircularProgress,
+    IconButton,
     Stack,
-    TextField,
     Typography,
 } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import CloseIcon from "@mui/icons-material/Close";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
 import type {ClockInAndOutRequest, Session} from "@/features/attendance/types.ts";
@@ -17,6 +20,8 @@ import {useSnackbar} from "@/context/SnackbarContext.ts";
 import {getDuration} from "@/utils/duration";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
+import LabelChip from "@/components/LabelChip.tsx";
+import ViewEditField from "@/components/ViewEditField.tsx";
 
 interface Props {
     session: Session | null;
@@ -34,6 +39,7 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
     const [description, setDescription] = useState("");
     const [now, setNow] = useState<number>(() => Date.now());
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => setNow(Date.now()), 1000);
@@ -41,6 +47,7 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
     }, []);
 
     const isActive = !!session;
+    const showEditMode = !isActive || isEditing;
 
     const durationText = useMemo(() => {
         return getDuration({clockIn: session?.clockIn || "", clockOut: new Date(now).toISOString()}, true);
@@ -83,11 +90,20 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
         }
     };
 
+    const selectedLabel = labels.find(l => l.id === labelId);
+
     return (
         <Card>
             <CardContent>
                 <Stack spacing={2}>
-                    <Typography variant="h6">Attendance</Typography>
+                    <Box display="flex" alignItems="center" justifyContent="space-between">
+                        <Typography variant="h6">Attendance</Typography>
+                        {isActive && (
+                            showEditMode
+                                ? <IconButton size="small" onClick={() => setIsEditing(false)}><CloseIcon fontSize="small"/></IconButton>
+                                : <IconButton size="small" onClick={() => setIsEditing(true)}><EditIcon fontSize="small"/></IconButton>
+                        )}
+                    </Box>
 
                     <Typography>
                         Clock In: {isActive ? dayjs(session!.clockIn).format("HH:mm:ss") : "--"}
@@ -97,29 +113,40 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
                         Duration: {isActive ? durationText : "--"}
                     </Typography>
 
-                    <LabelSelect
-                        labels={labels}
-                        value={labelId}
-                        onChange={setLabelId}
-                        onManage={() => setOpenLabelDialog(true)}
+                    <ViewEditField
+                        label="Label"
+                        value=""
+                        isEditing={showEditMode}
+                        renderView={() => selectedLabel ? <div><LabelChip label={selectedLabel}/></div> : undefined}
+                        renderEdit={() => (
+                            <>
+                                <LabelSelect
+                                    labels={labels}
+                                    size="small"
+                                    value={labelId}
+                                    onChange={setLabelId}
+                                    onManage={() => setOpenLabelDialog(true)}
+                                />
+                                <LabelDialog
+                                    open={openLabelDialog}
+                                    labels={labels}
+                                    onClose={() => setOpenLabelDialog(false)}
+                                    onCreate={createLabel}
+                                    onUpdate={updateLabel}
+                                    onDelete={deleteLabel}
+                                    onError={handleError}
+                                    onSuccess={showSuccess}
+                                />
+                            </>
+                        )}
                     />
 
-                    <LabelDialog
-                        open={openLabelDialog}
-                        labels={labels}
-                        onClose={() => setOpenLabelDialog(false)}
-                        onCreate={createLabel}
-                        onUpdate={updateLabel}
-                        onDelete={deleteLabel}
-                        onError={handleError}
-                        onSuccess={showSuccess}
-                    />
-
-                    <TextField
+                    <ViewEditField
                         label="Description"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        fullWidth
+                        size="small"
+                        isEditing={showEditMode}
+                        onChange={setDescription}
                         multiline
                         minRows={2}
                     />
@@ -128,7 +155,7 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
                         variant="contained"
                         color={isActive ? "secondary" : "primary"}
                         onClick={isActive ? handleClockOut : handleClockIn}
-                        disabled={sessionLoading}
+                        disabled={sessionLoading || (isActive && isEditing)}
                     >
                         {sessionLoading && <CircularProgress size={20} sx={{mr: 1}}/>}
                         {isActive ? "Clock Out" : "Clock In"}
