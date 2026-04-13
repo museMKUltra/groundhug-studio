@@ -17,8 +17,10 @@ export const useUsers = () => {
     const update = async (name: string) => {
         setLoading(true);
         try {
-            const data = await updateApi({name});
-            return data;
+            const {user, token} = await updateApi({name});
+            localStorage.setItem("access_token", token);
+
+            return user;
         } finally {
             setLoading(false);
         }

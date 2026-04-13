@@ -10,6 +10,11 @@ export interface UserResponse {
     email: string;
 }
 
+export interface UpdateUserResponse {
+    user: UserResponse;
+    token: string;
+}
+
 export interface UpdateRequest {
     name: string;
 }
