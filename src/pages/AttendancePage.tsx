@@ -28,6 +28,7 @@ export default function AttendancePage() {
         handleActiveSession,
         clockIn,
         clockOut,
+        updateSession,
     } = useSessions();
 
     const {
@@ -135,10 +136,12 @@ export default function AttendancePage() {
                     <Stack spacing={3}>
                         {/* Attendance */}
                         <AttendanceCard
+                            key={session?.id || 0}
                             session={session}
                             sessionLoading={sessionLoading}
                             clockIn={clockIn}
                             clockOut={clockOut}
+                            updateSession={updateSession}
                         />
 
                         {/* Monthly Preview */}
