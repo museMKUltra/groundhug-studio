@@ -53,7 +53,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
         });
     };
 
-    const resetEdit = () => {
+    const cancelEdit = () => {
         setEditingId(null);
         setDraft(null);
     };
@@ -70,12 +70,11 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                     color: draft.color,
                 });
                 onSuccess("Label created successfully");
-                resetEdit();
             } else {
                 await onUpdate(draft.id, draft);
                 onSuccess("Label updated successfully");
-                resetEdit();
             }
+            cancelEdit();
         } catch (e) {
             onError(e);
         } finally {
@@ -99,18 +98,11 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
         );
     }, [draft, editingId, labels]);
 
-    const cancelEdit = () => {
+    const handleClose = () => {
         if (hasChanged) {
             if (!window.confirm("Discard changes?")) return;
         }
-        resetEdit();
-    }
-
-    const isEditing = editingId !== null;
-    const handleClose = () => {
-        if (isEditing) {
-            return;
-        }
+        cancelEdit();
         onClose();
     }
 
@@ -133,8 +125,8 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
             <DialogContent>
                 <Stack>
                     {labels.map((label) => {
-                        const isEditingId = editingId === label.id;
-                        const current = (isEditingId && draft) ? draft : label;
+                        const isEditing = editingId === label.id;
+                        const current = (isEditing && draft) ? draft : label;
 
                         return (
                             label.isGlobal
@@ -149,7 +141,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                             <LabelChip label={current}/>
                                         </Box>
 
-                                        {isEditingId && (
+                                        {isEditing && (
                                             <>
                                                 <Box sx={{flex: 1}}>
                                                     <TextField
@@ -184,7 +176,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                             </>
                                         )}
 
-                                        {isEditingId ? (
+                                        {isEditing ? (
                                             <>
                                                 <IconButton
                                                     disabled={loading || !hasChanged}
@@ -293,7 +285,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
             </DialogContent>
 
             <DialogActions>
-                <Button disabled={isEditing} onClick={handleClose}>Close</Button>
+                <Button onClick={handleClose}>Close</Button>
             </DialogActions>
         </Dialog>
     );
