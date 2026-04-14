@@ -5,7 +5,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 import type {CreateLabelRequest, Label} from "@/features/attendance/types";
 import LabelChip from "./LabelChip";
 
@@ -83,6 +83,22 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
         }
     };
 
+    const hasChanged = useMemo(() => {
+        if (!draft) return false;
+
+        if (editingId === "new") {
+            return draft.name.trim() !== "";
+        }
+
+        const original = labels.find((l) => l.id === editingId);
+        if (!original) return false;
+
+        return (
+            draft.name.trim() !== original.name.trim() ||
+            draft.color !== original.color
+        );
+    }, [draft, editingId, labels]);
+
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
             <DialogTitle>Manage Labels</DialogTitle>
@@ -144,7 +160,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                         {isEditing ? (
                                             <>
                                                 <IconButton
-                                                    disabled={loading}
+                                                    disabled={loading || !hasChanged}
                                                     size="small"
                                                     color="primary"
                                                     onClick={confirmEdit}
@@ -217,7 +233,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                             />
 
                             <IconButton
-                                disabled={loading}
+                                disabled={loading || !draft.name.trim()}
                                 size="small"
                                 color="primary"
                                 onClick={confirmEdit}
