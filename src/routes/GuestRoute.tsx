@@ -1,13 +1,12 @@
 import {Navigate} from "react-router-dom";
+import {tokenStorage} from "@/features/auth/tokenStorage";
 
 export default function GuestRoute({
                                        children,
                                    }: {
     children: React.ReactNode;
 }) {
-    const token = localStorage.getItem("access_token");
-
-    if (token) {
+    if (tokenStorage.get()) {
         return <Navigate to="/attendance" replace/>;
     }
 

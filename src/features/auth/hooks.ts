@@ -3,14 +3,13 @@ import {loginApi, meApi} from "./api";
 import type {User} from "./types";
 import {jwtDecode} from "jwt-decode";
 import {useAuthContext} from "./useAuthContext";
+import {tokenStorage} from "./tokenStorage";
 
 export const useAuth = () => {
     const [loading, setLoading] = useState(false);
 
-    const getToken = () => localStorage.getItem("access_token");
-
     const getUserFromToken = (): User | null => {
-        const token = getToken();
+        const token = tokenStorage.get();
         if (!token) return null;
 
         try {
@@ -36,7 +35,7 @@ export const useAuth = () => {
         setLoading(true);
         try {
             const data = await loginApi({email, password});
-            localStorage.setItem("access_token", data.token);
+            tokenStorage.set(data.token);
 
             const user = jwtDecode<User>(data.token);
             setUser(user);
@@ -48,7 +47,7 @@ export const useAuth = () => {
     };
 
     const logout = () => {
-        localStorage.removeItem("access_token");
+        tokenStorage.clear();
         setUser(null);
     };
 

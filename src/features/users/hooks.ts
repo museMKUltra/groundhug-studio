@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {registerApi, updateApi} from "./api";
+import {tokenStorage} from "@/features/auth/tokenStorage";
 
 export const useUsers = () => {
     const [loading, setLoading] = useState(false);
@@ -18,7 +19,7 @@ export const useUsers = () => {
         setLoading(true);
         try {
             const {user, token} = await updateApi({name});
-            localStorage.setItem("access_token", token);
+            tokenStorage.set(token);
 
             return user;
         } finally {
