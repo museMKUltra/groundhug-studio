@@ -201,14 +201,16 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
                     />
 
                     {isActive && isEditing ? (
-                        <Button
-                            variant="contained"
-                            onClick={handleSave}
-                            disabled={isSaving || !hasChanged}
-                        >
-                            {isSaving && <CircularProgress size={20} sx={{mr: 1}}/>}
-                            Save
-                        </Button>
+                        <Box display="flex" justifyContent="right">
+                            <Button
+                                variant="contained"
+                                onClick={handleSave}
+                                disabled={isSaving || !hasChanged}
+                            >
+                                {isSaving && <CircularProgress size={20} sx={{mr: 1}}/>}
+                                Save
+                            </Button>
+                        </Box>
                     ) : (
                         <Button
                             variant="contained"
