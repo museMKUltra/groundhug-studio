@@ -1,4 +1,4 @@
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField,} from "@mui/material";
+import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -114,12 +114,24 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
         onClose();
     }
 
+    const heightSx = {
+        display: "flex",
+        alignItems: "center",
+        minHeight: "40px"
+    }
+    const labelSx = {
+        ...heightSx,
+        "&:hover": {
+            backgroundColor: "action.hover",
+        }
+    };
+
     return (
         <Dialog open={open} onClose={handleClose} fullWidth>
             <DialogTitle>Manage Labels</DialogTitle>
 
             <DialogContent>
-                <Stack spacing={2} mt={1}>
+                <Stack>
                     {labels.map((label) => {
                         const isEditingId = editingId === label.id;
                         const current = (isEditingId && draft) ? draft : label;
@@ -127,12 +139,12 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                         return (
                             label.isGlobal
                                 ? (
-                                    <Box key={label.id}>
+                                    <Box sx={heightSx} key={label.id}>
                                         <LabelChip label={current}/>
                                     </Box>
                                 )
                                 : (
-                                    <Box key={label.id} display="flex" alignItems="center" gap={1}>
+                                    <Box key={label.id} sx={labelSx} gap={1}>
                                         <Box sx={{flex: 1}}>
                                             <LabelChip label={current}/>
                                         </Box>
@@ -214,7 +226,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                     })}
 
                     {editingId === "new" && draft && (
-                        <Box display="flex" alignItems="center" gap={1}>
+                        <Box sx={labelSx} gap={1}>
                             <Box sx={{flex: 1}}>
                                 <LabelChip label={draft}/>
                             </Box>
@@ -266,13 +278,16 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                     )}
 
                     {editingId !== "new" && (
-                        <Button
-                            disabled={loading}
-                            variant="outlined"
-                            onClick={startCreate}
-                        >
-                            <AddIcon fontSize="small"/>
-                        </Button>
+                        <Box sx={heightSx}>
+                            <Button
+                                disabled={loading}
+                                variant="outlined"
+                                fullWidth
+                                onClick={startCreate}
+                            >
+                                <AddIcon fontSize="small"/>
+                            </Button>
+                        </Box>
                     )}
                 </Stack>
             </DialogContent>
