@@ -1,5 +1,10 @@
 import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField,} from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
+import CheckIcon from "@mui/icons-material/Check";
 import {useState} from "react";
 import type {CreateLabelRequest, Label} from "@/features/attendance/types";
 import LabelChip from "./LabelChip";
@@ -19,25 +24,29 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
     const [loading, SetLoading] = useState<boolean>(false);
     const [editingId, setEditingId] = useState<number | "new" | null>(null);
     const [draft, setDraft] = useState<Label | null>(null);
-    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const startEdit = (label: Label) => {
         setEditingId(label.id);
-        setDeletingId(null);
-        setDraft(label);
+        setDraft({...label});
     };
 
-    const startDelete = (label: Label) => {
-        setEditingId(label.id);
-        setDeletingId(label.id);
-        setDraft(label);
+    const handleDelete = async (label: Label) => {
+        if (!window.confirm(`Delete "${label.name}"?`)) return;
+        try {
+            SetLoading(true);
+            await onDelete(label.id);
+            onSuccess("Label deleted successfully");
+        } catch (e) {
+            onError(e);
+        } finally {
+            SetLoading(false);
+        }
     };
 
     const startCreate = () => {
         setEditingId("new");
-        setDeletingId(null);
         setDraft({
-            id: 0, // temporary
+            id: 0,
             name: "",
             color: "#1976d2",
             isGlobal: false,
@@ -46,27 +55,11 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
 
     const cancelEdit = () => {
         setEditingId(null);
-        setDeletingId(null);
         setDraft(null);
     };
 
     const confirmEdit = async () => {
         if (!draft) return;
-
-        if (deletingId === draft.id) {
-            try {
-                SetLoading(true);
-                await onDelete(draft.id);
-                onSuccess("Label deleted successfully");
-                cancelEdit();
-            } catch (e) {
-                onError(e);
-            } finally {
-                SetLoading(false);
-            }
-            return;
-        }
-
         if (!draft.name.trim()) return;
 
         try {
@@ -98,7 +91,6 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                 <Stack spacing={2} mt={1}>
                     {labels.map((label) => {
                         const isEditing = editingId === label.id;
-                        const isDeleting = deletingId === label.id;
                         const current = isEditing && draft ? draft : label;
 
                         return (
@@ -114,73 +106,75 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                             <LabelChip label={current}/>
                                         </Box>
 
-                                        <TextField
-                                            value={current.name}
-                                            size="small"
-                                            disabled={!isEditing || isDeleting}
-                                            onChange={(e) =>
-                                                setDraft((prev) =>
-                                                    prev ? {...prev, name: e.target.value} : prev
-                                                )
-                                            }
-                                            sx={{maxWidth: 220}}
-                                        />
+                                        {isEditing && (
+                                            <>
+                                                <Box sx={{flex: 1}}>
+                                                    <TextField
+                                                        value={current.name}
+                                                        size="small"
+                                                        fullWidth
+                                                        autoFocus
+                                                        onChange={(e) =>
+                                                            setDraft((prev) =>
+                                                                prev ? {...prev, name: e.target.value} : prev
+                                                            )
+                                                        }
+                                                    />
+                                                </Box>
 
-                                        <input
-                                            type="color"
-                                            value={current.color}
-                                            disabled={!isEditing || isDeleting}
-                                            onChange={(e) =>
-                                                setDraft((prev) =>
-                                                    prev ? {...prev, color: e.target.value} : prev
-                                                )
-                                            }
-                                            style={{
-                                                width: 40,
-                                                height: 40,
-                                                border: "none",
-                                                background: "none",
-                                                cursor: isEditing && !isDeleting ? "pointer" : "not-allowed",
-                                            }}
-                                        />
+                                                <input
+                                                    type="color"
+                                                    value={current.color}
+                                                    onChange={(e) =>
+                                                        setDraft((prev) =>
+                                                            prev ? {...prev, color: e.target.value} : prev
+                                                        )
+                                                    }
+                                                    style={{
+                                                        width: 40,
+                                                        height: 40,
+                                                        border: "none",
+                                                        background: "none",
+                                                        cursor: "pointer",
+                                                    }}
+                                                />
+                                            </>
+                                        )}
 
                                         {isEditing ? (
                                             <>
-                                                <Button
+                                                <IconButton
                                                     disabled={loading}
                                                     size="small"
-                                                    variant="contained"
-                                                    color={isDeleting ? "error" : "primary"}
+                                                    color="primary"
                                                     onClick={confirmEdit}
                                                 >
-                                                    Save
-                                                </Button>
-                                                <Button
+                                                    <CheckIcon fontSize="small"/>
+                                                </IconButton>
+                                                <IconButton
                                                     disabled={loading}
                                                     size="small"
-                                                    color={isDeleting ? "error" : "primary"}
                                                     onClick={cancelEdit}
                                                 >
-                                                    Cancel
-                                                </Button>
+                                                    <CloseIcon fontSize="small"/>
+                                                </IconButton>
                                             </>
                                         ) : (
                                             <>
-                                                <Button
+                                                <IconButton
                                                     disabled={loading}
                                                     size="small"
                                                     onClick={() => startEdit(label)}
                                                 >
-                                                    Edit
-                                                </Button>
-                                                <Button
+                                                    <EditIcon fontSize="small"/>
+                                                </IconButton>
+                                                <IconButton
                                                     disabled={loading}
                                                     size="small"
-                                                    color="error"
-                                                    onClick={() => startDelete(label)}
+                                                    onClick={() => handleDelete(label)}
                                                 >
-                                                    Delete
-                                                </Button>
+                                                    <DeleteIcon fontSize="small"/>
+                                                </IconButton>
                                             </>
                                         )}
                                     </Box>
@@ -194,16 +188,18 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                 <LabelChip label={draft}/>
                             </Box>
 
-                            <TextField
-                                value={draft.name}
-                                size="small"
-                                autoFocus
-                                placeholder="Label name"
-                                onChange={(e) =>
-                                    setDraft({...draft, name: e.target.value})
-                                }
-                                sx={{maxWidth: 220}}
-                            />
+                            <Box sx={{flex: 1}}>
+                                <TextField
+                                    value={draft.name}
+                                    size="small"
+                                    autoFocus
+                                    placeholder="Label name"
+                                    onChange={(e) =>
+                                        setDraft({...draft, name: e.target.value})
+                                    }
+                                    sx={{maxWidth: 220}}
+                                />
+                            </Box>
 
                             <input
                                 type="color"
@@ -220,21 +216,21 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                                 }}
                             />
 
-                            <Button
+                            <IconButton
                                 disabled={loading}
                                 size="small"
-                                variant="contained"
+                                color="primary"
                                 onClick={confirmEdit}
                             >
-                                Save
-                            </Button>
-                            <Button
+                                <CheckIcon fontSize="small"/>
+                            </IconButton>
+                            <IconButton
                                 disabled={loading}
                                 size="small"
                                 onClick={cancelEdit}
                             >
-                                Cancel
-                            </Button>
+                                <CloseIcon fontSize="small"/>
+                            </IconButton>
                         </Box>
                     )}
 
@@ -242,10 +238,9 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
                         <Button
                             disabled={loading}
                             variant="outlined"
-                            startIcon={<AddIcon fontSize="small"/>}
                             onClick={startCreate}
                         >
-                            Add Label
+                            <AddIcon fontSize="small"/>
                         </Button>
                     )}
                 </Stack>

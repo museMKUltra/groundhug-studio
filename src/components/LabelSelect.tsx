@@ -1,5 +1,5 @@
-import {ListItemIcon, ListItemText, MenuItem, TextField} from "@mui/material";
-import BorderColorIcon from '@mui/icons-material/BorderColor';
+import {MenuItem, TextField} from "@mui/material";
+import EditSquareIcon from '@mui/icons-material/EditSquare';
 import type {Label} from "./LabelChip";
 import LabelChip from "./LabelChip";
 
@@ -47,12 +47,7 @@ export default function LabelSelect({labels, value, defaultValue = 0, onChange, 
 
             {onManage && (
                 <MenuItem value="manage">
-                    <ListItemIcon>
-                        <BorderColorIcon fontSize="small"/>
-                    </ListItemIcon>
-                    <ListItemText>
-                        Manage Labels
-                    </ListItemText>
+                    <EditSquareIcon fontSize="small"/>
                 </MenuItem>
             )}
         </TextField>
