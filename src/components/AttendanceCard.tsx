@@ -192,7 +192,7 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
                         label="Label"
                         value=""
                         isEditing={showEditMode}
-                        renderView={() => selectedLabel ? <div><LabelChip label={selectedLabel}/></div> : undefined}
+                        renderView={() => selectedLabel ? <div><LabelChip label={selectedLabel}/></div> : "--"}
                         renderEdit={() => (
                             <>
                                 <LabelSelect
