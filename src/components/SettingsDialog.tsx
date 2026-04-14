@@ -1,10 +1,14 @@
 import {forwardRef, useImperativeHandle, useState} from "react";
-import {Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField} from "@mui/material";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography} from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import CloseIcon from "@mui/icons-material/Close";
 import {useAuth} from "@/features/auth/hooks";
 import {useUsers} from "@/features/users/hooks";
 import {useEmployeeRate} from "@/features/attendance/hooks";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {AxiosError} from "axios";
+import ViewEditField from "@/components/ViewEditField.tsx";
 
 export interface SettingsDialogHandle {
     open: () => void;
@@ -17,20 +21,38 @@ const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(
     const {createEmployeeRate} = useEmployeeRate();
 
     const [open, setOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
     const [rate, setRate] = useState(0);
+
+    const initialName = user?.name || "";
+    const initialRate = hourlyRate || 0;
+
+    const hasChanged = name !== initialName || rate !== initialRate;
 
     useImperativeHandle(ref, () => ({
         open() {
             setName(user?.name || "");
-            setEmail(user?.email || "");
             setRate(hourlyRate || 0);
+            setIsEditing(false);
             setOpen(true);
         },
     }));
 
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setIsEditing(false);
+        setOpen(false);
+    };
+
+    const handleCancelEdit = () => {
+        if (hasChanged) {
+            if (!window.confirm("Discard changes?")) return;
+        }
+        setName(user?.name || "");
+        setRate(hourlyRate || 0);
+        setIsEditing(false);
+    };
 
     const handleSave = async () => {
         try {
@@ -38,54 +60,89 @@ const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(
             const nameChanged = trimmedName && trimmedName !== user?.name;
             const rateChanged = rate !== hourlyRate;
 
+            if (!nameChanged && !rateChanged) {
+                setIsEditing(false);
+                return;
+            }
+
+            setIsLoading(true);
             await Promise.all([
                 nameChanged ? update(trimmedName).then(() => updateUser({name: trimmedName})) : Promise.resolve(),
                 rateChanged ? createEmployeeRate(rate).then(() => setHourlyRate(rate)) : Promise.resolve(),
             ]);
 
-            if (nameChanged || rateChanged) showSuccess("Settings saved");
-            setOpen(false);
+            showSuccess("Settings saved");
+            setIsEditing(false);
         } catch (err: unknown) {
-            const error = err as AxiosError<{error?: string; name?: string}>;
+            const error = err as AxiosError<{ error?: string; name?: string }>;
             console.error(error);
             showError(error?.response?.data?.name || error?.response?.data?.error || "Something went wrong");
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>Settings</DialogTitle>
+        <Dialog open={open} onClose={isEditing ? undefined : handleClose}>
+            <DialogTitle sx={{pr: 1}}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                    <span>{isEditing ? "Edit Settings" : "Settings"}</span>
+
+                    <Stack direction="row" spacing={0.5}>
+                        {isEditing ? (
+                            <IconButton onClick={handleCancelEdit} size="small">
+                                <CloseIcon/>
+                            </IconButton>
+                        ) : (
+                            <IconButton onClick={() => setIsEditing(true)} size="small">
+                                <EditIcon/>
+                            </IconButton>
+                        )}
+                    </Stack>
+                </Stack>
+            </DialogTitle>
 
             <DialogContent sx={{pt: 2}}>
-                <TextField
+                <ViewEditField
                     label="Name"
-                    fullWidth
-                    margin="normal"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    isEditing={isEditing}
+                    size="small"
+                    onChange={setName}
                 />
 
-                <TextField
+                <ViewEditField
                     label="Email"
-                    fullWidth
-                    margin="normal"
-                    value={email}
-                    disabled
+                    value={user?.email || ""}
+                    isEditing={false}
+                    size="small"
+                    renderView={(val) => (
+                        <Typography sx={{lineHeight: "40px"}}>
+                            {val || "--"}
+                        </Typography>
+                    )}
                 />
 
-                <TextField
+                <ViewEditField
                     label="Hourly Rate"
-                    fullWidth
-                    margin="normal"
+                    value={String(rate)}
+                    isEditing={isEditing}
+                    size="small"
                     type="number"
-                    value={rate}
-                    onChange={(e) => setRate(Number(e.target.value))}
+                    onChange={(val) => setRate(Number(val))}
+                    renderView={(val) => (
+                        <Typography sx={{lineHeight: "40px"}}>
+                            {val ? `${Number(val).toLocaleString()} TWD` : "--"}
+                        </Typography>
+                    )}
                 />
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={handleClose}>Cancel</Button>
-                <Button variant="contained" onClick={handleSave}>Save</Button>
+                {isEditing
+                    ? <Button variant="contained" onClick={handleSave} disabled={!hasChanged || isLoading}>Save</Button>
+                    : <Button onClick={handleClose}>Close</Button>
+                }
             </DialogActions>
         </Dialog>
     );
