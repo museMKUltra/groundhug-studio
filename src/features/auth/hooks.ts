@@ -56,6 +56,7 @@ export const useAuth = () => {
         logout,
         loading,
         user,
+        isAdmin: user?.role === "ADMIN",
         hourlyRate,
         setMe,
         updateUser,

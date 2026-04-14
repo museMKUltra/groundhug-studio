@@ -20,7 +20,7 @@ import Sessions from "@/components/Sessions.tsx";
 import AttendanceCard from "@/components/AttendanceCard.tsx";
 
 export default function AttendancePage() {
-    const {user, hourlyRate} = useAuth();
+    const {user, isAdmin, hourlyRate} = useAuth();
     const {
         session,
         todaySummary,
@@ -108,12 +108,22 @@ export default function AttendancePage() {
                         <Typography>
                             From: {today()}
                         </Typography>
-                        <Typography>
-                            Hours: <Box component="span" fontWeight="bold">{displayTodayHours}</Box> / {todayMostHours}h
-                        </Typography>
-                        <Typography>
-                            Salary: <Box component="span" fontWeight="bold">{todaySalary}</Box> / {todayMostSalary}
-                        </Typography>
+                        {
+                            isAdmin
+                                ? <>
+                                    <Typography>
+                                        Hours: <Box component="span"
+                                                    fontWeight="bold">{displayTodayHours}</Box> / {todayMostHours}h
+                                    </Typography>
+                                    <Typography>
+                                        Salary: <Box component="span"
+                                                     fontWeight="bold">{todaySalary}</Box> / {todayMostSalary}
+                                    </Typography>
+                                </>
+                                : <Typography>
+                                    Hours: <Box component="span" fontWeight="bold">{displayTodayHours}</Box>
+                                </Typography>
+                        }
                     </Stack>
                 </CardContent>
             </Card>
@@ -175,10 +185,14 @@ export default function AttendancePage() {
                             <Typography>
                                 Total Minutes: {monthSummary.totalMinutes} ({monthSummary.totalHours?.toFixed(2)}h)
                             </Typography>
-                            <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
-                            <Typography fontWeight="bold">
-                                Total Salary: {formatCurrency(monthSummary.salaryAmount)}
-                            </Typography>
+                            {
+                                isAdmin && <>
+                                    <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
+                                    <Typography fontWeight="bold">
+                                        Total Salary: {formatCurrency(monthSummary.salaryAmount)}
+                                    </Typography>
+                                </>
+                            }
                         </Stack>
                     ) : (
                         <Typography>No data</Typography>

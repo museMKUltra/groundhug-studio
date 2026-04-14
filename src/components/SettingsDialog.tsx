@@ -15,7 +15,7 @@ export interface SettingsDialogHandle {
 }
 
 const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(_, ref) {
-    const {user, hourlyRate, updateUser, setHourlyRate} = useAuth();
+    const {user, isAdmin, hourlyRate, updateUser, setHourlyRate} = useAuth();
     const {showError, showSuccess} = useSnackbar();
     const {update} = useUsers();
     const {createEmployeeRate} = useEmployeeRate();
@@ -123,19 +123,21 @@ const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(
                     )}
                 />
 
-                <ViewEditField
-                    label="Hourly Rate"
-                    value={String(rate)}
-                    isEditing={isEditing}
-                    size="small"
-                    type="number"
-                    onChange={(val) => setRate(Number(val))}
-                    renderView={(val) => (
-                        <Typography sx={{lineHeight: "40px"}}>
-                            {val ? `${Number(val).toLocaleString()} TWD` : "--"}
-                        </Typography>
-                    )}
-                />
+                {
+                    isAdmin && <ViewEditField
+                        label="Hourly Rate"
+                        value={String(rate)}
+                        isEditing={isEditing}
+                        size="small"
+                        type="number"
+                        onChange={(val) => setRate(Number(val))}
+                        renderView={(val) => (
+                            <Typography sx={{lineHeight: "40px"}}>
+                                {val ? `${Number(val).toLocaleString()} TWD` : "--"}
+                            </Typography>
+                        )}
+                    />
+                }
             </DialogContent>
 
             <DialogActions>
