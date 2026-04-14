@@ -142,7 +142,7 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
     return (
         <Card>
             <CardContent>
-                <Stack spacing={2}>
+                <Stack>
                     <Box display="flex" alignItems="center" justifyContent="space-between">
                         <Typography variant="h6">Attendance</Typography>
                         {isActive && (
@@ -154,13 +154,39 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
                         )}
                     </Box>
 
-                    <Typography>
-                        Clock In: {isActive ? dayjs(session!.clockIn).format("HH:mm:ss") : "--"}
-                    </Typography>
+                    <ViewEditField
+                        label="Clock In"
+                        value={""}
+                        isEditing={isEditing}
+                        size="small"
+                        renderEdit={() => (
+                            <Typography>
+                                {isActive ? dayjs(session!.clockIn).format("HH:mm:ss") : "--"}
+                            </Typography>
+                        )}
+                        renderView={() => (
+                            <Typography>
+                                {isActive ? dayjs(session!.clockIn).format("HH:mm:ss") : "--"}
+                            </Typography>
+                        )}
+                    />
 
-                    <Typography>
-                        Duration: {isActive ? durationText : "--"}
-                    </Typography>
+                    <ViewEditField
+                        label="Duration"
+                        value={""}
+                        isEditing={isEditing}
+                        size="small"
+                        renderEdit={() => (
+                            <Typography>
+                                {isActive ? durationText : "--"}
+                            </Typography>
+                        )}
+                        renderView={() => (
+                            <Typography>
+                                {isActive ? durationText : "--"}
+                            </Typography>
+                        )}
+                    />
 
                     <ViewEditField
                         label="Label"
@@ -212,15 +238,18 @@ export default function AttendanceCard({session, sessionLoading, clockIn, clockO
                             </Button>
                         </Box>
                     ) : (
-                        <Button
-                            variant="contained"
-                            color={isActive ? "secondary" : "primary"}
-                            onClick={isActive ? handleClockOut : handleClockIn}
-                            disabled={sessionLoading}
-                        >
-                            {sessionLoading && <CircularProgress size={20} sx={{mr: 1}}/>}
-                            {isActive ? "Clock Out" : "Clock In"}
-                        </Button>
+                        <Box mt={2}>
+                            <Button
+                                variant="contained"
+                                color={isActive ? "secondary" : "primary"}
+                                fullWidth
+                                onClick={isActive ? handleClockOut : handleClockIn}
+                                disabled={sessionLoading}
+                            >
+                                {sessionLoading && <CircularProgress size={20} sx={{mr: 1}}/>}
+                                {isActive ? "Clock Out" : "Clock In"}
+                            </Button>
+                        </Box>
                     )}
                 </Stack>
             </CardContent>
