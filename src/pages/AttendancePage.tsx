@@ -96,7 +96,7 @@ export default function AttendancePage() {
     }
 
     return (
-        <Stack spacing={3} sx={{p: 3, width: "80%", mx: "auto"}}>
+        <Stack spacing={3} sx={{py: 3, width: "80%", mx: "auto"}}>
             <Typography>
                 Hi, <Box component="span" fontWeight="bold">{userName}</Box>. Keep going!
             </Typography>
