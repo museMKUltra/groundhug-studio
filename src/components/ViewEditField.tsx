@@ -64,6 +64,7 @@ export default function ViewEditField({
                 alignItems: "center",
                 px: 1,
                 py: 1,
+                gap: 3
             }}
         >
             <Typography variant="body2" color="text.secondary">
