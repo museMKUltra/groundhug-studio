@@ -15,6 +15,7 @@ import {useSummary} from "@/features/attendance/hooks.ts";
 import {useAuth} from "@/features/auth/hooks.ts";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {Summary} from "@/features/attendance/types.ts";
+import SummaryPieChart from "@/components/SummaryPieChart";
 
 interface Props {
     todaySummary: Summary | null;
@@ -83,6 +84,7 @@ export default function MonthlyPreviewCard({todaySummary}: Props) {
                     ) : (
                         <Typography>No data</Typography>
                     )}
+                    <SummaryPieChart summaryLabels={monthSummary?.labels || []}/>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpen(false)}>Close</Button>

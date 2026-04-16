@@ -18,6 +18,11 @@ export interface Session {
     label: Label;
 }
 
+export interface SummaryLabel {
+    id: number;
+    workMinutes: number;
+}
+
 export interface Summary {
     id: string | null;
     year: number;
@@ -28,6 +33,7 @@ export interface Summary {
     totalHours?: number;
     salaryAmount: number;
     status?: Status;
+    labels?: SummaryLabel[];
 }
 
 export type PeriodSessionsResponse = Session[];
