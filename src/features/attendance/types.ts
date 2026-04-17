@@ -23,6 +23,7 @@ export interface SummaryLabel {
     name: string;
     color: string;
     workMinutes: number;
+    isGlobal: boolean;
 }
 
 export interface Summary {
