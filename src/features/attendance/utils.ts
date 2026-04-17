@@ -21,28 +21,31 @@ export function formatMinutes(value: number) {
     return `${h}h ${m}m`;
 }
 
+function getFilteredTotal(labels: SummaryLabel[], predicate: (label: SummaryLabel) => boolean) {
+    return labels
+        .filter(predicate)
+        .reduce(
+            (sum, label) =>
+                sum + label.workMinutes, 0
+        );
+}
+
 export const getPieSeries = (labels: SummaryLabel[]): PieSeries[] => {
-    const total = labels.reduce((sum, l) => sum + l.workMinutes, 0);
+    const total = getFilteredTotal(labels, () => true);
+    const includedTotal = getFilteredTotal(labels, (l) => !l.isGlobal);
+    const excludedTotal = getFilteredTotal(labels, (l) => l.isGlobal);
 
-    const localTotal = labels
-        .filter((l) => !l.isGlobal)
-        .reduce((s, l) => s + l.workMinutes, 0);
-
-    const globalTotal = labels
-        .filter((l) => l.isGlobal)
-        .reduce((s, l) => s + l.workMinutes, 0);
-
-    const globalData = [
+    const salaryScopeData = [
         {
-            id: "local",
+            id: "included",
             label: "Counts toward salary",
-            value: localTotal,
+            value: includedTotal,
             color: hexToRgba("#1976d2", 0.6)
         },
         {
-            id: "global",
+            id: "excluded",
             label: "Not counted toward salary",
-            value: globalTotal,
+            value: excludedTotal,
             color: hexToRgba("#9e9e9e", 0.6),
         },
     ];
@@ -61,8 +64,8 @@ export const getPieSeries = (labels: SummaryLabel[]): PieSeries[] => {
     const outerRadius = innerRadius + 100;
     const gap = 5;
 
-    const labelInnerRadius = outerRadius + gap;
-    const labelOuterRadius = labelInnerRadius + 20;
+    const scopeInnerRadius = outerRadius + gap;
+    const scopeOuterRadius = scopeInnerRadius + 20;
 
     return [
         {
@@ -75,9 +78,9 @@ export const getPieSeries = (labels: SummaryLabel[]): PieSeries[] => {
             highlightScope: {fade: "global", highlight: "item"},
         },
         {
-            innerRadius: labelInnerRadius,
-            outerRadius: labelOuterRadius,
-            data: globalData,
+            innerRadius: scopeInnerRadius,
+            outerRadius: scopeOuterRadius,
+            data: salaryScopeData,
             valueFormatter: ({value}) => `${formatMinutes(value)} (${((value / total) * 100).toFixed(0)}%)`,
             highlightScope: {fade: "global", highlight: "item"},
         },
