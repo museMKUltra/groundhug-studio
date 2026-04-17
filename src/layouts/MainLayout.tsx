@@ -23,7 +23,7 @@ export default function MainLayout({children}: {
                 }}
             >
                 <Box flex={1} display="flex">
-                    <Stack spacing={3} sx={{py: 3, width: "80%", mx: "auto"}}>
+                    <Stack spacing={3} sx={{p: 3, mx: "auto"}} maxWidth="lg">
                         <Typography>
                             Hi, <Box component="span" fontWeight="bold">{userName}</Box>. Keep going!
                         </Typography>

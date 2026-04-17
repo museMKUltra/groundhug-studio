@@ -1,48 +1,16 @@
-import {
-    AppBar,
-    Box,
-    IconButton,
-    ListItemIcon,
-    ListItemText,
-    Menu,
-    MenuItem,
-    Toolbar,
-    Typography
-} from "@mui/material";
-import SettingsDialog from "@/components/SettingsDialog";
-import type {SettingsDialogHandle} from "@/components/SettingsDialog";
-import AccountCircle from "@mui/icons-material/AccountCircle";
-import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
-import {useEffect, useRef, useState} from "react";
+import {AppBar, Box, Container, Toolbar, Typography} from "@mui/material";
+import {useEffect} from "react";
 import {useNavigate} from "react-router-dom";
 import {useAuth} from "@/features/auth/hooks";
+import AccountMenu from "@/components/AccountMenu";
 
 export default function Header() {
     const {logout, setMe} = useAuth();
     const navigate = useNavigate();
 
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const openMenu = Boolean(anchorEl);
-    const settingsRef = useRef<SettingsDialogHandle>(null);
-
-    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleMenuClose = () => {
-        setAnchorEl(null);
-    };
-
     const handleLogout = () => {
-        handleMenuClose();
         logout();
         navigate("/login");
-    };
-
-    const handleOpenSettings = () => {
-        handleMenuClose();
-        settingsRef.current?.open();
     };
 
     useEffect(() => {
@@ -52,38 +20,23 @@ export default function Header() {
     return (
         <>
             <AppBar position="static" elevation={1}>
-                <Toolbar>
-                    <Typography variant="h6">Attendance</Typography>
+                <Container maxWidth="lg">
+                    <Toolbar sx={{display: {xs: 'none', md: 'flex'}}}>
+                        <Typography variant="h6">LOGO</Typography>
 
-                    <Box sx={{flexGrow: 1}}/>
+                        <Box sx={{flexGrow: 1}}/>
 
-                    <IconButton color="inherit" onClick={handleMenuOpen}>
-                        <AccountCircle/>
-                    </IconButton>
+                        <AccountMenu onLogout={handleLogout}/>
+                    </Toolbar>
+                    <Toolbar sx={{display: {xs: 'flex', md: 'none'}, justifyContent: 'space-between'}}>
 
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={openMenu}
-                        onClose={handleMenuClose}
-                    >
-                        <MenuItem onClick={handleOpenSettings}>
-                            <ListItemIcon>
-                                <SettingsIcon fontSize="small"/>
-                            </ListItemIcon>
-                            <ListItemText>Settings</ListItemText>
-                        </MenuItem>
+                        <Typography variant="h6">LOGO</Typography>
 
-                        <MenuItem onClick={handleLogout}>
-                            <ListItemIcon>
-                                <LogoutIcon fontSize="small"/>
-                            </ListItemIcon>
-                            <ListItemText>Logout</ListItemText>
-                        </MenuItem>
-                    </Menu>
-                </Toolbar>
+                        <AccountMenu onLogout={handleLogout}/>
+
+                    </Toolbar>
+                </Container>
             </AppBar>
-
-            <SettingsDialog ref={settingsRef}/>
         </>
     );
 }
