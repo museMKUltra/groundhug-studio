@@ -12,7 +12,7 @@ function hexToRgba(hex: string, alpha: number) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-function formatMinutes(value: number) {
+export function formatMinutes(value: number) {
     const h = Math.floor(value / 60);
     const m = value % 60;
 

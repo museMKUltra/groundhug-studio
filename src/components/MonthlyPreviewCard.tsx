@@ -16,6 +16,7 @@ import {useAuth} from "@/features/auth/hooks.ts";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import type {Summary} from "@/features/attendance/types.ts";
 import SummaryPieChart from "@/components/SummaryPieChart";
+import {formatMinutes} from "@/features/attendance/utils";
 
 interface Props {
     todaySummary: Summary | null;
@@ -45,15 +46,6 @@ export default function MonthlyPreviewCard({todaySummary}: Props) {
             showError(error?.response?.data?.error || "Something went wrong");
         }
     };
-
-    function formatMinutes(value: number) {
-        const h = Math.floor(value / 60);
-        const m = value % 60;
-
-        if (h === 0) return `${m}m`;
-        if (m === 0) return `${h}h`;
-        return `${h}h ${m}m`;
-    }
 
     return (
         <>
