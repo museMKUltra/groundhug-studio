@@ -30,6 +30,13 @@ function getFilteredTotal(labels: SummaryLabel[], predicate: (label: SummaryLabe
         );
 }
 
+function formatValue(value: number, total: number) {
+    const percentage = (value / total) * 100;
+    const displayPercentage = `(${percentage.toFixed(1)}%)`;
+
+    return `${formatMinutes(value)} ${displayPercentage}`;
+}
+
 export const getPieSeries = (labels: SummaryLabel[], withSalaryScope: boolean = false): PieSeries[] => {
     const total = getFilteredTotal(labels, () => true);
     const includedTotal = getFilteredTotal(labels, (l) => !l.isGlobal);
@@ -73,7 +80,7 @@ export const getPieSeries = (labels: SummaryLabel[], withSalaryScope: boolean = 
             outerRadius,
             data: labelData,
             arcLabel: ({label}) => `${label}`,
-            valueFormatter: ({value}) => `${formatMinutes(value)} (${((value / total) * 100).toFixed(0)}%)`,
+            valueFormatter: ({value}) => formatValue(value, total),
             arcLabelMinAngle: 30,
             highlightScope: {fade: "global", highlight: "item"},
         },
@@ -84,7 +91,7 @@ export const getPieSeries = (labels: SummaryLabel[], withSalaryScope: boolean = 
             innerRadius: scopeInnerRadius,
             outerRadius: scopeOuterRadius,
             data: salaryScopeData,
-            valueFormatter: ({value}) => `${formatMinutes(value)} (${((value / total) * 100).toFixed(0)}%)`,
+            valueFormatter: ({value}) => formatValue(value, total),
             highlightScope: {fade: "global", highlight: "item"},
         });
     }
