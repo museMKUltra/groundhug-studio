@@ -30,7 +30,7 @@ function getFilteredTotal(labels: SummaryLabel[], predicate: (label: SummaryLabe
         );
 }
 
-export const getPieSeries = (labels: SummaryLabel[]): PieSeries[] => {
+export const getPieSeries = (labels: SummaryLabel[], withSalaryScope: boolean = false): PieSeries[] => {
     const total = getFilteredTotal(labels, () => true);
     const includedTotal = getFilteredTotal(labels, (l) => !l.isGlobal);
     const excludedTotal = getFilteredTotal(labels, (l) => l.isGlobal);
@@ -67,7 +67,7 @@ export const getPieSeries = (labels: SummaryLabel[]): PieSeries[] => {
     const scopeInnerRadius = outerRadius + gap;
     const scopeOuterRadius = scopeInnerRadius + 20;
 
-    return [
+    const series: PieSeries[] = [
         {
             innerRadius,
             outerRadius,
@@ -77,13 +77,18 @@ export const getPieSeries = (labels: SummaryLabel[]): PieSeries[] => {
             arcLabelMinAngle: 30,
             highlightScope: {fade: "global", highlight: "item"},
         },
-        {
+    ];
+
+    if (withSalaryScope) {
+        series.push({
             innerRadius: scopeInnerRadius,
             outerRadius: scopeOuterRadius,
             data: salaryScopeData,
             valueFormatter: ({value}) => `${formatMinutes(value)} (${((value / total) * 100).toFixed(0)}%)`,
             highlightScope: {fade: "global", highlight: "item"},
-        },
-    ];
+        });
+    }
+
+    return series;
 }
 

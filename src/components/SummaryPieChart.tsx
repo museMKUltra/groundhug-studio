@@ -3,13 +3,15 @@ import {Box} from "@mui/material";
 
 import type {SummaryLabel} from "@/features/attendance/types";
 import {getPieSeries} from "@/features/attendance/utils";
+import {useAuth} from "@/features/auth/hooks.ts";
 
 interface Props {
     summaryLabels: SummaryLabel[];
 }
 
 export default function LabelPieChart({summaryLabels}: Props) {
-    const series = getPieSeries(summaryLabels);
+    const {isAdmin} = useAuth();
+    const series = getPieSeries(summaryLabels, isAdmin);
 
     return (
         <Box sx={{
