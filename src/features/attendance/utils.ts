@@ -58,27 +58,27 @@ export const getPieSeries = (labels: SummaryLabel[]): PieSeries[] => {
         .sort((a, b) => Number(a.isGlobal) - Number(b.isGlobal));
 
     const innerRadius = 20;
-    const outerRadius = innerRadius + 60;
+    const outerRadius = innerRadius + 100;
     const gap = 5;
 
     const labelInnerRadius = outerRadius + gap;
-    const labelOuterRadius = labelInnerRadius + 40;
+    const labelOuterRadius = labelInnerRadius + 20;
 
     return [
         {
             innerRadius,
             outerRadius,
-            data: globalData,
+            data: labelData,
+            arcLabel: ({label}) => `${label}`,
             valueFormatter: ({value}) => `${formatMinutes(value)} (${((value / total) * 100).toFixed(0)}%)`,
+            arcLabelMinAngle: 30,
             highlightScope: {fade: "global", highlight: "item"},
         },
         {
             innerRadius: labelInnerRadius,
             outerRadius: labelOuterRadius,
-            data: labelData,
-            arcLabel: ({label}) => `${label}`,
+            data: globalData,
             valueFormatter: ({value}) => `${formatMinutes(value)} (${((value / total) * 100).toFixed(0)}%)`,
-            arcLabelMinAngle: 30,
             highlightScope: {fade: "global", highlight: "item"},
         },
     ];
