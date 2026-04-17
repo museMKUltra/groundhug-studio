@@ -1,52 +1,39 @@
 import {Navigate, Route, Routes} from "react-router-dom";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import GuestRoute from "@/routes/GuestRoute.tsx";
-import LoginPage from "@/pages/LoginPage";
-import SummaryPage from "@/pages/SummaryPage";
-import AttendancePage from "@/pages/AttendancePage";
 import MainLayout from "@/layouts/MainLayout.tsx";
 import AuthLayout from "@/layouts/AuthLayout.tsx";
-import {SessionProvider} from "@/features/attendance/SessionProvider";
-import {LabelProvider} from "@/features/attendance/LabelProvider";
+import {routes} from "./config";
 
 export default function AppRoutes() {
     return (
         <Routes>
             <Route path="/" element={<Navigate to="/login" replace/>}/>
 
-            <Route path="/login" element={
-                <GuestRoute>
-                    <AuthLayout>
-                        <LoginPage/>
-                    </AuthLayout>
-                </GuestRoute>
-            }/>
+            {routes.map((route) => {
+                let component = route.component;
 
-            <Route
-                path="/attendance"
-                element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <LabelProvider>
-                                <SessionProvider>
-                                    <AttendancePage/>
-                                </SessionProvider>
-                            </LabelProvider>
-                        </MainLayout>
-                    </ProtectedRoute>
+                if (route.layout === "main") {
+                    component = <MainLayout>{component}</MainLayout>;
                 }
-            />
+                if (route.layout === "auth") {
+                    component = <AuthLayout>{component}</AuthLayout>;
+                }
 
-            <Route
-                path="/summary"
-                element={
-                    <ProtectedRoute>
-                        <MainLayout>
-                            <SummaryPage/>
-                        </MainLayout>
-                    </ProtectedRoute>
+                if (route.protected) {
+                    component = <ProtectedRoute>{component}</ProtectedRoute>;
+                } else {
+                    component = <GuestRoute>{component}</GuestRoute>;
                 }
-            />
+
+                if (route.wrapper) {
+                    component = route.wrapper(component);
+                }
+
+                return (
+                    <Route key={route.path} path={route.path} element={component}/>
+                );
+            })}
         </Routes>
     );
 }

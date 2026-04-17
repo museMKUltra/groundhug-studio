@@ -1,13 +1,9 @@
 import {Box, Button,} from "@mui/material";
 import {NavLink} from "react-router-dom";
-
-interface Page {
-    name: string;
-    path: string;
-}
+import type {AppRoute} from "@/routes/config";
 
 interface Props {
-    pages: Page[];
+    pages: AppRoute[];
 }
 
 export default function NavMenu({pages}: Props) {
@@ -15,7 +11,7 @@ export default function NavMenu({pages}: Props) {
         <Box display='flex'>
             {pages.map((page) => (
                 <Button
-                    key={page.name}
+                    key={page.label}
                     component={NavLink}
                     to={page.path}
                     sx={{
@@ -26,7 +22,7 @@ export default function NavMenu({pages}: Props) {
                         },
                     }}
                 >
-                    {page.name}
+                    {page.label}
                 </Button>
             ))}
         </Box>

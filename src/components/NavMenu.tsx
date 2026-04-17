@@ -2,14 +2,10 @@ import {useState} from "react";
 import {Box, IconButton, Menu, MenuItem, Typography,} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import {NavLink} from "react-router-dom";
-
-interface Page {
-    name: string;
-    path: string;
-}
+import type {AppRoute} from "@/routes/config";
 
 interface Props {
-    pages: Page[];
+    pages: AppRoute[];
 }
 
 export default function NavMenu({pages}: Props) {
@@ -48,7 +44,7 @@ export default function NavMenu({pages}: Props) {
             >
                 {pages.map((page) => (
                     <MenuItem
-                        key={page.name}
+                        key={page.label}
                         component={NavLink}
                         to={page.path}
                         onClick={handleCloseNavMenu}
@@ -58,7 +54,7 @@ export default function NavMenu({pages}: Props) {
                             },
                         }}
                     >
-                        <Typography textAlign="center">{page.name}</Typography>
+                        <Typography textAlign="center">{page.label}</Typography>
                     </MenuItem>
                 ))}
             </Menu>
