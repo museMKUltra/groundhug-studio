@@ -20,6 +20,8 @@ export interface Session {
 
 export interface SummaryLabel {
     id: number;
+    name: string;
+    color: string;
     workMinutes: number;
 }
 
