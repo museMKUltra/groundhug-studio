@@ -46,6 +46,15 @@ export default function MonthlyPreviewCard({todaySummary}: Props) {
         }
     };
 
+    function formatMinutes(value: number) {
+        const h = Math.floor(value / 60);
+        const m = value % 60;
+
+        if (h === 0) return `${m}m`;
+        if (m === 0) return `${h}h`;
+        return `${h}h ${m}m`;
+    }
+
     return (
         <>
             <Card>
@@ -69,10 +78,10 @@ export default function MonthlyPreviewCard({todaySummary}: Props) {
                     {monthSummary ? (
                         <Stack spacing={1} sx={{mt: 1}}>
                             <Typography>
-                                Time: {monthSummary.year}/{monthSummary.month.toString().padStart(2, '0')}
+                                Month: {monthSummary.year}/{monthSummary.month.toString().padStart(2, '0')}
                             </Typography>
                             <Typography>
-                                Total Minutes: {monthSummary.totalMinutes} ({monthSummary.totalHours?.toFixed(2)}h)
+                                Total Time: {formatMinutes(monthSummary.totalMinutes)}
                             </Typography>
                             {isAdmin && <>
                                 <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
