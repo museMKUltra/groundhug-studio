@@ -2,6 +2,7 @@ import {Navigate, Route, Routes} from "react-router-dom";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import GuestRoute from "@/routes/GuestRoute.tsx";
 import LoginPage from "@/pages/LoginPage";
+import SummaryPage from "@/pages/SummaryPage";
 import AttendancePage from "@/pages/AttendancePage";
 import MainLayout from "@/layouts/MainLayout.tsx";
 import AuthLayout from "@/layouts/AuthLayout.tsx";
@@ -31,6 +32,17 @@ export default function AppRoutes() {
                                     <AttendancePage/>
                                 </SessionProvider>
                             </LabelProvider>
+                        </MainLayout>
+                    </ProtectedRoute>
+                }
+            />
+
+            <Route
+                path="/summary"
+                element={
+                    <ProtectedRoute>
+                        <MainLayout>
+                            <SummaryPage/>
                         </MainLayout>
                     </ProtectedRoute>
                 }
