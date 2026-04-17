@@ -1,11 +1,5 @@
 import {useEffect} from "react";
-import {
-    Box,
-    Card,
-    CardContent,
-    Stack,
-    Typography,
-} from "@mui/material";
+import {Box, Card, CardContent, Stack, Typography,} from "@mui/material";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
@@ -16,7 +10,7 @@ import AttendanceCard from "@/components/AttendanceCard.tsx";
 import MonthlyPreviewCard from "@/components/MonthlyPreviewCard.tsx";
 
 export default function AttendancePage() {
-    const {user, isAdmin, hourlyRate} = useAuth();
+    const {isAdmin, hourlyRate} = useAuth();
     const {
         session,
         todaySummary,
@@ -60,8 +54,6 @@ export default function AttendancePage() {
     const todaySalary = formatCurrency(todayHours * hourlyRate);
     const todayMostSalary = formatCurrency(todayMostHours * hourlyRate);
 
-    const userName = user?.name || "";
-
     function today() {
         if (todaySummary === null) {
             return "";
@@ -71,10 +63,7 @@ export default function AttendancePage() {
     }
 
     return (
-        <Stack spacing={3} sx={{py: 3, width: "80%", mx: "auto"}}>
-            <Typography>
-                Hi, <Box component="span" fontWeight="bold">{userName}</Box>. Keep going!
-            </Typography>
+        <Stack spacing={3}>
             {/* Today */}
             <Card>
                 <CardContent>
@@ -133,7 +122,6 @@ export default function AttendancePage() {
                     </Stack>
                 </Box>
             </Box>
-
         </Stack>
     );
 }

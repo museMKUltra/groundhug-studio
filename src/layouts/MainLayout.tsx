@@ -1,9 +1,13 @@
 import Header from "@/components/Header";
-import {Box} from "@mui/material";
+import {Box, Stack, Typography} from "@mui/material";
+import {useAuth} from "@/features/auth/hooks.ts";
 
 export default function MainLayout({children}: {
     children: React.ReactNode;
 }) {
+    const {user} = useAuth();
+    const userName = user?.name || "";
+
     return (
         <>
             <Header/>
@@ -15,11 +19,17 @@ export default function MainLayout({children}: {
                         xs: "calc(100vh - 56px)",
                         sm: "calc(100vh - 64px)",
                     },
-                    bgcolor: "#f5f5f5",
+                    bgcolor: "grey.100",
                 }}
             >
                 <Box flex={1} display="flex">
-                    {children}
+                    <Stack spacing={3} sx={{py: 3, width: "80%", mx: "auto"}}>
+                        <Typography>
+                            Hi, <Box component="span" fontWeight="bold">{userName}</Box>. Keep going!
+                        </Typography>
+
+                        {children}
+                    </Stack>
                 </Box>
             </Box>
         </>
