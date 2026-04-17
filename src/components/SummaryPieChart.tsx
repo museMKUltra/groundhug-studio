@@ -71,7 +71,11 @@ export default function LabelPieChart({summaryLabels}: Props) {
     const labelOuterRadius = labelInnerRadius + 40;
 
     return (
-        <Box sx={{backgroundColor: "grey.100", p: 2}}>
+        <Box sx={{
+            display: {xs: "none", md: "block"},
+            backgroundColor: "grey.100",
+            p: 2
+        }}>
             <PieChart
                 series={[
                     {
