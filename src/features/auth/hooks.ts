@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {loginApi, meApi} from "./api";
 import type {User} from "./types";
 import {jwtDecode} from "jwt-decode";
@@ -8,22 +8,7 @@ import {tokenStorage} from "./tokenStorage";
 export const useAuth = () => {
     const [loading, setLoading] = useState(false);
 
-    const getUserFromToken = (): User | null => {
-        const token = tokenStorage.get();
-        if (!token) return null;
-
-        try {
-            return jwtDecode<User>(token);
-        } catch {
-            return null;
-        }
-    };
-
     const {user, hourlyRate, setUser, updateUser, setHourlyRate} = useAuthContext();
-
-    useEffect(() => {
-        setUser(getUserFromToken());
-    }, [])
 
     const setMe = async () => {
         const me = await meApi();

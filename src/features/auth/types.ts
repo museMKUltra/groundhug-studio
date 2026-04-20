@@ -14,10 +14,12 @@ export interface MeResponse {
     hourlyRate: number;
 }
 
+export type Role = "ADMIN" | "USER";
+
 export type User = {
     sub: string;
     name: string;
     email: string;
-    role: string;
+    role: Role;
     exp: number;
 };

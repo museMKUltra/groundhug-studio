@@ -1,10 +1,9 @@
 import Header from "@/components/Header";
 import {Box, Stack, Typography} from "@mui/material";
 import {useAuth} from "@/features/auth/hooks.ts";
+import {Outlet} from "react-router-dom";
 
-export default function MainLayout({children}: {
-    children: React.ReactNode;
-}) {
+export default function MainLayout() {
     const {user} = useAuth();
     const userName = user?.name || "";
 
@@ -28,7 +27,7 @@ export default function MainLayout({children}: {
                             Hi, <Box component="span" fontWeight="bold">{userName}</Box>. Keep going!
                         </Typography>
 
-                        {children}
+                        <Outlet/>
                     </Stack>
                 </Box>
             </Box>

@@ -4,30 +4,34 @@ import LoginPage from "@/pages/LoginPage";
 import SummaryPage from "@/pages/SummaryPage";
 import AttendancePage from "@/pages/AttendancePage";
 
+import LoginLayout from "@/layouts/LoginLayout";
+
 import {SessionProvider} from "@/features/attendance/SessionProvider";
 import {LabelProvider} from "@/features/attendance/LabelProvider";
 
+import {authGuard, type Guard, guestGuard, roleGuard} from "@/routes/guards";
+
 export interface AppRoute {
     path: string;
-    component: ReactNode;
+    element: ReactNode;
     label?: string;
-    layout?: "main" | "auth";
-    protected?: boolean;
+    guards?: Guard[];
+    layout?: ReactNode;
     wrapper?: (node: ReactNode) => ReactNode;
 }
 
 export const routes: AppRoute[] = [
     {
         path: "/login",
-        component: <LoginPage/>,
-        layout: "auth",
+        element: <LoginPage/>,
+        guards: [guestGuard],
+        layout: <LoginLayout/>,
     },
     {
         path: "/attendance",
-        component: <AttendancePage/>,
+        element: <AttendancePage/>,
         label: "Attendance",
-        layout: "main",
-        protected: true,
+        guards: [authGuard],
         wrapper: (node) => (
             <LabelProvider>
                 <SessionProvider>
@@ -38,10 +42,9 @@ export const routes: AppRoute[] = [
     },
     {
         path: "/summary",
-        component: <SummaryPage/>,
+        element: <SummaryPage/>,
         label: "Summary",
-        layout: "main",
-        protected: true,
+        guards: [roleGuard(['ADMIN'])],
     },
 ];
 

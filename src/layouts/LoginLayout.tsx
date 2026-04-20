@@ -1,8 +1,7 @@
 import {Box} from "@mui/material";
+import {Outlet} from "react-router-dom";
 
-export default function AuthLayout({children}: {
-    children: React.ReactNode;
-}) {
+export default function LoginLayout() {
     return (
         <Box
             display="flex"
@@ -11,7 +10,7 @@ export default function AuthLayout({children}: {
             minHeight="100vh"
             bgcolor="#f5f5f5"
         >
-            {children}
+            <Outlet/>
         </Box>
     );
 }

@@ -1,26 +1,12 @@
 import {useState} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
 import {useAuth} from "@/features/auth/hooks";
 import {useUsers} from "@/features/users/hooks.ts";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 
-import {
-    Box,
-    Button,
-    Card,
-    CardContent,
-    Collapse,
-    Stack,
-    Tab,
-    Tabs,
-    TextField,
-    Typography,
-} from "@mui/material";
+import {Box, Button, Card, CardContent, Collapse, Stack, Tab, Tabs, TextField, Typography,} from "@mui/material";
 import type {AxiosError} from "axios";
 
 export default function LoginPage() {
-    const navigate = useNavigate();
-    const location = useLocation();
     const {login, loading} = useAuth();
     const {register} = useUsers();
     const {showError, showSuccess} = useSnackbar();
@@ -30,15 +16,11 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const from = location.state?.from?.pathname || "/attendance";
-
     const isLogin = mode === "login";
     const handleSubmit = async () => {
         try {
             if (mode === "login") {
                 await login(email, password);
-
-                navigate(from, {replace: true});
             } else {
                 await register(name, email, password);
 
