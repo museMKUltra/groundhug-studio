@@ -1,5 +1,6 @@
 import {type ReactNode} from "react";
 
+import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/LoginPage";
 import SummaryPage from "@/pages/SummaryPage";
 import AttendancePage from "@/pages/AttendancePage";
@@ -11,6 +12,7 @@ import {LabelProvider} from "@/features/attendance/LabelProvider";
 
 import {authGuard, type Guard, guestGuard, roleGuard} from "@/routes/guards";
 import type {Role} from "@/features/auth/types";
+import HomeLayout from "@/layouts/HomeLayout";
 
 export interface AppRoute {
     path: string;
@@ -23,6 +25,11 @@ export interface AppRoute {
 }
 
 export const routes: AppRoute[] = [
+    {
+        path: "/",
+        element: <HomePage/>,
+        layout: <HomeLayout/>,
+    },
     {
         path: "/login",
         element: <LoginPage/>,

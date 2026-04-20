@@ -1,9 +1,10 @@
-import {AppBar, Box, Container, Toolbar, Typography} from "@mui/material";
+import {AppBar, Box, Container, Toolbar} from "@mui/material";
 import {useEffect} from "react";
 import {useAuth} from "@/features/auth/hooks";
 import AccountMenu from "@/components/AccountMenu";
 import NavMenu from "@/components/NavMenu";
 import NavLinks from "@/components/NavLinks";
+import Logo from "@/components/Logo";
 import {getNavPages} from "@/routes/config";
 
 export default function Header() {
@@ -23,8 +24,8 @@ export default function Header() {
         <>
             <AppBar position="static" elevation={1}>
                 <Container maxWidth="lg">
-                    <Toolbar sx={{display: {xs: 'none', md: 'flex'}}} disableGutters>
-                        <Typography variant="h6" mr={3}>LOGO</Typography>
+                    <Toolbar sx={{display: {xs: 'none', md: 'flex'}, gap: 3}} disableGutters>
+                        <Logo/>
 
                         <NavLinks pages={navPages}/>
 
@@ -35,7 +36,7 @@ export default function Header() {
                     <Toolbar sx={{display: {xs: 'flex', md: 'none'}, justifyContent: 'space-between'}} disableGutters>
                         <NavMenu pages={navPages}/>
 
-                        <Typography variant="h6">LOGO</Typography>
+                        <Logo/>
 
                         <AccountMenu onLogout={handleLogout}/>
                     </Toolbar>
