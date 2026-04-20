@@ -4,10 +4,10 @@ import {useAuth} from "@/features/auth/hooks";
 import AccountMenu from "@/components/AccountMenu";
 import NavMenu from "@/components/NavMenu";
 import NavLinks from "@/components/NavLinks";
-import {navPages} from "@/routes/config";
+import {getNavPages} from "@/routes/config";
 
 export default function Header() {
-    const {logout, setMe} = useAuth();
+    const {logout, setMe, user} = useAuth();
 
     const handleLogout = () => {
         logout();
@@ -16,6 +16,8 @@ export default function Header() {
     useEffect(() => {
         setMe();
     }, []);
+
+    const navPages = getNavPages(user?.role);
 
     return (
         <>
