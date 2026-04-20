@@ -6,7 +6,7 @@ interface Props {
     pages: AppRoute[];
 }
 
-export default function NavMenu({pages}: Props) {
+export default function NavLinks({pages}: Props) {
     return (
         <Box display='flex'>
             {pages.map((page) => (
