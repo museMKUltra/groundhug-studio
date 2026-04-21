@@ -6,6 +6,7 @@ import {routes} from "./config";
 export default function AppRoutes() {
     return (
         <Routes>
+            {/* remove default route to login page when home page is ready */}
             <Route path="/" element={<Navigate to="/login" replace/>}/>
 
             {routes.map((route) => (
