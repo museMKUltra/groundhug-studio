@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {Box, Button, Card, CardContent, CircularProgress, Stack, Typography,} from "@mui/material";
+import {Box, Button, Card, CardContent, CircularProgress, Fade, Stack, Typography,} from "@mui/material";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
 
@@ -79,6 +79,7 @@ export default function AttendanceCard(
     };
 
     const {
+        autoStatus,
         scheduleSave,
         syncValue
     } = useAutoSaveForm<AutoSaveFormState>({
@@ -166,6 +167,11 @@ export default function AttendanceCard(
 
                     <Box display="flex" justifyContent="space-between" alignItems="center">
                         <Typography variant="h6">Attendance</Typography>
+                        <Fade in={autoStatus === "saved"} timeout={{ enter: 300, exit: 300 }} unmountOnExit>
+                            <Typography variant="caption" color="text.secondary">
+                                Saved
+                            </Typography>
+                        </Fade>
                     </Box>
 
                     <Stack>
