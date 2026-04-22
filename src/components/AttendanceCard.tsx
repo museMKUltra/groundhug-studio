@@ -165,7 +165,7 @@ export default function AttendanceCard(
                 <Stack spacing={2}>
 
                     <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="h6">Attendance</Typography>
+                        <Typography variant="h6">Start Your Cycle</Typography>
                     </Box>
 
                     <Stack>
