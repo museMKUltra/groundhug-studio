@@ -32,7 +32,16 @@ type FormState = {
 };
 
 export default function SessionDialog({session, onClose, onSave}: Props) {
-    const {labels, createLabel, updateLabel, deleteLabel} = useLabelContext();
+    const {
+        labels,
+        globalLabels,
+        sortableLabels,
+        setSortableLabels,
+        createLabel,
+        updateLabel,
+        deleteLabel,
+        reorderLabels
+    } = useLabelContext();
     const {updateSession} = useSessions();
     const {showError, showSuccess} = useSnackbar();
 
@@ -267,11 +276,14 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
 
                 <LabelDialog
                     open={openLabelDialog}
-                    labels={labels}
+                    globalLabels={globalLabels}
+                    sortableLabels={sortableLabels}
+                    setSortableLabels={setSortableLabels}
                     onClose={() => setOpenLabelDialog(false)}
                     onCreate={createLabel}
                     onUpdate={updateLabel}
                     onDelete={deleteLabel}
+                    onReorder={reorderLabels}
                     onError={handleError}
                     onSuccess={showSuccess}
                 />

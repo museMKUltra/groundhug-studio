@@ -16,7 +16,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
 
-import {useEffect, useMemo, useState} from "react";
+import {useMemo, useState} from "react";
 import type {CreateLabelRequest, Label} from "@/features/attendance/types";
 import LabelChip from "./LabelChip";
 
@@ -27,11 +27,14 @@ import {CSS} from "@dnd-kit/utilities";
 
 type Props = {
     open: boolean;
-    labels: Label[];
+    globalLabels: Label[];
+    sortableLabels: Label[];
+    setSortableLabels: (labels: Label[]) => void;
     onClose: () => void;
     onCreate: (data: CreateLabelRequest) => Promise<void>;
     onUpdate: (id: number, label: Label) => Promise<void>;
     onDelete: (id: number) => Promise<void>;
+    onReorder: (ids: number[]) => Promise<void>;
     onError: (err: unknown) => void;
     onSuccess: (message: string) => void;
 };
@@ -72,11 +75,14 @@ function SortableRow({
 
 export default function LabelDialog({
                                         open,
-                                        labels,
+                                        globalLabels,
+                                        sortableLabels,
+                                        setSortableLabels,
                                         onClose,
                                         onCreate,
                                         onUpdate,
                                         onDelete,
+                                        onReorder,
                                         onError,
                                         onSuccess
                                     }: Props) {
@@ -84,24 +90,6 @@ export default function LabelDialog({
     const [loading, setLoading] = useState(false);
     const [editingId, setEditingId] = useState<number | "new" | null>(null);
     const [draft, setDraft] = useState<Label | null>(null);
-
-    /** split global / user labels */
-    const globalLabels = useMemo(
-        () => labels.filter(l => l.isGlobal),
-        [labels]
-    );
-
-    const userLabelsSorted = useMemo(
-        () => [...labels]
-            .filter(l => !l.isGlobal),
-        [labels]
-    );
-
-    const [items, setItems] = useState<Label[]>(userLabelsSorted);
-
-    useEffect(() => {
-        setItems(userLabelsSorted);
-    }, [userLabelsSorted]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {activationConstraint: {distance: 5}})
@@ -112,24 +100,22 @@ export default function LabelDialog({
         const {active, over} = event;
         if (!over || active.id === over.id) return;
 
-        const oldIndex = items.findIndex(i => i.id === active.id);
-        const newIndex = items.findIndex(i => i.id === over.id);
+        const oldIndex = sortableLabels.findIndex(i => i.id === active.id);
+        const newIndex = sortableLabels.findIndex(i => i.id === over.id);
 
-        let newItems = arrayMove(items, oldIndex, newIndex);
-        setItems(newItems);
+        let sortedLabels = arrayMove(sortableLabels, oldIndex, newIndex);
+        setSortableLabels(sortedLabels);
 
         try {
             setLoading(true);
-
-            // TODO: reorder labels
-
+            await onReorder(sortedLabels.map(i => i.id));
             onSuccess("Order updated");
         } catch (e) {
             onError(e);
 
             // revert back to old order
-            newItems = arrayMove(newItems, newIndex, oldIndex);
-            setItems(newItems);
+            sortedLabels = arrayMove(sortedLabels, newIndex, oldIndex);
+            setSortableLabels(sortedLabels);
         } finally {
             setLoading(false);
         }
@@ -200,14 +186,14 @@ export default function LabelDialog({
             return draft.name.trim() !== "";
         }
 
-        const original = labels.find((l) => l.id === editingId);
+        const original = sortableLabels.find((l) => l.id === editingId);
         if (!original) return false;
 
         return (
             draft.name.trim() !== original.name.trim() ||
             draft.color !== original.color
         );
-    }, [draft, editingId, labels]);
+    }, [draft, editingId, sortableLabels]);
 
     const handleClose = () => {
         if (hasChanged) {
@@ -251,10 +237,10 @@ export default function LabelDialog({
                         onDragEnd={handleDragEnd}
                     >
                         <SortableContext
-                            items={items.map(i => i.id)}
+                            items={sortableLabels.map(i => i.id)}
                             strategy={verticalListSortingStrategy}
                         >
-                            {items.map(label => {
+                            {sortableLabels.map(label => {
                                 const isEditing = editingId === label.id;
                                 const current = (isEditing && draft) ? draft : label;
 
