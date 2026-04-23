@@ -1,15 +1,16 @@
 import axios from "@/api/axios";
 import type {
     ActiveSessionResponse,
-    UpdateSessionRequest,
     ClockInAndOutRequest,
     CreateLabelRequest,
     EmployeeRateRequest,
     EmployeeRateResponse,
     Label,
     PeriodSessionsResponse,
-    Summary,
+    ReorderLabelsRequest,
     Session,
+    Summary,
+    UpdateSessionRequest,
 } from "./types";
 
 export const getPeriodSessionsApi = async (startDate: string, endDate: string) => {
@@ -77,6 +78,10 @@ export const updateLabelApi = async (
 
 export const deleteLabelApi = async (id: number) => {
     await axios.delete(`/attendance/labels/${id}`);
+};
+
+export const reorderLabelsApi = async (data: ReorderLabelsRequest) => {
+    await axios.post(`/attendance/labels/reorder`, data);
 };
 
 export const createEmployeeRateApi = async (data: EmployeeRateRequest) => {

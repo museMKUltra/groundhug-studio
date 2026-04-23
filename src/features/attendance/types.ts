@@ -59,6 +59,10 @@ export interface CreateLabelRequest {
     color: string;
 }
 
+export interface ReorderLabelsRequest {
+    ids: number[];
+}
+
 export interface ClockInAndOutRequest {
     labelId?: number;
     description?: string;
