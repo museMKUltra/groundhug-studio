@@ -1,13 +1,29 @@
-import {Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField} from "@mui/material";
-import IconButton from "@mui/material/IconButton";
+import {
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    Stack,
+    TextField
+} from "@mui/material";
+
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
-import {useMemo, useState} from "react";
+
+import {useEffect, useMemo, useState} from "react";
 import type {CreateLabelRequest, Label} from "@/features/attendance/types";
 import LabelChip from "./LabelChip";
+
+/** dnd-kit */
+import {closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors} from "@dnd-kit/core";
+import {arrayMove, SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
+import {CSS} from "@dnd-kit/utilities";
 
 type Props = {
     open: boolean;
@@ -20,10 +36,104 @@ type Props = {
     onSuccess: (message: string) => void;
 };
 
-export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, onDelete, onError, onSuccess}: Props) {
-    const [loading, SetLoading] = useState<boolean>(false);
+/** draggable row */
+function SortableRow({
+                         label,
+                         children
+                     }: {
+    label: Label;
+    children: React.ReactNode;
+}) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({id: label.id});
+
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.6 : 1,
+        display: "flex",
+        alignItems: "center",
+        minHeight: 40,
+        cursor: "grab"
+    };
+
+    return (
+        <Box ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            {children}
+        </Box>
+    );
+}
+
+export default function LabelDialog({
+                                        open,
+                                        labels,
+                                        onClose,
+                                        onCreate,
+                                        onUpdate,
+                                        onDelete,
+                                        onError,
+                                        onSuccess
+                                    }: Props) {
+
+    const [loading, setLoading] = useState(false);
     const [editingId, setEditingId] = useState<number | "new" | null>(null);
     const [draft, setDraft] = useState<Label | null>(null);
+
+    /** split global / user labels */
+    const globalLabels = useMemo(
+        () => labels.filter(l => l.isGlobal),
+        [labels]
+    );
+
+    const userLabelsSorted = useMemo(
+        () => [...labels]
+            .filter(l => !l.isGlobal),
+        [labels]
+    );
+
+    const [items, setItems] = useState<Label[]>(userLabelsSorted);
+
+    useEffect(() => {
+        setItems(userLabelsSorted);
+    }, [userLabelsSorted]);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {activationConstraint: {distance: 5}})
+    );
+
+    /** reorder handler */
+    const handleDragEnd = async (event: DragEndEvent) => {
+        const {active, over} = event;
+        if (!over || active.id === over.id) return;
+
+        const oldIndex = items.findIndex(i => i.id === active.id);
+        const newIndex = items.findIndex(i => i.id === over.id);
+
+        let newItems = arrayMove(items, oldIndex, newIndex);
+        setItems(newItems);
+
+        try {
+            setLoading(true);
+
+            // TODO: reorder labels
+
+            onSuccess("Order updated");
+        } catch (e) {
+            onError(e);
+
+            // revert back to old order
+            newItems = arrayMove(newItems, newIndex, oldIndex);
+            setItems(newItems);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const startEdit = (label: Label) => {
         setEditingId(label.id);
@@ -33,13 +143,13 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
     const handleDelete = async (label: Label) => {
         if (!window.confirm(`Delete "${label.name}"?`)) return;
         try {
-            SetLoading(true);
+            setLoading(true);
             await onDelete(label.id);
             onSuccess("Label deleted successfully");
         } catch (e) {
             onError(e);
         } finally {
-            SetLoading(false);
+            setLoading(false);
         }
     };
 
@@ -59,26 +169,27 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
     };
 
     const confirmEdit = async () => {
-        if (!draft) return;
-        if (!draft.name.trim()) return;
+        if (!draft || !draft.name.trim()) return;
 
         try {
-            SetLoading(true);
+            setLoading(true);
+
             if (editingId === "new") {
                 await onCreate({
                     name: draft.name,
-                    color: draft.color,
+                    color: draft.color
                 });
-                onSuccess("Label created successfully");
+                onSuccess("Label created");
             } else {
                 await onUpdate(draft.id, draft);
-                onSuccess("Label updated successfully");
+                onSuccess("Label updated");
             }
+
             cancelEdit();
         } catch (e) {
             onError(e);
         } finally {
-            SetLoading(false);
+            setLoading(false);
         }
     };
 
@@ -108,6 +219,7 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
 
     const heightSx = {
         display: "flex",
+        flex: 1,
         alignItems: "center",
         minHeight: "40px"
     }
@@ -124,98 +236,104 @@ export default function LabelDialog({open, labels, onClose, onCreate, onUpdate, 
 
             <DialogContent>
                 <Stack>
-                    {labels.map((label) => {
-                        const isEditing = editingId === label.id;
-                        const current = (isEditing && draft) ? draft : label;
 
-                        return (
-                            label.isGlobal
-                                ? (
-                                    <Box sx={heightSx} key={label.id}>
-                                        <LabelChip label={current}/>
-                                    </Box>
-                                )
-                                : (
-                                    <Box key={label.id} sx={labelSx} gap={1}>
-                                        <Box sx={{flex: 1}}>
-                                            <LabelChip label={current}/>
-                                        </Box>
+                    {/* GLOBAL (fixed) */}
+                    {globalLabels.map(label => (
+                        <Box key={label.id} sx={heightSx}>
+                            <LabelChip label={label}/>
+                        </Box>
+                    ))}
 
-                                        {isEditing && (
-                                            <>
-                                                <Box sx={{flex: 1}}>
+                    {/* USER LABELS (DRAGGABLE) */}
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={items.map(i => i.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            {items.map(label => {
+                                const isEditing = editingId === label.id;
+                                const current = (isEditing && draft) ? draft : label;
+
+                                return (
+                                    <SortableRow key={label.id} label={label}>
+                                        <Box key={label.id} sx={labelSx} gap={1}>
+                                            <Box sx={{flex: 1}}>
+                                                <LabelChip label={current}/>
+                                            </Box>
+
+                                            {isEditing ? (
+                                                <>
                                                     <TextField
-                                                        value={current.name}
                                                         size="small"
-                                                        fullWidth
-                                                        autoFocus
+                                                        value={current.name}
                                                         onChange={(e) =>
-                                                            setDraft((prev) =>
+                                                            setDraft(prev =>
                                                                 prev ? {...prev, name: e.target.value} : prev
                                                             )
                                                         }
                                                     />
-                                                </Box>
 
-                                                <input
-                                                    type="color"
-                                                    value={current.color}
-                                                    onChange={(e) =>
-                                                        setDraft((prev) =>
-                                                            prev ? {...prev, color: e.target.value} : prev
-                                                        )
-                                                    }
-                                                    style={{
-                                                        width: 40,
-                                                        height: 40,
-                                                        border: "none",
-                                                        background: "none",
-                                                        cursor: "pointer",
-                                                    }}
-                                                />
-                                            </>
-                                        )}
+                                                    <input
+                                                        type="color"
+                                                        value={current.color}
+                                                        onChange={(e) =>
+                                                            setDraft(prev =>
+                                                                prev ? {...prev, color: e.target.value} : prev
+                                                            )
+                                                        }
+                                                        style={{
+                                                            width: 40,
+                                                            height: 40,
+                                                            border: "none",
+                                                            background: "none",
+                                                            cursor: "pointer",
+                                                        }}
+                                                    />
 
-                                        {isEditing ? (
-                                            <>
-                                                <IconButton
-                                                    disabled={loading || !hasChanged}
-                                                    size="small"
-                                                    color="primary"
-                                                    onClick={confirmEdit}
-                                                >
-                                                    <CheckIcon fontSize="small"/>
-                                                </IconButton>
-                                                <IconButton
-                                                    disabled={loading}
-                                                    size="small"
-                                                    onClick={cancelEdit}
-                                                >
-                                                    <CloseIcon fontSize="small"/>
-                                                </IconButton>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <IconButton
-                                                    disabled={loading}
-                                                    size="small"
-                                                    onClick={() => startEdit(label)}
-                                                >
-                                                    <EditIcon fontSize="small"/>
-                                                </IconButton>
-                                                <IconButton
-                                                    disabled={loading}
-                                                    size="small"
-                                                    onClick={() => handleDelete(label)}
-                                                >
-                                                    <DeleteIcon fontSize="small"/>
-                                                </IconButton>
-                                            </>
-                                        )}
-                                    </Box>
-                                )
-                        );
-                    })}
+                                                    <IconButton
+                                                        disabled={loading || !hasChanged}
+                                                        size="small"
+                                                        color="primary"
+                                                        onClick={confirmEdit}
+                                                    >
+                                                        <CheckIcon fontSize="small"/>
+                                                    </IconButton>
+                                                    <IconButton
+                                                        disabled={loading}
+                                                        size="small"
+                                                        onClick={cancelEdit}
+                                                    >
+                                                        <CloseIcon fontSize="small"/>
+                                                    </IconButton>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <IconButton
+                                                        disabled={loading}
+                                                        size="small"
+                                                        onClick={() => startEdit(label)}
+                                                    >
+                                                        <EditIcon fontSize="small"/>
+                                                    </IconButton>
+                                                    <IconButton
+                                                        disabled={loading}
+                                                        size="small"
+                                                        onClick={() => handleDelete(label)}
+                                                    >
+                                                        <DeleteIcon fontSize="small"/>
+                                                    </IconButton>
+                                                </>
+                                            )}
+                                        </Box>
+                                    </SortableRow>
+                                );
+                            })}
+                        </SortableContext>
+                    </DndContext>
 
                     {editingId === "new" && draft && (
                         <Box sx={labelSx} gap={1}>
