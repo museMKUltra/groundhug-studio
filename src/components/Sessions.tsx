@@ -18,6 +18,7 @@ export default function Sessions({onRefresh}: Props) {
         periodSessions,
         updatePeriodSessions,
         updateSession,
+        deleteSession,
         weekStart,
         setStartTime,
         setEndTime,
@@ -253,6 +254,11 @@ export default function Sessions({onRefresh}: Props) {
                     if (needRefresh) {
                         onRefresh();
                     }
+                }}
+                onDelete={(session) => {
+                    deleteSession(session);
+                    setSelected(null);
+                    onRefresh();
                 }}
             />
         </>

@@ -6,6 +6,7 @@ import type {AxiosError} from "axios";
 
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 
 import {useSnackbar} from "@/context/SnackbarContext.ts";
@@ -23,6 +24,7 @@ type Props = {
     session: Session | null;
     onClose: () => void;
     onSave: (session: Session, needRefresh: boolean) => void;
+    onDelete: (session: Session) => void;
 };
 
 type FormState = {
@@ -32,7 +34,7 @@ type FormState = {
     description: string;
 };
 
-export default function SessionDialog({session, onClose, onSave}: Props) {
+export default function SessionDialog({session, onClose, onSave, onDelete}: Props) {
     const {
         labels,
         globalLabels,
@@ -43,7 +45,7 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         deleteLabel,
         reorderLabels
     } = useLabelContext();
-    const {updateSession} = useSessions();
+    const {updateSession, deleteSession} = useSessions();
     const {showError, showSuccess} = useSnackbar();
 
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
@@ -144,6 +146,19 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         }
     };
 
+    const handleDelete = async () => {
+        try {
+            if (!session?.id) return;
+            if (!window.confirm("Delete this session?")) return;
+
+            await deleteSession(session.id);
+            onDelete(session);
+            showSuccess("Session deleted successfully");
+        } catch (error) {
+            handleError(error);
+        }
+    }
+
     const handleCancelEdit = () => {
         if (hasChanged) {
             if (!window.confirm("Discard changes?")) return;
@@ -208,6 +223,9 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                             <>
                                 <IconButton onClick={() => setIsEditing(true)} size="small">
                                     <EditIcon/>
+                                </IconButton>
+                                <IconButton onClick={handleDelete} size="small">
+                                    <DeleteIcon/>
                                 </IconButton>
                             </>
                         )}
