@@ -257,7 +257,7 @@ export default function SessionDialog({session, onClose, onSave, onDelete}: Prop
                     isEditing={isEditing}
                     renderView={(val) => (
                         <Typography sx={{lineHeight: "40px"}}>
-                            {val ? dayjs(val).format("YYYY-MM-DD HH:mm") : "-"}
+                            {val ? dayjs(val).format("MM/DD hh:mm A") : "--"}
                         </Typography>
                     )}
                     renderEdit={() => (
@@ -298,7 +298,7 @@ export default function SessionDialog({session, onClose, onSave, onDelete}: Prop
                     isEditing={isEditing}
                     renderView={(val) => (
                         <Typography sx={{lineHeight: "40px"}}>
-                            {val ? dayjs(val).format("YYYY-MM-DD HH:mm") : "-"}
+                            {val ? dayjs(val).format("MM/DD hh:mm A") : "--"}
                         </Typography>
                     )}
                     renderEdit={() => (
