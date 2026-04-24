@@ -9,6 +9,7 @@ export type SessionContextType = {
     updatePeriodSessions: () => Promise<void>;
     updateSession: (session: Session) => void;
     deleteSession: (session: Session) => void;
+    addSession: (session: Session) => void;
     setStartTime: (startTime: dayjs.Dayjs | null) => void;
     setEndTime: (endTime: dayjs.Dayjs | null) => void;
     weekStart: dayjs.Dayjs;
