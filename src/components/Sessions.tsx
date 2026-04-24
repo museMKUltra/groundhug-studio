@@ -7,7 +7,7 @@ import {useSessionContext} from "@/features/attendance/SessionContext";
 import {useLabelContext} from "@/features/attendance/LabelContext";
 import type {Session} from "@/features/attendance/types";
 import {getDuration} from "@/utils/duration";
-import SessionDialog from "@/components/SessionDialog";
+import EditSessionDialog from "@/components/EditSessionDialog.tsx";
 
 type Props = {
     onRefresh: () => void;
@@ -249,16 +249,14 @@ export default function Sessions({onRefresh}: Props) {
             </Box>
 
             {/* EDIT DIALOG */}
-            <SessionDialog
+            <EditSessionDialog
                 key={selected?.id ?? 0}
                 session={selected}
                 onClose={() => setSelected(null)}
                 onSave={(session, needRefresh) => {
                     updateSession(session);
                     setSelected(session);
-                    if (needRefresh) {
-                        onRefresh();
-                    }
+                    if (needRefresh) onRefresh();
                 }}
                 onDelete={(session) => {
                     deleteSession(session);
