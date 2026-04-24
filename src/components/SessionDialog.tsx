@@ -216,16 +216,16 @@ export default function SessionDialog({session, onClose, onSave, onDelete}: Prop
                         {isEditing ? (
                             <>
                                 <IconButton onClick={handleCancelEdit} size="small">
-                                    <CloseIcon/>
+                                    <CloseIcon fontSize="small"/>
                                 </IconButton>
                             </>
                         ) : (
                             <>
                                 <IconButton onClick={() => setIsEditing(true)} size="small">
-                                    <EditIcon/>
+                                    <EditIcon fontSize="small"/>
                                 </IconButton>
                                 <IconButton onClick={handleDelete} size="small">
-                                    <DeleteIcon/>
+                                    <DeleteIcon fontSize="small"/>
                                 </IconButton>
                             </>
                         )}

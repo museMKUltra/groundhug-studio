@@ -91,11 +91,11 @@ const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(
                     <Stack direction="row" spacing={0.5}>
                         {isEditing ? (
                             <IconButton onClick={handleCancelEdit} size="small">
-                                <CloseIcon/>
+                                <CloseIcon fontSize="small"/>
                             </IconButton>
                         ) : (
                             <IconButton onClick={() => setIsEditing(true)} size="small">
-                                <EditIcon/>
+                                <EditIcon fontSize="small"/>
                             </IconButton>
                         )}
                     </Stack>
