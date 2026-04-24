@@ -60,7 +60,6 @@ export default function ViewEditField({
             sx={{
                 display: "grid",
                 gridTemplateColumns: "minmax(0, 1fr) minmax(0, 2fr)",
-                maxWidth: 360,
                 alignItems: "center",
                 px: 1,
                 py: 1,

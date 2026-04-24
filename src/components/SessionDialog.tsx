@@ -1,4 +1,5 @@
 import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography} from "@mui/material";
+import {DatePicker, TimePicker} from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import {useMemo, useState} from "react";
 import type {AxiosError} from "axios";
@@ -169,6 +170,24 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
         return getDuration({clockIn, clockOut});
     }, [form]);
 
+
+    const updateDatePart = (original: string, newDate: dayjs.Dayjs) => {
+        const base = dayjs(original || newDate);
+        return base
+            .year(newDate.year())
+            .month(newDate.month())
+            .date(newDate.date())
+            .format("YYYY-MM-DDTHH:mm");
+    };
+
+    const updateTimePart = (original: string, newTime: dayjs.Dayjs) => {
+        const base = dayjs(original || newTime);
+        return base
+            .hour(newTime.hour())
+            .minute(newTime.minute())
+            .format("YYYY-MM-DDTHH:mm");
+    };
+
     return (
         <Dialog
             open={!!session}
@@ -214,24 +233,44 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     )}
                 />
 
-
                 <ViewEditField
                     label="Clock In"
                     value={form.clockIn}
                     isEditing={isEditing}
-                    size="small"
-                    type="datetime-local"
-                    slotProps={{
-                        htmlInput: {
-                            min: dayjs(session?.clockIn).startOf("month").format("YYYY-MM-DDTHH:mm"),
-                            max: dayjs(session?.clockIn).endOf("month").format("YYYY-MM-DDTHH:mm"),
-                        }
-                    }}
-                    onChange={(val) => handleChange("clockIn", val)}
                     renderView={(val) => (
                         <Typography sx={{lineHeight: "40px"}}>
                             {val ? dayjs(val).format("YYYY-MM-DD HH:mm") : "-"}
                         </Typography>
+                    )}
+                    renderEdit={() => (
+                        <Stack
+                            direction={{xs: "column", md: "row"}}
+                            spacing={1}
+                        >
+                            <DatePicker
+                                value={form.clockIn ? dayjs(form.clockIn) : null}
+                                onChange={(date) => {
+                                    if (!date) return;
+                                    handleChange("clockIn", updateDatePart(form.clockIn, date));
+                                }}
+                                slotProps={{
+                                    textField: {size: "small"}
+                                }}
+                                minDate={dayjs(session?.clockIn).startOf("month")}
+                                maxDate={dayjs(session?.clockIn).endOf("month")}
+                            />
+
+                            <TimePicker
+                                value={form.clockIn ? dayjs(form.clockIn) : null}
+                                onChange={(time) => {
+                                    if (!time) return;
+                                    handleChange("clockIn", updateTimePart(form.clockIn, time));
+                                }}
+                                slotProps={{
+                                    textField: {size: "small"}
+                                }}
+                            />
+                        </Stack>
                     )}
                 />
 
@@ -239,21 +278,41 @@ export default function SessionDialog({session, onClose, onSave}: Props) {
                     label="Clock Out"
                     value={form.clockOut}
                     isEditing={isEditing}
-                    size="small"
-                    type="datetime-local"
-                    slotProps={{
-                        htmlInput: {
-                            min: form.clockIn || undefined,
-                        }
-                    }}
-                    onChange={(val) => handleChange("clockOut", val)}
                     renderView={(val) => (
                         <Typography sx={{lineHeight: "40px"}}>
                             {val ? dayjs(val).format("YYYY-MM-DD HH:mm") : "-"}
                         </Typography>
                     )}
-                />
+                    renderEdit={() => (
+                        <Stack
+                            direction={{xs: "column", md: "row"}}
+                            spacing={1}
+                        >
+                            <DatePicker
+                                value={form.clockOut ? dayjs(form.clockOut) : null}
+                                onChange={(date) => {
+                                    if (!date) return;
+                                    handleChange("clockOut", updateDatePart(form.clockOut, date));
+                                }}
+                                slotProps={{
+                                    textField: {size: "small"}
+                                }}
+                                minDate={form.clockIn ? dayjs(form.clockIn) : undefined}
+                            />
 
+                            <TimePicker
+                                value={form.clockOut ? dayjs(form.clockOut) : null}
+                                onChange={(time) => {
+                                    if (!time) return;
+                                    handleChange("clockOut", updateTimePart(form.clockOut, time));
+                                }}
+                                slotProps={{
+                                    textField: {size: "small"}
+                                }}
+                            />
+                        </Stack>
+                    )}
+                />
                 <ViewEditField
                     label="Label"
                     value={String(form.labelId)}
