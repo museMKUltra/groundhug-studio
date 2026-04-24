@@ -44,6 +44,13 @@ export const SessionProvider = ({children}: { children: React.ReactNode }) => {
         setPeriodSessions(prev => prev.map(s => s.id === session.id ? session : s));
     };
 
+    const deleteSession = async (session: Session) => {
+        if (session == null) {
+            return;
+        }
+        setPeriodSessions(prev => prev.filter(s => s.id !== session.id));
+    };
+
     return (
         <SessionContext.Provider
             value={{
@@ -52,6 +59,7 @@ export const SessionProvider = ({children}: { children: React.ReactNode }) => {
                 fetchPeriodSessions,
                 updatePeriodSessions,
                 updateSession,
+                deleteSession,
                 setStartTime: (v) => {
                     startTime.current = v;
                 },
