@@ -25,11 +25,10 @@ type Props = {
     session: Session | null;
     form: FormState;
     onChange: <K extends keyof FormState>(key: K, value: FormState[K]) => void
-    onClose: () => void;
     isEditing: boolean
 };
 
-export default function SessionDialogContent({session, form, onChange, onClose, isEditing}: Props) {
+export default function SessionDialogContent({session, form, onChange, isEditing}: Props) {
     const {
         labels,
         globalLabels,
@@ -208,7 +207,7 @@ export default function SessionDialogContent({session, form, onChange, onClose, 
                 globalLabels={globalLabels}
                 sortableLabels={sortableLabels}
                 setSortableLabels={setSortableLabels}
-                onClose={onClose}
+                onClose={() => setOpenLabelDialog(false)}
                 onCreate={createLabel}
                 onUpdate={updateLabel}
                 onDelete={deleteLabel}

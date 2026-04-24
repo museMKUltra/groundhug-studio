@@ -183,7 +183,6 @@ export default function EditSessionDialog({session, onClose, onSave, onDelete}: 
                 session={session}
                 form={form}
                 onChange={onChange}
-                onClose={onClose}
                 isEditing={isEditing}
             />
 
