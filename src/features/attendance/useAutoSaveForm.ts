@@ -28,7 +28,6 @@ export function useAutoSaveForm<T>({
 
     const syncValue = (next: T) => {
         savedRef.current = next;
-        console.log('saveRef.current', savedRef.current);
     };
 
     const flush = async (currentValue: T) => {
