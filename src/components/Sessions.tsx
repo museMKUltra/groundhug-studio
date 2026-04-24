@@ -83,18 +83,23 @@ export default function Sessions({onRefresh}: Props) {
             {/* MAIN */}
             <Box display="flex">
                 {/* TIMELINE */}
-                <Box sx={{width: 24, height: 390, position: "relative", top: 32, mr: 1}}>
-                    {[0, 6, 12, 18, 24].map((h) => (
+                <Box sx={{width: 32, height: 390, position: "relative", top: 32, mr: 1}}>
+                    {[
+                        {hour: 0, display: 0, section: 'AM'},
+                        {hour: 6, display: 6, section: 'AM'},
+                        {hour: 12, display: 12, section: 'PM'},
+                        {hour: 18, display: 6, section: 'PM'},
+                    ].map((time) => (
                         <Box
-                            key={h}
+                            key={time.hour}
                             sx={{
                                 position: "absolute",
-                                top: `${(h / 24) * 100}%`,
+                                top: `${(time.hour / 24) * 100}%`,
                                 transform: "translateY(-50%)",
                                 fontSize: 10,
                             }}
                         >
-                            {String(h).padStart(2, "0")}
+                            {`${String(time.display).padStart(2, "0")} ${time.section}`}
                         </Box>
                     ))}
                 </Box>
@@ -179,7 +184,7 @@ export default function Sessions({onRefresh}: Props) {
                                                 title={
                                                     <Box>
                                                         <Typography variant="caption" fontWeight={600}>
-                                                            {start.format("HH:mm")} - {end.format("HH:mm")} ({getDuration({
+                                                            {start.format("hh:mm A")} - {end.format("hh:mm A")} ({getDuration({
                                                             clockIn: s.clockIn,
                                                             clockOut: s.clockOut || ""
                                                         })})
