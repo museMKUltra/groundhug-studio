@@ -4,13 +4,14 @@ import {
     clockOutApi,
     confirmWorkSummaryApi,
     createEmployeeRateApi,
+    createSessionApi,
     deleteSessionApi,
     getActiveSessionApi,
     getPeriodSessionsApi,
     getWorkSummaryPreviewApi,
-    updateSessionApi,
+    updateSessionApi
 } from "./api.ts";
-import type {ClockInAndOutRequest, Session, Summary, UpdateSessionRequest} from "./types";
+import type {ClockInAndOutRequest, CreateSessionRequest, Session, Summary, UpdateSessionRequest} from "./types";
 
 export const useSessions = () => {
     const [loading, setLoading] = useState(false);
@@ -56,6 +57,10 @@ export const useSessions = () => {
         setPeriodSessions(res);
     }
 
+    const createSession = async (data: CreateSessionRequest) => {
+        return await createSessionApi(data);
+    }
+
     const updateSession = async (id: number, data: UpdateSessionRequest) => {
         return await updateSessionApi(id, data);
     }
@@ -76,6 +81,7 @@ export const useSessions = () => {
         clockOut,
         periodSessions,
         handlePeriodSessions,
+        createSession,
         updateSession,
         deleteSession,
     };

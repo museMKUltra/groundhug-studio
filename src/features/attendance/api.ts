@@ -3,6 +3,7 @@ import type {
     ActiveSessionResponse,
     ClockInAndOutRequest,
     CreateLabelRequest,
+    CreateSessionRequest,
     EmployeeRateRequest,
     EmployeeRateResponse,
     Label,
@@ -22,6 +23,13 @@ export const getPeriodSessionsApi = async (startDate: string, endDate: string) =
 
 export const getActiveSessionApi = async () => {
     const res = await axios.get<ActiveSessionResponse>("/attendance/active-session");
+    return res.data;
+};
+
+export const createSessionApi = async (
+    data: CreateSessionRequest,
+) => {
+    const res = await axios.post<Session>(`/attendance/sessions`, data);
     return res.data;
 };
 
