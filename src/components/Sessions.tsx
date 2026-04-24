@@ -51,6 +51,7 @@ export default function Sessions({onRefresh}: Props) {
     }, [weekStart]);
 
     const [selected, setSelected] = useState<Session | null>(null);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
 
     const handleOpenDialog = (s: Session) => {
         setSelected(s);
@@ -221,7 +222,10 @@ export default function Sessions({onRefresh}: Props) {
                                                 }
                                             >
                                                 <Box
-                                                    onClick={() => handleOpenDialog(s)}
+                                                    onClick={() => {
+                                                        setSelected(s);
+                                                        setOpenEditDialog(true);
+                                                    }}
                                                     sx={{
                                                         position: "absolute",
                                                         left: 4,
@@ -252,7 +256,11 @@ export default function Sessions({onRefresh}: Props) {
             <EditSessionDialog
                 key={selected?.id ?? 0}
                 session={selected}
-                onClose={() => setSelected(null)}
+                open={openEditDialog}
+                onClose={() => {
+                    setSelected(null);
+                    setOpenEditDialog(false);
+                }}
                 onSave={(session, needRefresh) => {
                     updateSession(session);
                     setSelected(session);
@@ -261,6 +269,7 @@ export default function Sessions({onRefresh}: Props) {
                 onDelete={(session) => {
                     deleteSession(session);
                     setSelected(null);
+                    setOpenEditDialog(false);
                     onRefresh();
                 }}
             />

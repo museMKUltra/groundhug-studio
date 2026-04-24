@@ -15,6 +15,7 @@ import SessionDialogContent from "@/components/SessionDialogContent";
 
 type Props = {
     session: Session | null;
+    open: boolean;
     onClose: () => void;
     onSave: (session: Session, needRefresh: boolean) => void;
     onDelete: (session: Session) => void;
@@ -27,7 +28,7 @@ type FormState = {
     description: string;
 };
 
-export default function EditSessionDialog({session, onClose, onSave, onDelete}: Props) {
+export default function EditSessionDialog({session, open, onClose, onSave, onDelete}: Props) {
     const {updateSession, deleteSession} = useSessions();
     const {showError, showSuccess} = useSnackbar();
 
@@ -151,7 +152,7 @@ export default function EditSessionDialog({session, onClose, onSave, onDelete}: 
 
     return (
         <Dialog
-            open={!!session}
+            open={open}
             onClose={isEditing ? undefined : onClose}
         >
             <DialogTitle sx={{pr: 1}}>
