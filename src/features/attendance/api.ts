@@ -33,6 +33,12 @@ export const updateSessionApi = async (
     return res.data;
 };
 
+export const deleteSessionApi = async (
+    id: number,
+) => {
+    await axios.delete<Session>(`/attendance/sessions/${id}`);
+};
+
 export const clockInApi = async (data?: ClockInAndOutRequest) => {
     const res = await axios.post<ActiveSessionResponse>("/attendance/clock-in", data);
     return res.data;

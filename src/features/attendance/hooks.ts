@@ -4,6 +4,7 @@ import {
     clockOutApi,
     confirmWorkSummaryApi,
     createEmployeeRateApi,
+    deleteSessionApi,
     getActiveSessionApi,
     getPeriodSessionsApi,
     getWorkSummaryPreviewApi,
@@ -59,6 +60,10 @@ export const useSessions = () => {
         return await updateSessionApi(id, data);
     }
 
+    const deleteSession = async (id: number) => {
+        return await deleteSessionApi(id);
+    }
+
     return {
         loading,
         session,
@@ -72,6 +77,7 @@ export const useSessions = () => {
         periodSessions,
         handlePeriodSessions,
         updateSession,
+        deleteSession,
     };
 };
 
