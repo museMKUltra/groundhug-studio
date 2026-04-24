@@ -8,10 +8,13 @@ import {useLabelContext} from "@/features/attendance/LabelContext";
 import type {Session} from "@/features/attendance/types";
 import {getDuration} from "@/utils/duration";
 import EditSessionDialog from "@/components/EditSessionDialog.tsx";
+import AddSessionDialog from "@/components/AddSessionDialog.tsx";
 
 type Props = {
     onRefresh: () => void;
 };
+
+const MINUTES_IN_DAY = 1440;
 
 export default function Sessions({onRefresh}: Props) {
     const {
@@ -19,6 +22,7 @@ export default function Sessions({onRefresh}: Props) {
         updatePeriodSessions,
         updateSession,
         deleteSession,
+        addSession,
         weekStart,
         setStartTime,
         setEndTime,
@@ -26,22 +30,14 @@ export default function Sessions({onRefresh}: Props) {
         nextWeek,
         goToday
     } = useSessionContext();
+
     const {labels} = useLabelContext();
 
-    const endDate = useMemo(
-        () => weekStart.add(7, "day"),
-        [weekStart]
-    );
-
-    const weekEnd = useMemo(
-        () => weekStart.add(6, "day"),
-        [weekStart]
-    );
+    const endDate = useMemo(() => weekStart.add(7, "day"), [weekStart]);
+    const weekEnd = useMemo(() => weekStart.add(6, "day"), [weekStart]);
 
     const weekDays = useMemo(() => {
-        return Array.from({length: 7}).map((_, i) =>
-            weekStart.add(i, "day")
-        );
+        return Array.from({length: 7}).map((_, i) => weekStart.add(i, "day"));
     }, [weekStart]);
 
     useEffect(() => {
@@ -52,12 +48,22 @@ export default function Sessions({onRefresh}: Props) {
 
     const [selected, setSelected] = useState<Session | null>(null);
     const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openAddDialog, setOpenAddDialog] = useState(false);
 
-    const handleOpenDialog = (s: Session) => {
-        setSelected(s);
-    };
+    const [dragging, setDragging] = useState<{
+        day: dayjs.Dayjs;
+        startY: number;
+        currentY: number;
+    } | null>(null);
 
     const today = dayjs();
+
+    const getMinutesFromY = (y: number, height: number) => {
+        const ratio = Math.max(0, Math.min(1, y / height));
+        return Math.round(ratio * MINUTES_IN_DAY);
+    };
+
+    const snapTo15 = (min: number) => Math.round(min / 15) * 15;
 
     return (
         <>
@@ -82,7 +88,7 @@ export default function Sessions({onRefresh}: Props) {
             </Box>
 
             {/* MAIN */}
-            <Box display="flex">
+            <Box display="flex" sx={{userSelect: "none"}}>
                 {/* TIMELINE */}
                 <Box sx={{width: 32, height: 390, position: "relative", top: 32, mr: 1}}>
                     {[
@@ -115,9 +121,7 @@ export default function Sessions({onRefresh}: Props) {
                                 variant="caption"
                                 textAlign="center"
                                 sx={{
-                                    color: d.isSame(today, "day")
-                                        ? "primary.main"
-                                        : "text.secondary",
+                                    color: d.isSame(today, "day") ? "primary.main" : "text.secondary",
                                     fontWeight: d.isSame(today, "day") ? 600 : 400,
                                 }}
                             >
@@ -142,11 +146,7 @@ export default function Sessions({onRefresh}: Props) {
                                     const renderStart = start.isBefore(dayStart) ? dayStart : start;
                                     const renderEnd = end.isAfter(dayEnd) ? dayEnd : end;
 
-                                    return {
-                                        ...s,
-                                        renderStart,
-                                        renderEnd,
-                                    };
+                                    return {...s, renderStart, renderEnd};
                                 })
                                 .filter(Boolean) as (Session & {
                                 renderStart: dayjs.Dayjs;
@@ -162,8 +162,52 @@ export default function Sessions({onRefresh}: Props) {
                                         bgcolor: "grey.100",
                                         borderRadius: 1,
                                         overflow: "hidden",
+                                        cursor: dragging ? "grabbing" : "crosshair",
                                     }}
+                                    onMouseDown={(e) => {
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        const startY = e.clientY - rect.top;
+
+                                        setDragging({day, startY, currentY: startY});
+                                    }}
+                                    onMouseMove={(e) => {
+                                        if (!dragging) return;
+                                        const rect = e.currentTarget.getBoundingClientRect();
+                                        const currentY = e.clientY - rect.top;
+
+                                        setDragging(prev => prev && {...prev, currentY});
+                                    }}
+                                    onMouseUp={(e) => {
+                                        if (!dragging) return;
+
+                                        const rect = e.currentTarget.getBoundingClientRect();
+
+                                        const startMin = snapTo15(getMinutesFromY(dragging.startY, rect.height));
+                                        const endMin = snapTo15(getMinutesFromY(dragging.currentY, rect.height));
+
+                                        const [minStart, minEnd] = [startMin, endMin].sort((a, b) => a - b);
+                                        if (minStart === minEnd) {
+                                            setDragging(null);
+                                            return;
+                                        }
+
+                                        const start = dragging.day.startOf("day").add(minStart, "minute");
+                                        const end = dragging.day.startOf("day").add(minEnd, "minute");
+
+                                        setSelected({
+                                            id: 0,
+                                            clockIn: start,
+                                            clockOut: end,
+                                            label: null,
+                                            description: ""
+                                        } as Session);
+
+                                        setDragging(null);
+                                        setOpenAddDialog(true);
+                                    }}
+                                    onMouseLeave={() => setDragging(null)}
                                 >
+                                    {/* sessions */}
                                     {daySessions.map((s) => {
                                         const start = s.renderStart;
                                         const end = s.renderEnd;
@@ -173,8 +217,10 @@ export default function Sessions({onRefresh}: Props) {
 
                                         const top = (startMin / 1440) * 100;
                                         const height = Math.max(((endMin - startMin) / 1440) * 100, 1);
-                                        const labelId = s?.label?.id;
-                                        const color = labelId && labels.find(l => l.id === labelId)?.color
+
+                                        const color = s.label?.id
+                                            ? labels.find(l => l.id === s.label.id)?.color
+                                            : undefined;
 
                                         return (
                                             <Tooltip
@@ -182,6 +228,7 @@ export default function Sessions({onRefresh}: Props) {
                                                 placement="left"
                                                 arrow
                                                 enterDelay={300}
+                                                disableHoverListener={dragging}
                                                 title={
                                                     <Box>
                                                         <Typography variant="caption" fontWeight={600}>
@@ -222,6 +269,7 @@ export default function Sessions({onRefresh}: Props) {
                                                 }
                                             >
                                                 <Box
+                                                    onMouseDown={(e) => e.stopPropagation()}
                                                     onClick={() => {
                                                         setSelected(s);
                                                         setOpenEditDialog(true);
@@ -238,13 +286,38 @@ export default function Sessions({onRefresh}: Props) {
                                                         cursor: "pointer",
                                                         transition: "0.2s",
                                                         '&:hover': {
-                                                            opacity: 1,
+                                                            opacity: dragging ? 0.85 : 1,
                                                         }
                                                     }}
                                                 />
                                             </Tooltip>
                                         );
                                     })}
+
+                                    {/* preview */}
+                                    {dragging && dragging.day.isSame(day, "day") && (() => {
+                                        const start = Math.min(dragging.startY, dragging.currentY);
+                                        const end = Math.max(dragging.startY, dragging.currentY);
+
+                                        const top = (start / 400) * 100;
+                                        const height = ((end - start) / 400) * 100;
+
+                                        return (
+                                            <Box
+                                                sx={{
+                                                    position: "absolute",
+                                                    left: 4,
+                                                    right: 4,
+                                                    top: `${top}%`,
+                                                    height: `${height}%`,
+                                                    bgcolor: "primary.main",
+                                                    opacity: 0.3,
+                                                    borderRadius: 1,
+                                                    pointerEvents: "none"
+                                                }}
+                                            />
+                                        );
+                                    })()}
                                 </Box>
                             );
                         })}
@@ -271,6 +344,22 @@ export default function Sessions({onRefresh}: Props) {
                     setSelected(null);
                     setOpenEditDialog(false);
                     onRefresh();
+                }}
+            />
+
+            <AddSessionDialog
+                key={openAddDialog ? 'new' : 'none'}
+                session={selected}
+                open={openAddDialog}
+                onClose={() => {
+                    setSelected(null);
+                    setOpenAddDialog(false);
+                }}
+                onSave={(session, needRefresh) => {
+                    addSession(session);
+                    setSelected(null);
+                    setOpenAddDialog(false);
+                    if (needRefresh) onRefresh();
                 }}
             />
         </>
