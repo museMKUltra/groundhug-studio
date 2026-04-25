@@ -63,11 +63,22 @@ function SortableRow({
         display: "flex",
         alignItems: "center",
         minHeight: 40,
-        cursor: "grab"
+        cursor: isDragging ? "grabbing" : "grab",
+        scale: isDragging ? "1.03" : "1",
+        boxShadow: isDragging ? "0 4px 12px rgba(0,0,0,0.15)" : "none",
+        zIndex: isDragging ? 1 : 0,
     };
 
     return (
-        <Box ref={setNodeRef} style={style} {...attributes} {...listeners}>
+        <Box
+            ref={setNodeRef}
+            style={style}
+            sx={{
+                WebkitUserSelect: "none", // Prevent text selection / highlight (iOS issue)
+            }}
+            {...attributes}
+            {...listeners}
+        >
             {children}
         </Box>
     );
@@ -92,7 +103,12 @@ export default function LabelDialog({
     const [draft, setDraft] = useState<Label | null>(null);
 
     const sensors = useSensors(
-        useSensor(PointerSensor, {activationConstraint: {distance: 5}})
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                delay: 200,      // long-press time
+                tolerance: 8,    // allowed finger movement
+            },
+        })
     );
 
     /** reorder handler */
@@ -220,7 +236,10 @@ export default function LabelDialog({
         <Dialog open={open} onClose={handleClose} fullWidth>
             <DialogTitle>Manage Labels</DialogTitle>
 
-            <DialogContent>
+            <DialogContent sx={{
+                userSelect: "none",
+                touchAction: "none"
+            }}>
                 <Stack>
 
                     {/* GLOBAL (fixed) */}
