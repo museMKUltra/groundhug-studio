@@ -15,7 +15,7 @@ export interface Session {
     workMinutes: number | null;
     status: Status;
     description: string | null;
-    label: Label;
+    label: Label | null;
 }
 
 export interface SummaryLabel {

@@ -192,11 +192,10 @@ export default function Sessions({onRefresh}: Props) {
                                         const end = dragging.day.startOf("day").add(minEnd, "minute");
 
                                         setSelected({
-                                            id: 0,
-                                            clockIn: start,
-                                            clockOut: end,
+                                            clockIn: start.format("YYYY-MM-DDTHH:mm"),
+                                            clockOut: end.format("YYYY-MM-DDTHH:mm"),
                                             label: null,
-                                            description: ""
+                                            description: "",
                                         } as Session);
 
                                         setDragging(null);
@@ -215,9 +214,8 @@ export default function Sessions({onRefresh}: Props) {
                                         const top = (startMin / 1440) * 100;
                                         const height = Math.max(((endMin - startMin) / 1440) * 100, 1);
 
-                                        const color = s.label?.id
-                                            ? labels.find(l => l.id === s.label.id)?.color
-                                            : undefined;
+                                        const label = labels.find(l => l.id === s.label?.id);
+                                        const color = label ? label.color : 'white';
 
                                         return (
                                             <Tooltip
@@ -277,7 +275,7 @@ export default function Sessions({onRefresh}: Props) {
                                                         right: 4,
                                                         top: `${top}%`,
                                                         height: `${height}%`,
-                                                        bgcolor: color || 'white',
+                                                        bgcolor: color,
                                                         borderRadius: 1,
                                                         opacity: 0.85,
                                                         cursor: "pointer",
