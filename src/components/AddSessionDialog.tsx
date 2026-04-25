@@ -16,7 +16,6 @@ type Props = {
     open: boolean;
     onClose: () => void;
     onSave: (session: Session, needRefresh: boolean) => void;
-    onDelete: (session: Session) => void;
 };
 
 type FormState = {
