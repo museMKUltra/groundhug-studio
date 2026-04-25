@@ -15,6 +15,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CheckIcon from "@mui/icons-material/Check";
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import {useMemo, useState} from "react";
 import type {CreateLabelRequest, Label} from "@/features/attendance/types";
@@ -266,6 +267,7 @@ export default function LabelDialog({
                                 return (
                                     <SortableRow key={label.id} label={label}>
                                         <Box key={label.id} sx={labelSx} gap={1}>
+                                            <DragIndicatorIcon fontSize="small" sx={{color: "grey.700"}}/>
                                             <Box sx={{flex: 1}}>
                                                 <LabelChip label={current}/>
                                             </Box>
