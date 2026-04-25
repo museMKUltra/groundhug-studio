@@ -223,7 +223,7 @@ export default function Sessions({onRefresh}: Props) {
                                                 placement="left"
                                                 arrow
                                                 enterDelay={300}
-                                                disableHoverListener={dragging}
+                                                disableHoverListener={Boolean(dragging)}
                                                 title={
                                                     <Box>
                                                         <Typography variant="caption" fontWeight={600}>
