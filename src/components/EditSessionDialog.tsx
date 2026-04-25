@@ -36,12 +36,8 @@ export default function EditSessionDialog({session, open, onClose, onSave, onDel
     const [isLoading, setIsLoading] = useState(false);
 
     const initialForm = useMemo<FormState>(() => ({
-        clockIn: session?.clockIn
-            ? dayjs(session.clockIn).format("YYYY-MM-DDTHH:mm")
-            : "",
-        clockOut: session?.clockOut
-            ? dayjs(session.clockOut).format("YYYY-MM-DDTHH:mm")
-            : "",
+        clockIn: session?.clockIn || "",
+        clockOut: session?.clockOut || "",
         labelId: session?.label?.id || 0,
         description: session?.description || "",
     }), [session]);
