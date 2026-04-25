@@ -185,11 +185,8 @@ export default function Sessions({onRefresh}: Props) {
                                         const startMin = snapTo15(getMinutesFromY(dragging.startY, rect.height));
                                         const endMin = snapTo15(getMinutesFromY(dragging.currentY, rect.height));
 
-                                        const [minStart, minEnd] = [startMin, endMin].sort((a, b) => a - b);
-                                        if (minStart === minEnd) {
-                                            setDragging(null);
-                                            return;
-                                        }
+                                        const [minStart, minEndRaw] = [startMin, endMin].sort((a, b) => a - b);
+                                        const minEnd = minStart === minEndRaw ? minEndRaw + 60 : minEndRaw;
 
                                         const start = dragging.day.startOf("day").add(minStart, "minute");
                                         const end = dragging.day.startOf("day").add(minEnd, "minute");
