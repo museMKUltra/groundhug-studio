@@ -14,6 +14,14 @@ type Props = {
     onRefresh: () => void;
 };
 
+type InteractionState = {
+    day: dayjs.Dayjs;
+    startY: number;
+    currentY: number;
+    startTime: number;
+    moved: boolean;
+} | null;
+
 const MINUTES_IN_DAY = 1440;
 
 export default function Sessions({onRefresh}: Props) {
@@ -50,11 +58,7 @@ export default function Sessions({onRefresh}: Props) {
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [openAddDialog, setOpenAddDialog] = useState(false);
 
-    const [dragging, setDragging] = useState<{
-        day: dayjs.Dayjs;
-        startY: number;
-        currentY: number;
-    } | null>(null);
+    const [interaction, setInteraction] = useState<InteractionState>(null);
 
     const today = dayjs();
 
@@ -64,6 +68,32 @@ export default function Sessions({onRefresh}: Props) {
     };
 
     const snapTo15 = (min: number) => Math.round(min / 15) * 15;
+
+    const createSession = (interaction: InteractionState, rect: DOMRect) => {
+        if (!interaction) return;
+
+        const startMin = snapTo15(getMinutesFromY(interaction.startY, rect.height));
+        const endMin = snapTo15(getMinutesFromY(interaction.currentY, rect.height));
+
+        const [minStart, minEndRaw] = [startMin, endMin].sort((a, b) => a - b);
+        const minEnd = minStart === minEndRaw ? minEndRaw + 60 : minEndRaw;
+
+        openAdd(minStart, minEnd, interaction.day);
+    };
+
+    const openAdd = (startMin: number, endMin: number, day: dayjs.Dayjs) => {
+        const start = day.startOf("day").add(startMin, "minute");
+        const end = day.startOf("day").add(endMin, "minute");
+
+        setSelected({
+            clockIn: start.format("YYYY-MM-DDTHH:mm"),
+            clockOut: end.format("YYYY-MM-DDTHH:mm"),
+            label: null,
+            description: "",
+        } as Session);
+
+        setOpenAddDialog(true);
+    };
 
     return (
         <>
@@ -162,49 +192,51 @@ export default function Sessions({onRefresh}: Props) {
                                         bgcolor: "grey.100",
                                         borderRadius: 1,
                                         overflow: "hidden",
-                                        cursor: dragging ? "grabbing" : "crosshair",
+                                        cursor: interaction ? "grabbing" : "crosshair",
                                         userSelect: "none",
                                         touchAction: "none",
                                         WebkitUserSelect: "none",
                                     }}
-                                    onMouseDown={(e) => {
+                                    onPointerDown={(e) => {
                                         const rect = e.currentTarget.getBoundingClientRect();
                                         const startY = e.clientY - rect.top;
 
-                                        setDragging({day, startY, currentY: startY});
+                                        setInteraction({
+                                            day,
+                                            startY,
+                                            currentY: startY,
+                                            startTime: Date.now(),
+                                            moved: false,
+                                        });
                                     }}
-                                    onMouseMove={(e) => {
-                                        if (!dragging) return;
+                                    onPointerMove={(e) => {
+                                        if (!interaction) return;
+
                                         const rect = e.currentTarget.getBoundingClientRect();
                                         const currentY = e.clientY - rect.top;
+                                        const moved = Math.abs(currentY - interaction.startY) > 5;
 
-                                        setDragging(prev => prev && {...prev, currentY});
+                                        setInteraction(prev =>
+                                                prev && {
+                                                    ...prev,
+                                                    currentY,
+                                                    moved: prev.moved || moved,
+                                                }
+                                        );
                                     }}
-                                    onMouseUp={(e) => {
-                                        if (!dragging) return;
+                                    onPointerUp={(e) => {
+                                        if (!interaction) return;
 
                                         const rect = e.currentTarget.getBoundingClientRect();
+                                        const duration = Date.now() - interaction.startTime;
 
-                                        const startMin = snapTo15(getMinutesFromY(dragging.startY, rect.height));
-                                        const endMin = snapTo15(getMinutesFromY(dragging.currentY, rect.height));
+                                        if (interaction.moved && duration > 200) {
+                                            createSession(interaction, rect);
+                                        }
 
-                                        const [minStart, minEndRaw] = [startMin, endMin].sort((a, b) => a - b);
-                                        const minEnd = minStart === minEndRaw ? minEndRaw + 60 : minEndRaw;
-
-                                        const start = dragging.day.startOf("day").add(minStart, "minute");
-                                        const end = dragging.day.startOf("day").add(minEnd, "minute");
-
-                                        setSelected({
-                                            clockIn: start.format("YYYY-MM-DDTHH:mm"),
-                                            clockOut: end.format("YYYY-MM-DDTHH:mm"),
-                                            label: null,
-                                            description: "",
-                                        } as Session);
-
-                                        setDragging(null);
-                                        setOpenAddDialog(true);
+                                        setInteraction(null);
                                     }}
-                                    onMouseLeave={() => setDragging(null)}
+                                    onPointerLeave={() => setInteraction(null)}
                                 >
                                     {/* sessions */}
                                     {daySessions.map((s) => {
@@ -226,7 +258,7 @@ export default function Sessions({onRefresh}: Props) {
                                                 placement="left"
                                                 arrow
                                                 enterDelay={300}
-                                                disableHoverListener={Boolean(dragging)}
+                                                disableHoverListener={Boolean(interaction)}
                                                 title={
                                                     <Box>
                                                         <Typography variant="caption" fontWeight={600}>
@@ -284,7 +316,7 @@ export default function Sessions({onRefresh}: Props) {
                                                         cursor: "pointer",
                                                         transition: "0.2s",
                                                         '&:hover': {
-                                                            opacity: dragging ? 0.85 : 1,
+                                                            opacity: interaction ? 0.85 : 1,
                                                         }
                                                     }}
                                                 />
@@ -293,9 +325,9 @@ export default function Sessions({onRefresh}: Props) {
                                     })}
 
                                     {/* preview */}
-                                    {dragging && dragging.day.isSame(day, "day") && (() => {
-                                        const start = Math.min(dragging.startY, dragging.currentY);
-                                        const end = Math.max(dragging.startY, dragging.currentY);
+                                    {interaction && interaction.day.isSame(day, "day") && (() => {
+                                        const start = Math.min(interaction.startY, interaction.currentY);
+                                        const end = Math.max(interaction.startY, interaction.currentY);
 
                                         const top = (start / 400) * 100;
                                         const height = ((end - start) / 400) * 100;
