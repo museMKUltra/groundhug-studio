@@ -147,7 +147,6 @@ export default function LabelDialog({
         try {
             setLoading(true);
             await onReorder(sortedLabels.map(i => i.id));
-            onSuccess("Order updated");
         } catch (e) {
             onError(e);
 
