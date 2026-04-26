@@ -83,6 +83,8 @@ function SortableRow({
             ref={setNodeRef}
             style={style}
             sx={{
+                userSelect: "none",
+                touchAction: "none",
                 WebkitUserSelect: "none", // Prevent text selection / highlight (iOS issue)
             }}
             {...attributes}
@@ -257,10 +259,7 @@ export default function LabelDialog({
         <Dialog open={open} onClose={handleClose} fullWidth>
             <DialogTitle>Manage Labels</DialogTitle>
 
-            <DialogContent sx={{
-                userSelect: "none",
-                touchAction: "none"
-            }}>
+            <DialogContent>
                 <Stack>
 
                     {/* GLOBAL (fixed) */}
@@ -297,6 +296,7 @@ export default function LabelDialog({
                                                     <TextField
                                                         size="small"
                                                         value={current.name}
+                                                        onPointerDown={(e) => e.stopPropagation()}
                                                         onChange={(e) =>
                                                             setDraft(prev =>
                                                                 prev ? {...prev, name: e.target.value} : prev
@@ -307,6 +307,7 @@ export default function LabelDialog({
                                                     <input
                                                         type="color"
                                                         value={current.color}
+                                                        onPointerDown={(e) => e.stopPropagation()}
                                                         onChange={(e) =>
                                                             setDraft(prev =>
                                                                 prev ? {...prev, color: e.target.value} : prev
@@ -325,6 +326,7 @@ export default function LabelDialog({
                                                         disabled={loading || !hasChanged}
                                                         size="small"
                                                         color="primary"
+                                                        onPointerDown={(e) => e.stopPropagation()}
                                                         onClick={confirmEdit}
                                                     >
                                                         <CheckIcon fontSize="small"/>
@@ -332,6 +334,7 @@ export default function LabelDialog({
                                                     <IconButton
                                                         disabled={loading}
                                                         size="small"
+                                                        onPointerDown={(e) => e.stopPropagation()}
                                                         onClick={cancelEdit}
                                                     >
                                                         <CloseIcon fontSize="small"/>
@@ -342,6 +345,7 @@ export default function LabelDialog({
                                                     <IconButton
                                                         disabled={loading}
                                                         size="small"
+                                                        onPointerDown={(e) => e.stopPropagation()}
                                                         onClick={() => startEdit(label)}
                                                     >
                                                         <EditIcon fontSize="small"/>
@@ -349,6 +353,7 @@ export default function LabelDialog({
                                                     <IconButton
                                                         disabled={loading}
                                                         size="small"
+                                                        onPointerDown={(e) => e.stopPropagation()}
                                                         onClick={() => handleDelete(label)}
                                                     >
                                                         <DeleteIcon fontSize="small"/>
@@ -374,6 +379,7 @@ export default function LabelDialog({
                                     size="small"
                                     autoFocus
                                     placeholder="Label name"
+                                    onPointerDown={(e) => e.stopPropagation()}
                                     onChange={(e) =>
                                         setDraft({...draft, name: e.target.value})
                                     }
@@ -384,6 +390,7 @@ export default function LabelDialog({
                             <input
                                 type="color"
                                 value={draft.color}
+                                onPointerDown={(e) => e.stopPropagation()}
                                 onChange={(e) =>
                                     setDraft({...draft, color: e.target.value})
                                 }
@@ -400,6 +407,7 @@ export default function LabelDialog({
                                 disabled={loading || !draft.name.trim()}
                                 size="small"
                                 color="primary"
+                                onPointerDown={(e) => e.stopPropagation()}
                                 onClick={confirmEdit}
                             >
                                 <CheckIcon fontSize="small"/>
@@ -407,6 +415,7 @@ export default function LabelDialog({
                             <IconButton
                                 disabled={loading}
                                 size="small"
+                                onPointerDown={(e) => e.stopPropagation()}
                                 onClick={cancelEdit}
                             >
                                 <CloseIcon fontSize="small"/>
