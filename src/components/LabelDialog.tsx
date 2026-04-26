@@ -22,7 +22,15 @@ import type {CreateLabelRequest, Label} from "@/features/attendance/types";
 import LabelChip from "./LabelChip";
 
 /** dnd-kit */
-import {closestCenter, DndContext, type DragEndEvent, PointerSensor, useSensor, useSensors} from "@dnd-kit/core";
+import {
+    closestCenter,
+    DndContext,
+    type DragEndEvent,
+    PointerSensor,
+    TouchSensor,
+    useSensor,
+    useSensors
+} from "@dnd-kit/core";
 import {arrayMove, SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
 
@@ -103,14 +111,27 @@ export default function LabelDialog({
     const [editingId, setEditingId] = useState<number | "new" | null>(null);
     const [draft, setDraft] = useState<Label | null>(null);
 
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                delay: 200,      // long-press time
-                tolerance: 8,    // allowed finger movement
-            },
-        })
-    );
+    const pointerSensor = useSensor(PointerSensor, {
+        activationConstraint: {
+            delay: 0,
+            tolerance: 4,
+        },
+    });
+
+    const touchSensor = useSensor(TouchSensor, {
+        activationConstraint: {
+            delay: 180,
+            tolerance: 10,
+        },
+    });
+
+    const isTouchDevice = useMemo(() => {
+        if (typeof window === "undefined") return false;
+        return window.matchMedia("(pointer: coarse)").matches;
+    }, []);
+
+    const activeSensor = isTouchDevice ? touchSensor : pointerSensor;
+    const sensors = useSensors(activeSensor);
 
     /** reorder handler */
     const handleDragEnd = async (event: DragEndEvent) => {
