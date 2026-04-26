@@ -88,7 +88,7 @@ export default function Sessions({onRefresh}: Props) {
             </Box>
 
             {/* MAIN */}
-            <Box display="flex" sx={{userSelect: "none"}}>
+            <Box display="flex">
                 {/* TIMELINE */}
                 <Box sx={{width: 32, height: 390, position: "relative", top: 32, mr: 1}}>
                     {[
@@ -163,6 +163,9 @@ export default function Sessions({onRefresh}: Props) {
                                         borderRadius: 1,
                                         overflow: "hidden",
                                         cursor: dragging ? "grabbing" : "crosshair",
+                                        userSelect: "none",
+                                        touchAction: "none",
+                                        WebkitUserSelect: "none",
                                     }}
                                     onMouseDown={(e) => {
                                         const rect = e.currentTarget.getBoundingClientRect();
