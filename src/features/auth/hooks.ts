@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {loginApi, meApi} from "./api";
+import {loginApi, logoutApi, meApi} from "./api";
 import type {User} from "./types";
 import {jwtDecode} from "jwt-decode";
 import {useAuthContext} from "./useAuthContext";
@@ -31,9 +31,16 @@ export const useAuth = () => {
         }
     };
 
-    const logout = () => {
-        tokenStorage.clear();
-        setUser(null);
+    const logout = async () => {
+        setLoading(true);
+        try {
+            await logoutApi();
+
+            tokenStorage.clear();
+            setUser(null);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return {

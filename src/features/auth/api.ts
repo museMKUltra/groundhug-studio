@@ -11,6 +11,10 @@ export const refreshApi = async () => {
     return res.data;
 };
 
+export const logoutApi = async () => {
+    await axios.post<void>("/auth/logout");
+};
+
 export const meApi = async () => {
     const res = await axios.get<MeResponse>("/auth/me");
     return res.data;
