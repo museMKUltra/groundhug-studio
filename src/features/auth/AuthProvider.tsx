@@ -1,6 +1,6 @@
 import {useState} from "react";
 import type {User} from "./types";
-import {AuthContext} from "./auth.context";
+import {AuthContext} from "./useAuthContext";
 import {tokenStorage} from "@/features/auth/tokenStorage.ts";
 import {jwtDecode} from "jwt-decode";
 
