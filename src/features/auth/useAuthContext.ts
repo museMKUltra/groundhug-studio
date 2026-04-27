@@ -5,6 +5,7 @@ import type {User} from "./types";
 export type AuthContextType = {
     user: User | null;
     hourlyRate: number;
+    isInitializing: boolean;
     setUser: (user: User | null) => void;
     updateUser: (updates: Partial<User>) => void;
     setHourlyRate: (rate: number) => void;

@@ -8,7 +8,7 @@ import {tokenStorage} from "./tokenStorage";
 export const useAuth = () => {
     const [loading, setLoading] = useState(false);
 
-    const {user, hourlyRate, setUser, updateUser, setHourlyRate} = useAuthContext();
+    const {user, hourlyRate, isInitializing, setUser, updateUser, setHourlyRate} = useAuthContext();
 
     const setMe = async () => {
         const me = await meApi();
@@ -41,6 +41,7 @@ export const useAuth = () => {
         logout,
         loading,
         user,
+        isInitializing,
         isAdmin: user?.role === "ADMIN",
         hourlyRate,
         setMe,

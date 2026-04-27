@@ -3,8 +3,10 @@ import {useAuth} from "@/features/auth/hooks";
 import type {Guard} from "@/routes/guards";
 
 export default function GuardPipeline({guards}: { guards?: Guard[] }) {
-    const {user} = useAuth();
+    const {user, isInitializing} = useAuth();
     const location = useLocation();
+
+    if (isInitializing) return null;
 
     const ctx = {user, location};
 

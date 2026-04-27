@@ -1,15 +1,15 @@
-const ACCESS_TOKEN_KEY = "access_token";
+let accessToken: string | null = null;
 
 export const tokenStorage = {
     get(): string | null {
-        return localStorage.getItem(ACCESS_TOKEN_KEY);
+        return accessToken;
     },
 
     set(token: string) {
-        localStorage.setItem(ACCESS_TOKEN_KEY, token);
+        accessToken = token;
     },
 
     clear() {
-        localStorage.removeItem(ACCESS_TOKEN_KEY);
+        accessToken = null;
     },
 };
