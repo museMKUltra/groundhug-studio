@@ -1,5 +1,5 @@
 import axios from "@/api/axios";
-import type {AuthResponse, LoginRequest, MeResponse} from "./types";
+import type {AuthResponse, GuestRequest, LoginRequest, MeResponse} from "./types";
 
 export const loginApi = async (data: LoginRequest) => {
     const res = await axios.post<AuthResponse>("/auth/login", data);
@@ -13,6 +13,11 @@ export const refreshApi = async () => {
 
 export const logoutApi = async () => {
     await axios.post<void>("/auth/logout");
+};
+
+export const guestApi = async (data: GuestRequest) => {
+    const res = await axios.post<AuthResponse>("/auth/guest", data);
+    return res.data;
 };
 
 export const meApi = async () => {

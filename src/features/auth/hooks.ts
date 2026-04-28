@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {loginApi, logoutApi, meApi} from "./api";
+import {guestApi, loginApi, logoutApi, meApi} from "./api";
 import type {User} from "./types";
 import {jwtDecode} from "jwt-decode";
 import {useAuthContext} from "./useAuthContext";
@@ -31,6 +31,21 @@ export const useAuth = () => {
         }
     };
 
+    const guest = async (name: string) => {
+        setLoading(true);
+        try {
+            const data = await guestApi({name});
+            tokenStorage.set(data.token);
+
+            const user = jwtDecode<User>(data.token);
+            setUser(user);
+
+            return data;
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const logout = async () => {
         setLoading(true);
         try {
@@ -44,6 +59,7 @@ export const useAuth = () => {
     };
 
     return {
+        guest,
         login,
         logout,
         loading,

@@ -3,6 +3,10 @@ export interface LoginRequest {
     password: string;
 }
 
+export interface GuestRequest {
+    name: string;
+}
+
 export interface AuthResponse {
     token: string;
 }
