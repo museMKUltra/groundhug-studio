@@ -7,10 +7,11 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsDialog, {type SettingsDialogHandle,} from "@/components/SettingsDialog";
 
 interface Props {
+    showSettings: boolean;
     onLogout: () => void;
 }
 
-export default function AccountMenu({onLogout}: Props) {
+export default function AccountMenu({onLogout, showSettings}: Props) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
 
@@ -42,12 +43,14 @@ export default function AccountMenu({onLogout}: Props) {
                 </IconButton>
 
                 <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-                    <MenuItem onClick={handleSettingsClick}>
-                        <ListItemIcon>
-                            <SettingsIcon fontSize="small"/>
-                        </ListItemIcon>
-                        <ListItemText>Settings</ListItemText>
-                    </MenuItem>
+                    {showSettings || (
+                        <MenuItem onClick={handleSettingsClick}>
+                            <ListItemIcon>
+                                <SettingsIcon fontSize="small"/>
+                            </ListItemIcon>
+                            <ListItemText>Settings</ListItemText>
+                        </MenuItem>
+                    )}
 
                     <MenuItem onClick={handleLogoutClick}>
                         <ListItemIcon>

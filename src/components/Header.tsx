@@ -19,6 +19,7 @@ export default function Header() {
     }, []);
 
     const navPages = getNavPages(user?.role);
+    const isGuest = user?.isGuest ?? false;
 
     return (
         <>
@@ -31,14 +32,14 @@ export default function Header() {
 
                         <Box sx={{flexGrow: 1}}/>
 
-                        <AccountMenu onLogout={handleLogout}/>
+                        <AccountMenu onLogout={handleLogout} showSettings={isGuest}/>
                     </Toolbar>
                     <Toolbar sx={{display: {xs: 'flex', md: 'none'}, justifyContent: 'space-between'}} disableGutters>
                         <NavMenu pages={navPages}/>
 
                         <Logo/>
 
-                        <AccountMenu onLogout={handleLogout}/>
+                        <AccountMenu onLogout={handleLogout} showSettings={isGuest}/>
                     </Toolbar>
                 </Container>
             </AppBar>
