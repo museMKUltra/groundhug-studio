@@ -18,18 +18,21 @@ axiosInstance.interceptors.request.use((config) => {
     return config;
 });
 
+const AUTH_PATHS = ["/auth/login", "/auth/refresh", "/auth/logout"];
+
 axiosInstance.interceptors.response.use(
     (res) => res,
     async (error: AxiosError) => {
         const originalRequest = error.config as AxiosRequestConfig & {
             _retry?: boolean;
         };
+        const isUnauthorized = error.response?.status === 401;
+        const isAuthPath = AUTH_PATHS.some(p => originalRequest.url?.includes(p));
 
         if (
-            error.response?.status !== 401 ||
+            !isUnauthorized ||
             originalRequest._retry ||
-            originalRequest.url?.includes("/auth/login") ||
-            originalRequest.url?.includes("/auth/refresh")
+            isAuthPath
         ) {
             return Promise.reject(error);
         }
@@ -69,8 +72,11 @@ axiosInstance.interceptors.response.use(
 
             return axiosInstance(originalRequest);
         } catch (err) {
+            alert("Please log in again.");
+
             tokenStorage.clear();
             window.location.href = "/login";
+
             return Promise.reject(err);
         } finally {
             refreshController.finish();
