@@ -6,9 +6,11 @@ export default function LoginLayout() {
         <Box
             display="flex"
             justifyContent="center"
-            alignItems="center"
             minHeight="100vh"
             bgcolor="#f5f5f5"
+            sx={{
+                paddingTop: "24vh"
+            }}
         >
             <Outlet/>
         </Box>

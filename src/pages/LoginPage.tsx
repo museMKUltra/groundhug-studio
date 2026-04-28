@@ -3,31 +3,34 @@ import {useAuth} from "@/features/auth/hooks";
 import {useUsers} from "@/features/users/hooks.ts";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 
-import {Box, Button, Card, CardContent, Collapse, Stack, Tab, Tabs, TextField, Typography,} from "@mui/material";
+import {Box, Button, Card, CardContent, Stack, Tab, Tabs, TextField, Typography,} from "@mui/material";
 import type {AxiosError} from "axios";
 
 export default function LoginPage() {
-    const {login, loading} = useAuth();
+    const {guest, login, loading} = useAuth();
     const {register} = useUsers();
     const {showError, showSuccess} = useSnackbar();
 
-    const [mode, setMode] = useState<"login" | "register">("login");
+    const [mode, setMode] = useState<"login" | "register" | "guest">("login");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const isLogin = mode === "login";
     const handleSubmit = async () => {
         try {
             if (mode === "login") {
                 await login(email, password);
-            } else {
+            }
+            if (mode === "register") {
                 await register(name, email, password);
 
                 setName("");
                 setPassword("");
                 setMode("login");
                 showSuccess("Register successful. Please login.");
+            }
+            if (mode === "guest") {
+                await guest(name);
             }
         } catch (err: unknown) {
             const error = err as AxiosError<{
@@ -53,11 +56,13 @@ export default function LoginPage() {
     }
 
     return (
-        <>
+        <Box>
             <Card sx={{width: 400, borderRadius: 3, boxShadow: 3}}>
                 <CardContent>
                     <Typography variant="h5" textAlign="center" mb={2}>
-                        {isLogin ? "Login" : "Register"}
+                        {mode === "login" && "Login"}
+                        {mode === "register" && "Register"}
+                        {mode === "guest" && "Guest"}
                     </Typography>
 
                     <Tabs
@@ -68,33 +73,50 @@ export default function LoginPage() {
                     >
                         <Tab label="Login" value="login"/>
                         <Tab label="Register" value="register"/>
+                        <Tab label="Guest" value="guest"/>
                     </Tabs>
 
                     <Box component="form" onSubmit={onSubmit}>
                         <Stack spacing={2}>
-                            <Collapse in={mode === "register"}>
-                                <TextField
-                                    label="Name"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    fullWidth
-                                />
-                            </Collapse>
+                            {
+                                (mode === "register" || mode === "guest") && (
+                                    <TextField
+                                        label="Name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        fullWidth
+                                    />
+                                )
+                            }
 
-                            <TextField
-                                label="Email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                fullWidth
-                            />
+                            {
+                                (mode === "login" || mode === "register") && (
+                                    <>
+                                        <TextField
+                                            label="Email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            fullWidth
+                                        />
+                                        <TextField
+                                            label="Password"
+                                            type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            fullWidth
+                                        />
+                                    </>
+                                )
+                            }
 
-                            <TextField
-                                label="Password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                fullWidth
-                            />
+                            {
+                                mode === "guest" && (
+                                    <Typography variant="caption" color="text.secondary" textAlign="center">
+                                        Guest data will be deleted after 24 hours
+                                    </Typography>
+                                )
+                            }
+
 
                             <Button
                                 type="submit"
@@ -103,12 +125,14 @@ export default function LoginPage() {
                                 fullWidth
                                 size="large"
                             >
-                                {isLogin ? "Login" : "Register"}
+                                {mode === "login" && "Login"}
+                                {mode === "register" && "Register"}
+                                {mode === "guest" && "Try as Guest"}
                             </Button>
                         </Stack>
                     </Box>
                 </CardContent>
             </Card>
-        </>
+        </Box>
     );
 }
