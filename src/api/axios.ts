@@ -27,7 +27,13 @@ axiosInstance.interceptors.response.use(
             _retry?: boolean;
         };
         const isUnauthorized = error.response?.status === 401;
+        const isForbidden = error.response?.status === 403;
         const isAuthPath = AUTH_PATHS.some(p => originalRequest.url?.includes(p));
+
+        if (isForbidden) {
+            alert("You don't have permission to perform this action.");
+            return Promise.reject(error);
+        }
 
         if (
             !isUnauthorized ||
