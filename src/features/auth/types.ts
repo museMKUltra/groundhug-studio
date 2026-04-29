@@ -16,6 +16,7 @@ export interface MeResponse {
     name: string;
     email: string;
     hourlyRate: number;
+    expiresAt: string | null;
 }
 
 export type Role = "ADMIN" | "USER";

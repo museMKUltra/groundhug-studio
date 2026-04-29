@@ -7,7 +7,8 @@ import {refreshApi} from "./api";
 
 export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
-    const [hourlyRate, setHourlyRateState] = useState<number>(0);
+    const [hourlyRate, setHourlyRate] = useState<number>(0);
+    const [expiresAt, setExpiresAt] = useState<string | null>(null);
     const [isInitializing, setIsInitializing] = useState(true);
     const isRefreshing = useRef(false);
 
@@ -40,18 +41,16 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         setUser(prev => prev ? {...prev, ...updates} : prev);
     };
 
-    const setHourlyRate = (rate: number) => {
-        setHourlyRateState(rate);
-    };
-
     return (
         <AuthContext.Provider value={{
             user,
             hourlyRate,
+            expiresAt,
             isInitializing,
             setUser,
             updateUser,
-            setHourlyRate
+            setHourlyRate,
+            setExpiresAt
         }}>
             {children}
         </AuthContext.Provider>

@@ -8,12 +8,22 @@ import {tokenStorage} from "./tokenStorage";
 export const useAuth = () => {
     const [loading, setLoading] = useState(false);
 
-    const {user, hourlyRate, isInitializing, setUser, updateUser, setHourlyRate} = useAuthContext();
+    const {
+        user,
+        hourlyRate,
+        expiresAt,
+        isInitializing,
+        setUser,
+        updateUser,
+        setHourlyRate,
+        setExpiresAt
+    } = useAuthContext();
 
     const setMe = async () => {
         const me = await meApi();
 
         setHourlyRate(me.hourlyRate);
+        setExpiresAt(me.expiresAt);
     }
 
     const login = async (email: string, password: string) => {
@@ -50,10 +60,9 @@ export const useAuth = () => {
         setLoading(true);
         try {
             await logoutApi();
-
+        } finally {
             tokenStorage.clear();
             setUser(null);
-        } finally {
             setLoading(false);
         }
     };
@@ -66,6 +75,7 @@ export const useAuth = () => {
         user,
         isInitializing,
         isAdmin: user?.role === "ADMIN",
+        expiresAt,
         hourlyRate,
         setMe,
         updateUser,
