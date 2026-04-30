@@ -14,6 +14,7 @@ import {getDuration} from "@/utils/duration";
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
 import ViewEditField from "@/components/ViewEditField";
+import {useClock} from "@/features/clock/useClockContext.ts";
 
 interface Props {
     session: Session | null;
@@ -38,8 +39,18 @@ export default function AttendanceCard(
     }: Props
 ) {
     const {goDay} = useSessionContext();
-    const {labels, globalLabels, sortableLabels, setSortableLabels, createLabel, updateLabel, deleteLabel, reorderLabels} = useLabelContext();
+    const {
+        labels,
+        globalLabels,
+        sortableLabels,
+        setSortableLabels,
+        createLabel,
+        updateLabel,
+        deleteLabel,
+        reorderLabels
+    } = useLabelContext();
     const {showError, showSuccess} = useSnackbar();
+    const clock = useClock();
 
     const initialLabelId = useMemo(() => session?.label?.id || 0, [session]);
     const initialDescription = useMemo(() => session?.description || "", [session]);
@@ -51,7 +62,7 @@ export default function AttendanceCard(
     const [now, setNow] = useState<number>(() => Date.now());
 
     useEffect(() => {
-        const timer = setInterval(() => setNow(Date.now()), 1000);
+        const timer = setInterval(() => setNow(clock.now()), 1000);
         return () => clearInterval(timer);
     }, []);
 

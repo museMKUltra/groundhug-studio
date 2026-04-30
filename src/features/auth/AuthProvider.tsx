@@ -1,9 +1,13 @@
 import {useEffect, useRef, useState} from "react";
+import {jwtDecode} from "jwt-decode";
+
 import type {User} from "./types";
 import {AuthContext} from "./useAuthContext";
-import {tokenStorage} from "@/features/auth/tokenStorage.ts";
-import {jwtDecode} from "jwt-decode";
 import {refreshApi} from "./api";
+
+import {tokenStorage} from "@/features/auth/tokenStorage.ts";
+import {type ClockMode, ClockProvider} from "@/features/clock/ClockProvider";
+
 
 export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -41,6 +45,14 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         setUser(prev => prev ? {...prev, ...updates} : prev);
     };
 
+    const [clockMode, setClockMode] = useState<ClockMode>("system");
+
+    useEffect(() => {
+        if (!isInitializing && user) {
+            setClockMode(user?.isGuest ? "demo" : "system");
+        }
+    }, [user, isInitializing]);
+
     return (
         <AuthContext.Provider value={{
             user,
@@ -52,7 +64,9 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
             setHourlyRate,
             setExpiresAt
         }}>
-            {children}
+            <ClockProvider mode={clockMode}>
+                {children}
+            </ClockProvider>
         </AuthContext.Provider>
     );
 };
