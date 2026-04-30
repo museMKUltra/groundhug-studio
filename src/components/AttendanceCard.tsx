@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {Box, Button, Card, CardContent, CircularProgress, Stack, Typography,} from "@mui/material";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
@@ -9,7 +9,7 @@ import {useSessionContext} from "@/features/attendance/SessionContext";
 import {useLabelContext} from "@/features/attendance/LabelContext";
 import {useAutoSaveForm} from "@/features/attendance/useAutoSaveForm";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
-import {getDuration} from "@/utils/duration";
+import {formatDuration, getDuration} from "@/utils/duration";
 
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
@@ -60,6 +60,9 @@ export default function AttendanceCard(
 
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
+    const clockInState = useRef<{ startTime: number | null }>({
+        startTime: null,
+    });
     const getDurationText = useCallback(() => {
         return getDuration(
             {
@@ -73,10 +76,18 @@ export default function AttendanceCard(
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setDurationText(getDurationText());
+            if (clockInState.current.startTime) {
+                const seconds = Math.floor(
+                    (clock.now() - clockInState.current.startTime) / 1000
+                );
+                setDurationText(formatDuration(seconds, true));
+            } else {
+                setDurationText(getDurationText());
+            }
         }, 1000);
+
         return () => clearInterval(timer);
-    }, []);
+    }, [getDurationText, clock]);
 
     const isActive = Boolean(session);
 
@@ -149,6 +160,8 @@ export default function AttendanceCard(
     };
 
     const handleClockIn = async () => {
+        clockInState.current.startTime = clock.now();
+
         try {
             await clockIn(getClockInAndOutRequest());
             commitSnapshot();
@@ -159,6 +172,8 @@ export default function AttendanceCard(
     };
 
     const handleClockOut = async () => {
+        clockInState.current.startTime = null;
+
         try {
             await clockOut(getClockInAndOutRequest());
             commitSnapshot();
