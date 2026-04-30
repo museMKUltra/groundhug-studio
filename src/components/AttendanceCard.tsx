@@ -55,8 +55,8 @@ export default function AttendanceCard(
     const initialLabelId = useMemo(() => session?.label?.id || 0, [session]);
     const initialDescription = useMemo(() => session?.description || "", [session]);
 
-    const [labelId, setLabelId] = useState<number>(initialLabelId);
-    const [description, setDescription] = useState<string>(initialDescription);
+    const [labelId, setLabelId] = useState<number>(0);
+    const [description, setDescription] = useState<string>("");
 
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
@@ -134,17 +134,25 @@ export default function AttendanceCard(
         onError: handleError
     });
 
-    // sync initial value by session
+    // set default label id
+    useEffect(() => {
+        setLabelId(initialLabelId);
+    }, [initialLabelId]);
+
+    // set default description
+    useEffect(() => {
+        setDescription(initialDescription);
+    }, [initialDescription]);
+
+    // sync saved value
     useEffect(() => {
         syncValue({labelId: initialLabelId, description: initialDescription});
     }, [initialLabelId, initialDescription]);
 
     // trigger auto-save
     useEffect(() => {
-        if (!isActive) return;
-
         scheduleSave({labelId, description});
-    }, [labelId, description, session]);
+    }, [labelId, description]);
 
     const getClockInAndOutRequest = (): ClockInAndOutRequest => {
         const req: ClockInAndOutRequest = {labelId};
@@ -155,16 +163,11 @@ export default function AttendanceCard(
         return req;
     };
 
-    const commitSnapshot = () => {
-        syncValue({labelId, description});
-    };
-
     const handleClockIn = async () => {
         clockInState.current.startTime = clock.now();
 
         try {
             await clockIn(getClockInAndOutRequest());
-            commitSnapshot();
             showSuccess("Clock in successful");
         } catch (e) {
             handleError(e);
@@ -176,7 +179,6 @@ export default function AttendanceCard(
 
         try {
             await clockOut(getClockInAndOutRequest());
-            commitSnapshot();
             showSuccess("Clock out successful");
 
             if (session?.workDate) {

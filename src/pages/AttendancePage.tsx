@@ -110,7 +110,6 @@ export default function AttendancePage() {
                     <Stack spacing={3}>
                         {/* Attendance */}
                         <AttendanceCard
-                            key={session?.id || 0}
                             session={session}
                             sessionLoading={sessionLoading}
                             clockIn={clockIn}
