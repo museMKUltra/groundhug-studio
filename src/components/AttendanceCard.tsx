@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {Box, Button, Card, CardContent, CircularProgress, Stack, Typography,} from "@mui/material";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
@@ -9,7 +9,7 @@ import {useSessionContext} from "@/features/attendance/SessionContext";
 import {useLabelContext} from "@/features/attendance/LabelContext";
 import {useAutoSaveForm} from "@/features/attendance/useAutoSaveForm";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
-import {formatDuration, getDuration} from "@/utils/duration";
+import {formatDuration} from "@/utils/duration";
 
 import LabelSelect from "@/components/LabelSelect.tsx";
 import LabelDialog from "@/components/LabelDialog.tsx";
@@ -60,34 +60,35 @@ export default function AttendanceCard(
 
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
 
-    const clockInState = useRef<{ startTime: number | null }>({
-        startTime: null,
-    });
-    const getDurationText = useCallback(() => {
-        return getDuration(
-            {
-                clockIn: session?.clockIn || "",
-                clockOut: new Date(clock.now()).toISOString()
-            },
-            true
-        );
-    }, [session, clock])
-    const [durationText, setDurationText] = useState<string>(getDurationText());
+    const [localStartTime, setLocalStartTime] = useState<number | null>(null);
+    const startTime = useMemo(() => {
+        if (localStartTime !== null) {
+            return localStartTime;
+        }
+        if (session) {
+            return dayjs(session.clockIn).valueOf();
+        }
+        return null;
+    }, [session, localStartTime]);
+
+    const getLiveDuration = useCallback(() => {
+        if (startTime === null) return "";
+
+        const seconds = Math.floor((clock.now() - startTime) / 1000);
+        return formatDuration(seconds, true);
+    }, [startTime, clock]);
+
+    const [durationText, setDurationText] = useState<string>("");
 
     useEffect(() => {
+        setDurationText(getLiveDuration());
+
         const timer = setInterval(() => {
-            if (clockInState.current.startTime) {
-                const seconds = Math.floor(
-                    (clock.now() - clockInState.current.startTime) / 1000
-                );
-                setDurationText(formatDuration(seconds, true));
-            } else {
-                setDurationText(getDurationText());
-            }
+            setDurationText(getLiveDuration());
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [getDurationText, clock]);
+    }, [getLiveDuration]);
 
     const isActive = Boolean(session);
 
@@ -164,7 +165,7 @@ export default function AttendanceCard(
     };
 
     const handleClockIn = async () => {
-        clockInState.current.startTime = clock.now();
+        setLocalStartTime(clock.now());
 
         try {
             await clockIn(getClockInAndOutRequest());
@@ -175,7 +176,7 @@ export default function AttendanceCard(
     };
 
     const handleClockOut = async () => {
-        clockInState.current.startTime = null;
+        setLocalStartTime(null);
 
         try {
             await clockOut(getClockInAndOutRequest());
