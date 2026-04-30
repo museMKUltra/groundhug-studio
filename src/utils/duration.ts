@@ -3,14 +3,22 @@ import duration from "dayjs/plugin/duration";
 
 dayjs.extend(duration);
 
-type Time = { clockIn: string, clockOut: string };
+type Time = {
+    clockIn: string;
+    clockOut: string;
+};
 
-export function getDuration(time: Time, withSeconds: boolean = false) {
+export function getDurationSeconds(time: Time): number {
     const {clockIn, clockOut} = time;
-    if (!clockIn || !clockOut) return "--";
+    if (!clockIn || !clockOut) return 0;
 
-    const d = dayjs.duration(dayjs(clockOut).diff(dayjs(clockIn)));
-    const h = d.days() * 24 + d.hours();
+    return dayjs(clockOut).diff(dayjs(clockIn), "second");
+}
+
+export function formatDuration(seconds: number, withSeconds: boolean = false): string {
+    const d = dayjs.duration(seconds, "second");
+
+    const h = Math.floor(d.asHours());
     const m = d.minutes();
     const s = d.seconds();
 
@@ -22,4 +30,8 @@ export function getDuration(time: Time, withSeconds: boolean = false) {
 
     if (h > 0) return `${h}h ${m}m`;
     return `${m}m`;
+}
+
+export function getDuration(time: Time, withSeconds: boolean = false) {
+    return formatDuration(getDurationSeconds(time), withSeconds);
 }

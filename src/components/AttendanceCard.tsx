@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {Box, Button, Card, CardContent, CircularProgress, Stack, Typography,} from "@mui/material";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
@@ -59,24 +59,26 @@ export default function AttendanceCard(
     const [description, setDescription] = useState<string>(initialDescription);
 
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
-    const [now, setNow] = useState<number>(() => Date.now());
+
+    const getDurationText = useCallback(() => {
+        return getDuration(
+            {
+                clockIn: session?.clockIn || "",
+                clockOut: new Date(clock.now()).toISOString()
+            },
+            true
+        );
+    }, [session, clock])
+    const [durationText, setDurationText] = useState<string>(getDurationText());
 
     useEffect(() => {
-        const timer = setInterval(() => setNow(clock.now()), 1000);
+        const timer = setInterval(() => {
+            setDurationText(getDurationText());
+        }, 1000);
         return () => clearInterval(timer);
     }, []);
 
     const isActive = Boolean(session);
-
-    const durationText = useMemo(() => {
-        return getDuration(
-            {
-                clockIn: session?.clockIn || "",
-                clockOut: new Date(now).toISOString()
-            },
-            true
-        );
-    }, [session, now]);
 
     const handleError = (err: unknown) => {
         const error = err as AxiosError<{ error?: string; description?: string }>;
