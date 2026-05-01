@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState} from "react";
 import {Box, Button, IconButton, Tooltip, Typography} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -81,6 +82,17 @@ export default function Sessions({onRefresh}: Props) {
         openAdd(minStart, minEnd, interaction.day);
     };
 
+    function createNowSession() {
+        const day = today;
+        const now = dayjs();
+        const startMin = now.hour() * 60 + now.minute();
+        const snappedStart = Math.floor(startMin / 15) * 15;
+        const endMin = snappedStart + 60;
+        const safeEnd = Math.min(endMin, 1440);
+
+        openAdd(snappedStart, safeEnd, day);
+    }
+
     const openAdd = (startMin: number, endMin: number, day: dayjs.Dayjs) => {
         const start = day.startOf("day").add(startMin, "minute");
         const end = day.startOf("day").add(endMin, "minute");
@@ -94,6 +106,11 @@ export default function Sessions({onRefresh}: Props) {
 
         setOpenAddDialog(true);
     };
+
+    const isTouch = useMemo(
+        () => window.matchMedia("(pointer: coarse)").matches,
+        []
+    );
 
     return (
         <>
@@ -112,9 +129,17 @@ export default function Sessions({onRefresh}: Props) {
                     {weekStart.format("MMM DD")} - {weekEnd.format("MMM DD")}
                 </Typography>
 
-                <Button size="small" variant="outlined" onClick={goToday}>
-                    Today
-                </Button>
+                <Box display="flex" gap={1}>
+                    {
+                        isTouch &&
+                        <IconButton onClick={createNowSession}>
+                            <AddIcon/>
+                        </IconButton>
+                    }
+                    <Button size="small" variant="outlined" onClick={goToday}>
+                        Today
+                    </Button>
+                </Box>
             </Box>
 
             {/* MAIN */}
@@ -194,10 +219,11 @@ export default function Sessions({onRefresh}: Props) {
                                         overflow: "hidden",
                                         cursor: interaction ? "grabbing" : "crosshair",
                                         userSelect: "none",
-                                        touchAction: "none",
                                         WebkitUserSelect: "none",
                                     }}
                                     onPointerDown={(e) => {
+                                        if (isTouch) return;
+
                                         const rect = e.currentTarget.getBoundingClientRect();
                                         const startY = e.clientY - rect.top;
 
@@ -210,6 +236,7 @@ export default function Sessions({onRefresh}: Props) {
                                         });
                                     }}
                                     onPointerMove={(e) => {
+                                        if (isTouch) return;
                                         if (!interaction) return;
 
                                         const rect = e.currentTarget.getBoundingClientRect();
@@ -225,6 +252,7 @@ export default function Sessions({onRefresh}: Props) {
                                         );
                                     }}
                                     onPointerUp={(e) => {
+                                        if (isTouch) return;
                                         if (!interaction) return;
 
                                         const rect = e.currentTarget.getBoundingClientRect();
