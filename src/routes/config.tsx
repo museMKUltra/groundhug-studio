@@ -37,6 +37,18 @@ export const routes: AppRoute[] = [
         layout: <LoginLayout/>,
     },
     {
+        path: "/register",
+        element: <LoginPage/>,
+        guards: [guestGuard],
+        layout: <LoginLayout/>,
+    },
+    {
+        path: "/guest",
+        element: <LoginPage/>,
+        guards: [guestGuard],
+        layout: <LoginLayout/>,
+    },
+    {
         path: "/attendance",
         element: <AttendancePage/>,
         label: "Attendance",

@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useAuth} from "@/features/auth/hooks";
 import {useUsers} from "@/features/users/hooks.ts";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
@@ -6,12 +7,18 @@ import {useSnackbar} from "@/context/SnackbarContext.ts";
 import {Box, Button, Card, CardContent, Stack, Tab, Tabs, TextField, Typography,} from "@mui/material";
 import type {AxiosError} from "axios";
 
+type Mode = "login" | "register" | "guest";
+
 export default function LoginPage() {
     const {guest, login, loading} = useAuth();
     const {register} = useUsers();
     const {showError, showSuccess} = useSnackbar();
 
-    const [mode, setMode] = useState<"login" | "register" | "guest">("login");
+    const location = useLocation();
+    const navigate = useNavigate();
+    const path = location.pathname.replace("/", "");
+    const mode: Mode = (path === "register" || path === "guest") ? path : "login";
+
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -26,7 +33,7 @@ export default function LoginPage() {
 
                 setName("");
                 setPassword("");
-                setMode("login");
+                navigate("/login");
                 showSuccess("Register successful. Please login.");
             }
             if (mode === "guest") {
@@ -67,7 +74,7 @@ export default function LoginPage() {
 
                     <Tabs
                         value={mode}
-                        onChange={(_, value) => setMode(value)}
+                        onChange={(_, value) => navigate(`/${value}`)}
                         centered
                         sx={{mb: 2}}
                     >
