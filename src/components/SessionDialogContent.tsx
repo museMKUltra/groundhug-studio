@@ -128,6 +128,7 @@ export default function SessionDialogContent({session, form, onChange, isEditing
                             }}
                             minDate={dayjs(session?.clockIn).startOf("month")}
                             maxDate={dayjs(session?.clockIn).endOf("month")}
+                            desktopModeMediaQuery="@media (min-width: 0px)"
                         />
 
                         <TimePicker
@@ -139,6 +140,7 @@ export default function SessionDialogContent({session, form, onChange, isEditing
                             slotProps={{
                                 textField: {size: "small"}
                             }}
+                            desktopModeMediaQuery="@media (min-width: 0px)"
                         />
                     </Stack>
                 )}
@@ -168,6 +170,7 @@ export default function SessionDialogContent({session, form, onChange, isEditing
                                 textField: {size: "small"}
                             }}
                             minDate={form.clockIn ? dayjs(form.clockIn) : undefined}
+                            desktopModeMediaQuery="@media (min-width: 0px)"
                         />
 
                         <TimePicker
@@ -179,6 +182,7 @@ export default function SessionDialogContent({session, form, onChange, isEditing
                             slotProps={{
                                 textField: {size: "small"}
                             }}
+                            desktopModeMediaQuery="@media (min-width: 0px)"
                         />
                     </Stack>
                 )}
