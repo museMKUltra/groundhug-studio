@@ -10,7 +10,11 @@ import Header from "@/components/Header";
 dayjs.extend(relativeTime);
 
 export default function MainLayout() {
-    const {user, expiresAt} = useAuth();
+    const {user, setMe, expiresAt} = useAuth();
+
+    useEffect(() => {
+        setMe();
+    }, []);
 
     const userName = user?.name || "";
     const isGuest = user?.isGuest ?? false;
