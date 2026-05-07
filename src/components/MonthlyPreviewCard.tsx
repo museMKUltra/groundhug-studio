@@ -1,6 +1,5 @@
-import {Button, Card, CardContent, Stack, Typography,} from "@mui/material";
-import MonthlySummaryDialog from "@/components/MonthlySummaryDialog";
-import {useMonthlyPreview} from "@/components/useMonthlyPreview.ts";
+import {Card, CardContent, Stack, Typography,} from "@mui/material";
+import MonthlyPreviewButton from "@/components/MonthlyPreviewButton.tsx";
 
 interface Props {
     year: number;
@@ -8,30 +7,14 @@ interface Props {
 }
 
 export default function MonthlyPreviewCard({year, month}: Props) {
-    const {monthSummary, loading, open, setOpen, handleOpenPreview} = useMonthlyPreview(year, month);
-
     return (
-        <>
-            <Card>
-                <CardContent>
-                    <Stack spacing={2}>
-                        <Typography variant="h6">Monthly</Typography>
-                        <Button
-                            variant="outlined"
-                            onClick={handleOpenPreview}
-                            disabled={loading}
-                        >
-                            Preview Month
-                        </Button>
-                    </Stack>
-                </CardContent>
-            </Card>
-
-            <MonthlySummaryDialog
-                open={open}
-                onClose={() => setOpen(false)}
-                monthSummary={monthSummary}
-            />
-        </>
+        <Card>
+            <CardContent>
+                <Stack spacing={2}>
+                    <Typography variant="h6">Monthly</Typography>
+                    <MonthlyPreviewButton year={year} month={month} textContent="Preview Month"/>
+                </Stack>
+            </CardContent>
+        </Card>
     );
 }
