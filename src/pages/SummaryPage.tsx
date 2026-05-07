@@ -1,8 +1,142 @@
+import {useEffect, useState} from "react";
+import {
+    Box,
+    CircularProgress,
+    Pagination,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
+} from "@mui/material";
+import {useSummary} from "@/features/attendance/hooks.ts";
+import type {WorkSummaryResponse} from "@/features/attendance/types.ts";
+import MonthlyPreviewButton from "@/components/MonthlyPreviewButton.tsx";
+
 export default function SummaryPage() {
+    const {getWorkSummaryList} = useSummary()
+
+    const [loading, setLoading] = useState(false)
+    const [page, setPage] = useState(1)
+    const [data, setData] = useState<WorkSummaryResponse | null>(null)
+
+    const pageSize = 6
+
+    useEffect(() => {
+        fetchData()
+    }, [page])
+
+    const fetchData = async () => {
+        try {
+            setLoading(true)
+
+            const response = await getWorkSummaryList(page - 1, pageSize)
+
+            setData(response)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const emptyRows =
+        pageSize - (data?.content.length || 0)
+
     return (
-        <div>
-            <h1>Summary Page</h1>
-            <p>This is the summary page content.</p>
-        </div>
+        <Box p={3}>
+            <Typography variant="h4" mb={3}>
+                Monthly Summary
+            </Typography>
+
+            {loading ? (
+                <CircularProgress/>
+            ) : (
+                <>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Year</TableCell>
+                                    <TableCell>Month</TableCell>
+                                    <TableCell>Total Minutes</TableCell>
+                                    <TableCell>Hourly Rate</TableCell>
+                                    <TableCell>Salary</TableCell>
+                                    <TableCell></TableCell>
+                                </TableRow>
+                            </TableHead>
+
+                            <TableBody>
+                                {data?.content.map((item) => (
+                                    <TableRow key={item.id} hover>
+                                        <TableCell>{item.year}</TableCell>
+
+                                        <TableCell>{item.month}</TableCell>
+
+                                        <TableCell>
+                                            {item.totalMinutes}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            ${item.hourlyRate}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            ${item.salaryAmount}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            <MonthlyPreviewButton
+                                                year={item.year}
+                                                month={item.month}
+                                                textContent="Preview"
+                                                size="small"
+                                            />
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+
+                                {/* keep table height fixed */}
+                                {Array.from({length: emptyRows}).map((_, index) => (
+                                    <TableRow
+                                        key={`empty-${index}`}
+                                        sx={{
+                                            height: 63
+                                        }}
+                                    >
+                                        <TableCell colSpan={6}/>
+                                    </TableRow>
+                                ))}
+
+                                {data?.content.length === 0 && (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={6}
+                                            align="center"
+                                        >
+                                            No Data
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+
+                    <Box
+                        mt={3}
+                        display="flex"
+                        justifyContent="center"
+                    >
+                        <Pagination
+                            page={page}
+                            count={data?.page.totalPages || 0}
+                            onChange={(_, value) => setPage(value)}
+                            color="primary"
+                        />
+                    </Box>
+                </>
+            )}
+        </Box>
     )
 }
