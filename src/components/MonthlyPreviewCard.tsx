@@ -1,51 +1,14 @@
-import {useState} from "react";
-import {
-    Button,
-    Card,
-    CardContent,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Stack,
-    Typography,
-} from "@mui/material";
-import type {AxiosError} from "axios";
-import {useSummary} from "@/features/attendance/hooks.ts";
-import {useAuth} from "@/features/auth/hooks.ts";
-import {useSnackbar} from "@/context/SnackbarContext.ts";
-import type {Summary} from "@/features/attendance/types.ts";
-import SummaryPieChart from "@/components/SummaryPieChart";
-import {formatMinutes} from "@/features/attendance/utils";
+import {Button, Card, CardContent, Stack, Typography,} from "@mui/material";
+import MonthlySummaryDialog from "@/components/MonthlySummaryDialog";
+import {useMonthlyPreview} from "@/components/useMonthlyPreview.ts";
 
 interface Props {
-    todaySummary: Summary | null;
+    year: number;
+    month: number;
 }
 
-const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("zh-TW", {
-        style: "currency",
-        currency: "TWD",
-        maximumFractionDigits: 0,
-    }).format(value);
-
-export default function MonthlyPreviewCard({todaySummary}: Props) {
-    const {isAdmin} = useAuth();
-    const {monthSummary, loading, previewSummary} = useSummary();
-    const {showError} = useSnackbar();
-    const [open, setOpen] = useState(false);
-
-    const handleOpenPreview = async () => {
-        if (todaySummary === null) return;
-        try {
-            const {year, month} = todaySummary;
-            await previewSummary(year, month);
-            setOpen(true);
-        } catch (err) {
-            const error = err as AxiosError<{ error?: string }>;
-            showError(error?.response?.data?.error || "Something went wrong");
-        }
-    };
+export default function MonthlyPreviewCard({year, month}: Props) {
+    const {monthSummary, loading, open, setOpen, handleOpenPreview} = useMonthlyPreview(year, month);
 
     return (
         <>
@@ -64,33 +27,11 @@ export default function MonthlyPreviewCard({todaySummary}: Props) {
                 </CardContent>
             </Card>
 
-            <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-                <DialogTitle>Monthly Summary</DialogTitle>
-                <DialogContent>
-                    {monthSummary ? (
-                        <Stack spacing={1} sx={{mt: 1}}>
-                            <Typography>
-                                Month: {monthSummary.year}/{monthSummary.month.toString().padStart(2, '0')}
-                            </Typography>
-                            <Typography>
-                                Total Time: {formatMinutes(monthSummary.totalMinutes)}
-                            </Typography>
-                            {isAdmin && <>
-                                <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
-                                <Typography fontWeight="bold">
-                                    Total Salary: {formatCurrency(monthSummary.salaryAmount)}
-                                </Typography>
-                            </>}
-                        </Stack>
-                    ) : (
-                        <Typography>No data</Typography>
-                    )}
-                    <SummaryPieChart summaryLabels={monthSummary?.labels || []}/>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Close</Button>
-                </DialogActions>
-            </Dialog>
+            <MonthlySummaryDialog
+                open={open}
+                onClose={() => setOpen(false)}
+                monthSummary={monthSummary}
+            />
         </>
     );
 }

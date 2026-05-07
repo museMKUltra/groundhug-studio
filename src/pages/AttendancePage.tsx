@@ -117,7 +117,7 @@ export default function AttendancePage() {
                             updateSession={updateSession}
                         />
 
-                        <MonthlyPreviewCard todaySummary={todaySummary}/>
+                        <MonthlyPreviewCard year={todaySummary?.year || 0} month={todaySummary?.month || 0}/>
                     </Stack>
                 </Box>
             </Box>
