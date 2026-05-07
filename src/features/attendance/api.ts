@@ -12,6 +12,7 @@ import type {
     Session,
     Summary,
     UpdateSessionRequest,
+    WorkSummaryResponse,
 } from "./types";
 
 export const getPeriodSessionsApi = async (startDate: string, endDate: string) => {
@@ -60,6 +61,13 @@ export const clockOutApi = async (data?: ClockInAndOutRequest) => {
 export const getWorkSummaryPreviewApi = async (year: number, month: number) => {
     const res = await axios.get<Summary>(`/work-summary/preview`, {
         params: {year, month},
+    });
+    return res.data;
+};
+
+export const getWorkSummaryListApi = async (page: number, size: number) => {
+    const res = await axios.get<WorkSummaryResponse>(`/work-summary/list`, {
+        params: {page, size},
     });
     return res.data;
 };
