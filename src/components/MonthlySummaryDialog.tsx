@@ -10,14 +10,8 @@ import {
 import type {Summary} from "@/features/attendance/types.ts";
 import SummaryPieChart from "@/components/SummaryPieChart";
 import {formatMinutes} from "@/features/attendance/utils";
+import {formatCurrency} from "@/utils/currency.ts";
 import {useAuth} from "@/features/auth/hooks.ts";
-
-const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("zh-TW", {
-        style: "currency",
-        currency: "TWD",
-        maximumFractionDigits: 0,
-    }).format(value);
 
 interface Props {
     open: boolean;

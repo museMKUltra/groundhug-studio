@@ -8,6 +8,7 @@ import {useAuth} from "@/features/auth/hooks.ts";
 import Sessions from "@/components/Sessions.tsx";
 import AttendanceCard from "@/components/AttendanceCard.tsx";
 import MonthlyPreviewCard from "@/components/MonthlyPreviewCard.tsx";
+import {formatCurrency} from "@/utils/currency.ts";
 
 export default function AttendancePage() {
     const {isAdmin, hourlyRate} = useAuth();
@@ -40,13 +41,6 @@ export default function AttendancePage() {
 
         init();
     }, []);
-
-    const formatCurrency = (value: number) =>
-        new Intl.NumberFormat("zh-TW", {
-            style: "currency",
-            currency: "TWD",
-            maximumFractionDigits: 0,
-        }).format(value);
 
     const todayHours = todaySummary?.totalHours || 0;
     const displayTodayHours = todayHours.toFixed(2);
