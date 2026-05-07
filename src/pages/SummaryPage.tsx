@@ -15,8 +15,12 @@ import {
 import {useSummary} from "@/features/attendance/hooks.ts";
 import type {WorkSummaryResponse} from "@/features/attendance/types.ts";
 import MonthlyPreviewButton from "@/components/MonthlyPreviewButton.tsx";
+import {useAuth} from "@/features/auth/hooks.ts";
+import {formatMinutes} from "@/features/attendance/utils";
+import {formatCurrency} from "@/utils/currency.ts";
 
 export default function SummaryPage() {
+    const {isAdmin} = useAuth();
     const {getWorkSummaryList} = useSummary()
 
     const [loading, setLoading] = useState(false)
@@ -60,9 +64,14 @@ export default function SummaryPage() {
                                 <TableRow>
                                     <TableCell>Year</TableCell>
                                     <TableCell>Month</TableCell>
-                                    <TableCell>Total Minutes</TableCell>
-                                    <TableCell>Hourly Rate</TableCell>
-                                    <TableCell>Salary</TableCell>
+                                    <TableCell>Total Time</TableCell>
+                                    {
+                                        isAdmin && (<>
+                                            <TableCell>Hourly Rate</TableCell>
+                                            <TableCell>Total Salary</TableCell>
+                                        </>)
+                                    }
+                                    <TableCell>Status</TableCell>
                                     <TableCell></TableCell>
                                 </TableRow>
                             </TableHead>
@@ -75,15 +84,22 @@ export default function SummaryPage() {
                                         <TableCell>{item.month}</TableCell>
 
                                         <TableCell>
-                                            {item.totalMinutes}
+                                            {item.totalMinutes ? formatMinutes(item.totalMinutes) : '--'}
                                         </TableCell>
 
-                                        <TableCell>
-                                            ${item.hourlyRate}
-                                        </TableCell>
+                                        {
+                                            isAdmin && (<>
+                                                <TableCell>
+                                                    {item.hourlyRate ? formatCurrency(item.hourlyRate) : '--'}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {item.salaryAmount ? formatCurrency(item.salaryAmount) : '--'}
+                                                </TableCell>
+                                            </>)
+                                        }
 
                                         <TableCell>
-                                            ${item.salaryAmount}
+                                            {item.status}
                                         </TableCell>
 
                                         <TableCell>

@@ -10,7 +10,7 @@ import LoginLayout from "@/layouts/LoginLayout";
 import {SessionProvider} from "@/features/attendance/SessionProvider";
 import {LabelProvider} from "@/features/attendance/LabelProvider";
 
-import {authGuard, type Guard, guestGuard, roleGuard} from "@/routes/guards";
+import {authGuard, type Guard, guestGuard} from "@/routes/guards";
 import type {Role} from "@/features/auth/types";
 import HomeLayout from "@/layouts/HomeLayout";
 
@@ -65,8 +65,7 @@ export const routes: AppRoute[] = [
         path: "/summary",
         element: <SummaryPage/>,
         label: "Summary",
-        roles: ["ADMIN"],
-        guards: [roleGuard(["ADMIN"])],
+        guards: [authGuard],
     },
 ];
 
