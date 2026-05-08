@@ -1,4 +1,4 @@
-type Status = "ACTIVE" | "COMPLETED" | "DRAFT" | string;
+export type Status = "ACTIVE" | "COMPLETED" | "DRAFT" | string;
 
 export interface Label {
     id: number;
@@ -44,7 +44,7 @@ export type WorkSummary = {
     year: number
     month: number
     totalMinutes: number
-    status: string
+    status: Status
     hourlyRate: number
     salaryAmount: number
 }

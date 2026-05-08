@@ -13,7 +13,7 @@ import {
     Typography
 } from "@mui/material";
 import {useSummary} from "@/features/attendance/hooks.ts";
-import type {WorkSummaryResponse} from "@/features/attendance/types.ts";
+import type {Status, WorkSummaryResponse} from "@/features/attendance/types.ts";
 import MonthlyPreviewButton from "@/components/MonthlyPreviewButton.tsx";
 import {useAuth} from "@/features/auth/hooks.ts";
 import {formatMinutes} from "@/features/attendance/utils";
@@ -45,8 +45,8 @@ export default function SummaryPage() {
         }
     }
 
-    const emptyRows =
-        pageSize - (data?.content.length || 0)
+    const emptyRows = pageSize - (data?.content.length || 0)
+    const isDraft = (status: Status) => (status === 'DRAFT')
 
     return (
         <Box p={3}>
@@ -84,16 +84,16 @@ export default function SummaryPage() {
                                         <TableCell>{item.month}</TableCell>
 
                                         <TableCell>
-                                            {item.totalMinutes ? formatMinutes(item.totalMinutes) : '--'}
+                                            {isDraft(item.status) ? '--' : formatMinutes(item.totalMinutes)}
                                         </TableCell>
 
                                         {
                                             isAdmin && (<>
                                                 <TableCell>
-                                                    {item.hourlyRate ? formatCurrency(item.hourlyRate) : '--'}
+                                                    {isDraft(item.status) ? '--' : formatCurrency(item.hourlyRate)}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {item.salaryAmount ? formatCurrency(item.salaryAmount) : '--'}
+                                                    {isDraft(item.status) ? '--' : formatCurrency(item.salaryAmount)}
                                                 </TableCell>
                                             </>)
                                         }
