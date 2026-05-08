@@ -49,7 +49,7 @@ export default function SummaryPage() {
     const isDraft = (status: Status) => (status === 'DRAFT')
 
     return (
-        <Box p={3}>
+        <Box>
             <Typography variant="h4" mb={3}>
                 Monthly Summary
             </Typography>
