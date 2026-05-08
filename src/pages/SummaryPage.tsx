@@ -1,4 +1,3 @@
-import {useEffect, useState} from "react";
 import {
     Box,
     CircularProgress,
@@ -12,40 +11,20 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import {useSummary} from "@/features/attendance/hooks.ts";
-import type {Status, WorkSummaryResponse} from "@/features/attendance/types.ts";
+import type {Status} from "@/features/attendance/types.ts";
 import MonthlyPreviewButton from "@/components/MonthlyPreviewButton.tsx";
 import {useAuth} from "@/features/auth/hooks.ts";
 import {formatMinutes} from "@/features/attendance/utils";
 import {formatCurrency} from "@/utils/currency.ts";
+import {useWorkSummary} from "@/features/attendance/useWorkSummary.ts";
 
 export default function SummaryPage() {
+    const pageSize = 6;
+
     const {isAdmin} = useAuth();
-    const {getWorkSummaryList} = useSummary()
+    const {loading, page, setPage, list, totalPages} = useWorkSummary(pageSize)
 
-    const [loading, setLoading] = useState(false)
-    const [page, setPage] = useState(1)
-    const [data, setData] = useState<WorkSummaryResponse | null>(null)
-
-    const pageSize = 6
-
-    useEffect(() => {
-        fetchData()
-    }, [page])
-
-    const fetchData = async () => {
-        try {
-            setLoading(true)
-
-            const response = await getWorkSummaryList(page - 1, pageSize)
-
-            setData(response)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    const emptyRows = pageSize - (data?.content.length || 0)
+    const emptyRows = pageSize - (list.length || 0)
     const isDraft = (status: Status) => (status === 'DRAFT')
 
     return (
@@ -77,7 +56,7 @@ export default function SummaryPage() {
                             </TableHead>
 
                             <TableBody>
-                                {data?.content.map((item) => (
+                                {list.map((item) => (
                                     <TableRow key={item.id} hover>
                                         <TableCell>{item.year}</TableCell>
 
@@ -125,7 +104,7 @@ export default function SummaryPage() {
                                     </TableRow>
                                 ))}
 
-                                {data?.content.length === 0 && (
+                                {list.length === 0 && (
                                     <TableRow>
                                         <TableCell
                                             colSpan={6}
@@ -146,7 +125,7 @@ export default function SummaryPage() {
                     >
                         <Pagination
                             page={page}
-                            count={data?.page.totalPages || 0}
+                            count={totalPages || 0}
                             onChange={(_, value) => setPage(value)}
                             color="primary"
                         />
