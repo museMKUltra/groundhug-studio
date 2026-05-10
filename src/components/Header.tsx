@@ -22,7 +22,14 @@ export default function Header() {
 
     return (
         <>
-            <AppBar position="static" elevation={1}>
+            <AppBar
+                position="sticky"
+                elevation={0}
+                sx={{
+                    bgcolor: 'background.paper',
+                    color: 'text.primary',
+                }}
+            >
                 <Container maxWidth="lg">
                     <Toolbar sx={{display: {xs: 'none', md: 'flex'}, gap: 3}} disableGutters>
                         <Logo/>
