@@ -194,7 +194,7 @@ export default function AttendanceCard(
                             {sessionLoading && (
                                 <CircularProgress size={20} sx={{mr: 1}}/>
                             )}
-                            {isActive ? "Clock Out" : "Clock In"}
+                            {isActive ? "Finish" : "Start"}
                         </Button>
                     </Box>
 
