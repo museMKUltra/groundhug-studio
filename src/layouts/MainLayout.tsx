@@ -1,10 +1,11 @@
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import {Outlet} from "react-router-dom";
-import {Box, Stack, Typography} from "@mui/material";
+import {Box, Container, Stack, Typography} from "@mui/material";
 
 import {useAuth} from "@/features/auth/hooks.ts";
 import Header from "@/components/Header";
+import {useEffect} from "react";
 
 dayjs.extend(relativeTime);
 
@@ -39,41 +40,44 @@ export default function MainLayout() {
         <>
             <Header/>
 
-            <Box
-                display="flex"
-                flexDirection="column"
-                sx={{
-                    minHeight: {
-                        xs: "calc(100vh - 56px)",
-                        sm: "calc(100vh - 64px)",
-                    },
-                    bgcolor: "grey.100",
-                }}
-            >
-                <Box flex={1} display="flex">
-                    <Stack spacing={3} sx={{p: 3, mx: "auto"}} maxWidth="lg" width="100%">
+            <Box bgcolor="grey.100">
+                <Container
+                    maxWidth="lg"
+                    sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        minHeight: {
+                            xs: "calc(100vh - 72px)",
+                            sm: "calc(100vh - 80px)",
+                        },
+                        paddingY: 3
+                    }}
+                >
+                    <Box flex={1} display="flex">
+                        <Stack spacing={3} width="100%">
 
-                        <Box display="flex" gap={1} alignItems="baseline">
-                            <Typography>
-                                Hi,{" "}
-                                <Box component="span" fontWeight="bold">
-                                    {userName}
-                                </Box>
-                                .
-                            </Typography>
-
-                            {isGuest ? (
-                                <Typography variant="body2" color={textColor}>
-                                    {expiryText}
+                            <Box display="flex" gap={1} alignItems="baseline">
+                                <Typography>
+                                    Hi,{" "}
+                                    <Box component="span" fontWeight="bold">
+                                        {userName}
+                                    </Box>
+                                    .
                                 </Typography>
-                            ) : (
-                                <Typography>Keep going!</Typography>
-                            )}
-                        </Box>
 
-                        <Outlet/>
-                    </Stack>
-                </Box>
+                                {isGuest ? (
+                                    <Typography variant="body2" color={textColor}>
+                                        {expiryText}
+                                    </Typography>
+                                ) : (
+                                    <Typography>Keep going!</Typography>
+                                )}
+                            </Box>
+
+                            <Outlet/>
+                        </Stack>
+                    </Box>
+                </Container>
             </Box>
         </>
     );

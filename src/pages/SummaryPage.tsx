@@ -3,6 +3,7 @@ import {
     CircularProgress,
     Pagination,
     Paper,
+    Stack,
     Table,
     TableBody,
     TableCell,
@@ -28,8 +29,8 @@ export default function SummaryPage() {
     const isDraft = (status: Status) => (status === 'DRAFT')
 
     return (
-        <Box>
-            <Typography variant="h4" mb={3}>
+        <Stack gap={3} width={'100%'}>
+            <Typography variant="h4">
                 Monthly Summary
             </Typography>
 

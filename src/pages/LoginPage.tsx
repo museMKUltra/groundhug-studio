@@ -63,7 +63,10 @@ export default function LoginPage() {
     }
 
     return (
-        <Box>
+        <Box
+            display="flex"
+            justifyContent="center"
+        >
             <Card sx={{width: 400, borderRadius: 3, boxShadow: 3}}>
                 <CardContent>
                     <Typography variant="h5" textAlign="center" mb={2}>

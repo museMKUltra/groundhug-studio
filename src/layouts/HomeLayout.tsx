@@ -1,4 +1,4 @@
-import {Box} from "@mui/material";
+import {Container} from "@mui/material";
 import {Outlet} from "react-router-dom";
 import Header from "@/components/Header.tsx";
 
@@ -7,19 +7,18 @@ export default function HomeLayout() {
     return (
         <>
             <Header/>
-            <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
+            <Container
+                maxWidth="lg"
                 sx={{
                     minHeight: {
-                        xs: "calc(100vh - 56px)",
-                        sm: "calc(100vh - 64px)",
+                        xs: "calc(100vh - 72px)",
+                        sm: "calc(100vh - 80px)",
                     },
+                    paddingY: 8
                 }}
             >
                 <Outlet/>
-            </Box>
+            </Container>
         </>
 
     );
