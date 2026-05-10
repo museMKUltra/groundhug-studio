@@ -1,4 +1,4 @@
-type Status = "ACTIVE" | "COMPLETED" | "DRAFT" | string;
+export type Status = "ACTIVE" | "COMPLETED" | "DRAFT" | string;
 
 export interface Label {
     id: number;
@@ -37,6 +37,28 @@ export interface Summary {
     salaryAmount: number;
     status?: Status;
     labels?: SummaryLabel[];
+}
+
+export type WorkSummary = {
+    id: number
+    year: number
+    month: number
+    totalMinutes: number
+    status: Status
+    hourlyRate: number
+    salaryAmount: number
+}
+
+type Page = {
+    size: number
+    number: number
+    totalElements: number
+    totalPages: number
+}
+
+export type WorkSummaryResponse = {
+    content: WorkSummary[]
+    page: Page
 }
 
 export type PeriodSessionsResponse = Session[];

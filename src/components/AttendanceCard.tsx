@@ -62,7 +62,8 @@ export default function AttendanceCard(
         labelId,
         setLabelId,
         description,
-        setDescription
+        setDescription,
+        resetForm
     } = useSessionForm(session, updateSession, handleError);
 
     const {
@@ -96,6 +97,7 @@ export default function AttendanceCard(
 
         try {
             await clockOut(getClockInAndOutRequest());
+            resetForm()
             showSuccess("Clock out successful");
 
             if (session?.workDate) {

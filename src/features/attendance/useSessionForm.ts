@@ -7,18 +7,21 @@ type AutoSaveFormState = {
     description: string;
 }
 
+const DEFAULT_LABEL_ID = 0;
+const DEFAULT_DESCRIPTION = "";
+
 export function useSessionForm(
     session: Session | null,
     updateSession: (id: number, data: UpdateSessionRequest) => Promise<Session>,
     onError: (err: unknown) => void
 ) {
-    const initialLabelId = useMemo(() => session?.label?.id ?? 0, [session]);
-    const initialDescription = useMemo(() => session?.description ?? "", [session]);
+    const initialLabelId = useMemo(() => session?.label?.id ?? DEFAULT_LABEL_ID, [session]);
+    const initialDescription = useMemo(() => session?.description ?? DEFAULT_DESCRIPTION, [session]);
 
     const [labelId, setLabelId] = useState(initialLabelId);
     const [description, setDescription] = useState(initialDescription);
 
-    const {scheduleSave, syncValue} = useAutoSaveForm<AutoSaveFormState>({
+    const {scheduleSave} = useAutoSaveForm<AutoSaveFormState>({
         defaultValue: {
             labelId: initialLabelId,
             description: initialDescription
@@ -47,7 +50,6 @@ export function useSessionForm(
         onError
     });
 
-
     // sync when session changes
     useEffect(() => {
         setLabelId(initialLabelId);
@@ -55,19 +57,22 @@ export function useSessionForm(
     useEffect(() => {
         setDescription(initialDescription);
     }, [initialDescription]);
-    useEffect(() => {
-        syncValue({labelId: initialLabelId, description: initialDescription});
-    }, [initialLabelId, initialDescription]);
 
     // auto save
     useEffect(() => {
         scheduleSave({labelId, description});
     }, [labelId, description]);
 
+    const resetForm: () => void = () => {
+        setLabelId(DEFAULT_LABEL_ID);
+        setDescription(DEFAULT_DESCRIPTION);
+    }
+
     return {
         labelId,
         setLabelId,
         description,
-        setDescription
+        setDescription,
+        resetForm
     };
 }

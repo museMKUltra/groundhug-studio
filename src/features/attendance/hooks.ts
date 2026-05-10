@@ -8,6 +8,7 @@ import {
     deleteSessionApi,
     getActiveSessionApi,
     getPeriodSessionsApi,
+    getWorkSummaryListApi,
     getWorkSummaryPreviewApi,
     updateSessionApi
 } from "./api.ts";
@@ -103,6 +104,9 @@ export const useSummary = () => {
     const getWorkSummaryPreview = (year: number, month: number) =>
         withLoading(() => getWorkSummaryPreviewApi(year, month));
 
+    const getWorkSummaryList = (page: number, size: number) =>
+        withLoading(() => getWorkSummaryListApi(page, size));
+
     const confirmWorkSummary = (summaryId: string) =>
         withLoading(() => confirmWorkSummaryApi(summaryId));
 
@@ -116,6 +120,7 @@ export const useSummary = () => {
         monthSummary,
         confirmWorkSummary,
         previewSummary,
+        getWorkSummaryList,
     };
 };
 

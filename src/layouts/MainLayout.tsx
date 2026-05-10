@@ -2,7 +2,6 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import {Outlet} from "react-router-dom";
 import {Box, Stack, Typography} from "@mui/material";
-import {useEffect} from "react";
 
 import {useAuth} from "@/features/auth/hooks.ts";
 import Header from "@/components/Header";
