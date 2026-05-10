@@ -8,17 +8,16 @@ interface Props {
 
 export default function NavLinks({pages}: Props) {
     return (
-        <Box display='flex'>
+        <Box display='flex' gap={1}>
             {pages.map((page) => (
                 <Button
                     key={page.label}
                     component={NavLink}
                     to={page.path}
+                    color="inherit"
                     sx={{
-                        color: "white",
                         "&.active": {
-                            backgroundColor: "rgba(255,255,255,0.1)",
-                            borderRadius: 1,
+                            backgroundColor: "action.hover",
                         },
                     }}
                 >
