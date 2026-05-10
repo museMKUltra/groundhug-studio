@@ -25,7 +25,9 @@ export default function SummaryPage() {
     const {isAdmin} = useAuth();
     const {loading, page, setPage, list, totalPages} = useWorkSummary(pageSize)
 
-    const emptyRows = pageSize - (list.length || 0)
+    const listLength = list.length || 0;
+    const isEmptyList = listLength === 0;
+    const emptyRows = loading ? (pageSize - 1) : (pageSize - listLength)
     const isDraft = (status: Status) => (status === 'DRAFT')
 
     return (
@@ -34,30 +36,40 @@ export default function SummaryPage() {
                 Monthly Summary
             </Typography>
 
-            {loading ? (
-                <CircularProgress/>
-            ) : (
-                <>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Year</TableCell>
-                                    <TableCell>Month</TableCell>
-                                    <TableCell>Total Time</TableCell>
-                                    {
-                                        isAdmin && (<>
-                                            <TableCell>Hourly Rate</TableCell>
-                                            <TableCell>Total Salary</TableCell>
-                                        </>)
-                                    }
-                                    <TableCell>Status</TableCell>
-                                    <TableCell></TableCell>
-                                </TableRow>
-                            </TableHead>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Year</TableCell>
+                            <TableCell>Month</TableCell>
+                            <TableCell>Total Time</TableCell>
+                            {
+                                isAdmin && (<>
+                                    <TableCell>Hourly Rate</TableCell>
+                                    <TableCell>Total Salary</TableCell>
+                                </>)
+                            }
+                            <TableCell>Status</TableCell>
+                            <TableCell></TableCell>
+                        </TableRow>
+                    </TableHead>
 
-                            <TableBody>
-                                {list.map((item) => (
+                    <TableBody>
+                        {
+                            (loading || isEmptyList)
+                                ? (
+                                    <TableRow>
+                                        <TableCell
+                                            colSpan={7}
+                                            align="center"
+                                        >
+                                            {
+                                                loading ? <CircularProgress size={24}/> : 'No Data'
+                                            }
+                                        </TableCell>
+                                    </TableRow>
+                                )
+                                : list.map((item) => (
                                     <TableRow key={item.id} hover>
                                         <TableCell>{item.year}</TableCell>
 
@@ -93,46 +105,35 @@ export default function SummaryPage() {
                                     </TableRow>
                                 ))}
 
-                                {/* keep table height fixed */}
-                                {Array.from({length: emptyRows}).map((_, index) => (
-                                    <TableRow
-                                        key={`empty-${index}`}
-                                        sx={{
-                                            height: 63
-                                        }}
-                                    >
-                                        <TableCell colSpan={6}/>
-                                    </TableRow>
-                                ))}
 
-                                {list.length === 0 && (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={6}
-                                            align="center"
-                                        >
-                                            No Data
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                        {/* keep table height fixed */}
+                        {Array.from({length: emptyRows}).map((_, index) => (
+                            <TableRow
+                                key={`empty-${index}`}
+                                sx={{
+                                    height: 63
+                                }}
+                            >
+                                <TableCell colSpan={7}/>
+                            </TableRow>
+                        ))}
 
-                    <Box
-                        mt={3}
-                        display="flex"
-                        justifyContent="center"
-                    >
-                        <Pagination
-                            page={page}
-                            count={totalPages || 0}
-                            onChange={(_, value) => setPage(value)}
-                            color="primary"
-                        />
-                    </Box>
-                </>
-            )}
-        </Box>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            <Box
+                mt={3}
+                display="flex"
+                justifyContent="center"
+            >
+                <Pagination
+                    page={page}
+                    count={totalPages || 0}
+                    onChange={(_, value) => setPage(value)}
+                    color="primary"
+                />
+            </Box>
+        </Stack>
     )
 }
