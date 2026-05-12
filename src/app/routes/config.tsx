@@ -5,14 +5,14 @@ import LoginPage from "@/pages/LoginPage.tsx";
 import SummaryPage from "@/pages/SummaryPage.tsx";
 import AttendancePage from "@/pages/AttendancePage.tsx";
 
-import LoginLayout from "@/layouts/LoginLayout.tsx";
+import LoginLayout from "@/app/layouts/LoginLayout.tsx";
 
 import {SessionProvider} from "@/features/attendance/SessionProvider.tsx";
 import {LabelProvider} from "@/features/attendance/LabelProvider.tsx";
 
 import {authGuard, type Guard, guestGuard, roleGuard} from "@/app/routes/guards.tsx";
 import type {Role} from "@/features/auth/types.ts";
-import HomeLayout from "@/layouts/HomeLayout.tsx";
+import HomeLayout from "@/app/layouts/HomeLayout.tsx";
 
 export interface AppRoute {
     path: string;
