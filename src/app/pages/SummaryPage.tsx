@@ -12,12 +12,12 @@ import {
     TableRow,
     Typography
 } from "@mui/material";
-import type {Status} from "@/features/attendance/types.ts";
 import MonthlyPreviewButton from "@/shared/components/MonthlyPreviewButton.tsx";
 import {useAuth} from "@/features/auth/hooks.ts";
 import {formatMinutes} from "@/features/attendance/utils.ts";
 import {formatCurrency} from "@/shared/utils/currency.ts";
 import {useWorkSummary} from "@/features/attendance/presentation/hooks/useWorkSummary"
+import {isDraft} from "@/features/attendance/domain/utils/status.ts";
 
 export default function SummaryPage() {
     const pageSize = 6;
@@ -28,7 +28,6 @@ export default function SummaryPage() {
     const listLength = list.length || 0;
     const isEmptyList = listLength === 0;
     const emptyRows = loading ? (pageSize - 1) : (pageSize - listLength)
-    const isDraft = (status: Status) => (status === 'DRAFT')
 
     return (
         <Stack gap={3} width={'100%'}>
