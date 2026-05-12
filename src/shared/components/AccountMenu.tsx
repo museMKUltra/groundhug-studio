@@ -4,7 +4,7 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-import SettingsDialog, {type SettingsDialogHandle,} from "@/components/SettingsDialog";
+import SettingsDialog, {type SettingsDialogHandle,} from "@/shared/components/SettingsDialog.tsx";
 
 interface Props {
     showSettings: boolean;

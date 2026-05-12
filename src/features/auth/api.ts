@@ -1,4 +1,4 @@
-import axios from "@/api/axios";
+import axios from "@/app/api/axios";
 import type {AuthResponse, GuestRequest, LoginRequest, MeResponse} from "./types";
 
 export const loginApi = async (data: LoginRequest) => {

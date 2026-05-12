@@ -1,5 +1,5 @@
 import {Card, CardContent, Stack, Typography,} from "@mui/material";
-import MonthlyPreviewButton from "@/components/MonthlyPreviewButton.tsx";
+import MonthlyPreviewButton from "@/shared/components/MonthlyPreviewButton.tsx";
 
 interface Props {
     year: number;

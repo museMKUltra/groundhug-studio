@@ -5,15 +5,15 @@ import type {AxiosError} from "axios";
 
 import type {ClockInAndOutRequest, Session, UpdateSessionRequest} from "@/features/attendance/types.ts";
 
-import {useSessionContext} from "@/features/attendance/SessionContext";
-import {useLabelContext} from "@/features/attendance/LabelContext";
+import {useSessionContext} from "@/features/attendance/SessionContext.tsx";
+import {useLabelContext} from "@/features/attendance/LabelContext.tsx";
 import {useSessionForm} from "@/features/attendance/useSessionForm.ts";
 import {useLiveDuration} from "@/features/attendance/useLiveDuration.ts";
-import {useSnackbar} from "@/context/SnackbarContext.ts";
+import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 
-import LabelSelect from "@/components/LabelSelect.tsx";
-import LabelDialog from "@/components/LabelDialog.tsx";
-import ViewEditField from "@/components/ViewEditField";
+import LabelSelect from "@/shared/components/LabelSelect.tsx";
+import LabelDialog from "@/shared/components/LabelDialog.tsx";
+import ViewEditField from "@/shared/components/ViewEditField.tsx";
 
 interface Props {
     session: Session | null;

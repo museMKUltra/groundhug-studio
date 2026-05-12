@@ -13,10 +13,10 @@ import {
     Typography
 } from "@mui/material";
 import type {Status} from "@/features/attendance/types.ts";
-import MonthlyPreviewButton from "@/components/MonthlyPreviewButton.tsx";
+import MonthlyPreviewButton from "@/shared/components/MonthlyPreviewButton.tsx";
 import {useAuth} from "@/features/auth/hooks.ts";
 import {formatMinutes} from "@/features/attendance/utils.ts";
-import {formatCurrency} from "@/utils/currency.ts";
+import {formatCurrency} from "@/shared/utils/currency.ts";
 import {useWorkSummary} from "@/features/attendance/useWorkSummary.ts";
 
 export default function SummaryPage() {

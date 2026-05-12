@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useMemo, useState} from "react";
 import dayjs from "dayjs";
-import {formatDuration} from "@/utils/duration";
+import {formatDuration} from "@/shared/utils/duration";
 import {useClock} from "@/features/clock/useClockContext.ts";
 
 export function useLiveDuration(

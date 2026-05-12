@@ -1,9 +1,9 @@
 import {AppBar, Box, Container, IconButton, Toolbar} from "@mui/material";
-import {useAuth} from "@/features/auth/hooks";
-import AccountMenu from "@/components/AccountMenu";
-import NavMenu from "@/components/NavMenu";
-import NavLinks from "@/components/NavLinks";
-import Logo from "@/components/Logo";
+import {useAuth} from "@/features/auth/hooks.ts";
+import AccountMenu from "@/shared/components/AccountMenu.tsx";
+import NavMenu from "@/shared/components/NavMenu.tsx";
+import NavLinks from "@/shared/components/NavLinks.tsx";
+import Logo from "@/shared/components/Logo.tsx";
 import {getNavPages} from "@/app/routes";
 import LoginIcon from "@mui/icons-material/Login";
 import {useNavigate} from "react-router-dom";

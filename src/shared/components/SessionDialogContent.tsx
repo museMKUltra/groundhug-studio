@@ -4,15 +4,15 @@ import dayjs from "dayjs";
 import {useMemo, useState} from "react";
 import type {AxiosError} from "axios";
 
-import {useSnackbar} from "@/context/SnackbarContext.ts";
-import type {Session} from "@/features/attendance/types";
-import {useLabelContext} from "@/features/attendance/LabelContext";
-import {getDuration} from "@/utils/duration";
+import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
+import type {Session} from "@/features/attendance/types.ts";
+import {useLabelContext} from "@/features/attendance/LabelContext.tsx";
+import {getDuration} from "@/shared/utils/duration.ts";
 
-import LabelChip from "@/components/LabelChip.tsx";
-import LabelSelect from "@/components/LabelSelect.tsx";
-import LabelDialog from "@/components/LabelDialog.tsx";
-import ViewEditField from "@/components/ViewEditField.tsx";
+import LabelChip from "@/shared/components/LabelChip.tsx";
+import LabelSelect from "@/shared/components/LabelSelect.tsx";
+import LabelDialog from "@/shared/components/LabelDialog.tsx";
+import ViewEditField from "@/shared/components/ViewEditField.tsx";
 
 type FormState = {
     clockIn: string;

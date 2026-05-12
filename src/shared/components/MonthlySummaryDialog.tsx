@@ -8,9 +8,9 @@ import {
     Typography,
 } from "@mui/material";
 import type {Summary} from "@/features/attendance/types.ts";
-import SummaryPieChart from "@/components/SummaryPieChart";
-import {formatMinutes} from "@/features/attendance/utils";
-import {formatCurrency} from "@/utils/currency.ts";
+import SummaryPieChart from "@/shared/components/SummaryPieChart.tsx";
+import {formatMinutes} from "@/features/attendance/utils.ts";
+import {formatCurrency} from "@/shared/utils/currency.ts";
 import {useAuth} from "@/features/auth/hooks.ts";
 
 interface Props {

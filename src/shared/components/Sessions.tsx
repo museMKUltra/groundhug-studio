@@ -4,12 +4,12 @@ import AddIcon from "@mui/icons-material/Add";
 import dayjs from "dayjs";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {useSessionContext} from "@/features/attendance/SessionContext";
-import {useLabelContext} from "@/features/attendance/LabelContext";
-import type {Session} from "@/features/attendance/types";
-import {getDuration} from "@/utils/duration";
-import EditSessionDialog from "@/components/EditSessionDialog.tsx";
-import AddSessionDialog from "@/components/AddSessionDialog.tsx";
+import {useSessionContext} from "@/features/attendance/SessionContext.tsx";
+import {useLabelContext} from "@/features/attendance/LabelContext.tsx";
+import type {Session} from "@/features/attendance/types.ts";
+import {getDuration} from "@/shared/utils/duration.ts";
+import EditSessionDialog from "@/shared/components/EditSessionDialog.tsx";
+import AddSessionDialog from "@/shared/components/AddSessionDialog.tsx";
 
 type Props = {
     onRefresh: () => void;

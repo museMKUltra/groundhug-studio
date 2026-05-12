@@ -1,7 +1,7 @@
 import {MenuItem, TextField} from "@mui/material";
 import EditSquareIcon from '@mui/icons-material/EditSquare';
-import type {Label} from "./LabelChip";
-import LabelChip from "./LabelChip";
+import type {Label} from "./LabelChip.tsx";
+import LabelChip from "./LabelChip.tsx";
 
 type Props = {
     labels: Label[];

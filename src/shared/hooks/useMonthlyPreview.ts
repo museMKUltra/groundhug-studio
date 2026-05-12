@@ -1,7 +1,7 @@
 import {useState} from "react";
 import type {AxiosError} from "axios";
 import {useSummary} from "@/features/attendance/hooks.ts";
-import {useSnackbar} from "@/context/SnackbarContext.ts";
+import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 
 export function useMonthlyPreview(year: number, month: number) {
     const {monthSummary, loading, previewSummary} = useSummary();

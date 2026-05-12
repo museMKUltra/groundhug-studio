@@ -18,8 +18,8 @@ import CheckIcon from "@mui/icons-material/Check";
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 import {useMemo, useState} from "react";
-import type {CreateLabelRequest, Label} from "@/features/attendance/types";
-import LabelChip from "./LabelChip";
+import type {CreateLabelRequest, Label} from "@/features/attendance/types.ts";
+import LabelChip from "./LabelChip.tsx";
 
 /** dnd-kit */
 import {

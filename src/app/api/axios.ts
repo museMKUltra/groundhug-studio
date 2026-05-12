@@ -1,7 +1,7 @@
 import type {AxiosRequestConfig} from "axios";
 import axios, {AxiosError} from "axios";
-import {tokenStorage} from "@/features/auth/tokenStorage";
-import {refreshController} from "@/features/auth/refreshController";
+import {tokenStorage} from "@/features/auth/tokenStorage.ts";
+import {refreshController} from "@/features/auth/refreshController.ts";
 
 const axiosInstance = axios.create({
     baseURL: "/api",

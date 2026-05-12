@@ -1,8 +1,8 @@
 import {PieChart} from "@mui/x-charts/PieChart";
 import {Box} from "@mui/material";
 
-import type {SummaryLabel} from "@/features/attendance/types";
-import {getPieSeries} from "@/features/attendance/utils";
+import type {SummaryLabel} from "@/features/attendance/types.ts";
+import {getPieSeries} from "@/features/attendance/utils.ts";
 import {useAuth} from "@/features/auth/hooks.ts";
 
 interface Props {

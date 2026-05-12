@@ -1,5 +1,5 @@
 import {type ReactNode} from "react";
-import {SnackbarProvider} from "@/context/SnackbarProvider.tsx";
+import {SnackbarProvider} from "@/shared/providers/SnackbarProvider.tsx";
 
 interface Props {
     children: ReactNode;

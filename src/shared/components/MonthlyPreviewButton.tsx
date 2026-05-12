@@ -1,6 +1,6 @@
 import {Button} from "@mui/material";
-import MonthlySummaryDialog from "@/components/MonthlySummaryDialog.tsx";
-import {useMonthlyPreview} from "@/components/useMonthlyPreview.ts";
+import MonthlySummaryDialog from "@/shared/components/MonthlySummaryDialog.tsx";
+import {useMonthlyPreview} from "@/shared/hooks/useMonthlyPreview.ts";
 
 interface Props {
     year: number;

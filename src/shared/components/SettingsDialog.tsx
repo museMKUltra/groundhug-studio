@@ -3,12 +3,12 @@ import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typogr
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
-import {useAuth} from "@/features/auth/hooks";
-import {useUsers} from "@/features/users/hooks";
-import {useEmployeeRate} from "@/features/attendance/hooks";
-import {useSnackbar} from "@/context/SnackbarContext.ts";
+import {useAuth} from "@/features/auth/hooks.ts";
+import {useUsers} from "@/features/users/hooks.ts";
+import {useEmployeeRate} from "@/features/attendance/hooks.ts";
+import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 import type {AxiosError} from "axios";
-import ViewEditField from "@/components/ViewEditField.tsx";
+import ViewEditField from "@/shared/components/ViewEditField.tsx";
 
 export interface SettingsDialogHandle {
     open: () => void;

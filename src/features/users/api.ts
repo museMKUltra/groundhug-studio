@@ -1,4 +1,4 @@
-import axios from "@/api/axios";
+import axios from "@/app/api/axios";
 import type {RegisterRequest, UserResponse, UpdateRequest, UpdateUserResponse} from "./types";
 
 export const registerApi = async (data: RegisterRequest) => {

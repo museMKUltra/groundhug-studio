@@ -2,7 +2,7 @@ import {useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import {useAuth} from "@/features/auth/hooks.ts";
 import {useUsers} from "@/features/users/hooks.ts";
-import {useSnackbar} from "@/context/SnackbarContext.ts";
+import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 
 import {Box, Button, Card, CardContent, Stack, Tab, Tabs, TextField, Typography,} from "@mui/material";
 import type {AxiosError} from "axios";

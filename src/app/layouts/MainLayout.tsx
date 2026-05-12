@@ -4,7 +4,7 @@ import {Outlet} from "react-router-dom";
 import {Box, Container, Stack, Typography} from "@mui/material";
 
 import {useAuth} from "@/features/auth/hooks.ts";
-import Header from "@/components/Header.tsx";
+import Header from "@/shared/components/Header.tsx";
 import {useEffect} from "react";
 
 dayjs.extend(relativeTime);

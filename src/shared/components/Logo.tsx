@@ -1,6 +1,6 @@
 import {NavLink} from "react-router-dom";
 import {Box, Typography} from "@mui/material";
-import logo from "@/assets/logo_TickBun.png";
+import logo from "@/shared/assets/logo_TickBun.png";
 
 export default function Logo() {
     return (

@@ -8,10 +8,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
 
-import {useSnackbar} from "@/context/SnackbarContext.ts";
-import type {Session, UpdateSessionRequest} from "@/features/attendance/types";
+import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
+import type {Session, UpdateSessionRequest} from "@/features/attendance/types.ts";
 import {useSessions} from "@/features/attendance/hooks.ts";
-import SessionDialogContent from "@/components/SessionDialogContent";
+import SessionDialogContent from "@/shared/components/SessionDialogContent.tsx";
 
 type Props = {
     session: Session | null;

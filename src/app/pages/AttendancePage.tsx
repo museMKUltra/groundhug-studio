@@ -1,14 +1,14 @@
 import {useEffect} from "react";
 import {Box, Card, CardContent, Stack, Typography,} from "@mui/material";
-import {useSnackbar} from "@/context/SnackbarContext.ts";
+import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
 import {useSessions} from "@/features/attendance/hooks.ts";
 import {useAuth} from "@/features/auth/hooks.ts";
-import Sessions from "@/components/Sessions.tsx";
-import AttendanceCard from "@/components/AttendanceCard.tsx";
-import MonthlyPreviewCard from "@/components/MonthlyPreviewCard.tsx";
-import {formatCurrency} from "@/utils/currency.ts";
+import Sessions from "@/shared/components/Sessions.tsx";
+import AttendanceCard from "@/shared/components/AttendanceCard.tsx";
+import MonthlyPreviewCard from "@/shared/components/MonthlyPreviewCard.tsx";
+import {formatCurrency} from "@/shared/utils/currency.ts";
 
 export default function AttendancePage() {
     const {isAdmin, hourlyRate} = useAuth();
