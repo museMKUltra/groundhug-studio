@@ -15,7 +15,7 @@ import {
 import type {Status} from "@/features/attendance/types.ts";
 import MonthlyPreviewButton from "@/components/MonthlyPreviewButton.tsx";
 import {useAuth} from "@/features/auth/hooks.ts";
-import {formatMinutes} from "@/features/attendance/utils";
+import {formatMinutes} from "@/features/attendance/utils.ts";
 import {formatCurrency} from "@/utils/currency.ts";
 import {useWorkSummary} from "@/features/attendance/useWorkSummary.ts";
 

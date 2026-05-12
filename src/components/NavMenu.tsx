@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Box, IconButton, Menu, MenuItem, Typography,} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import {NavLink} from "react-router-dom";
-import type {AppRoute} from "@/app/routes/config";
+import type {AppRoute} from "@/app/routes/routes.tsx";
 
 interface Props {
     pages: AppRoute[];

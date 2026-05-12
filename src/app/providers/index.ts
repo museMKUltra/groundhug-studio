@@ -1,1 +1,1 @@
-export * from "./AppProviders";
+export {default as AppProviders} from "./AppProviders";

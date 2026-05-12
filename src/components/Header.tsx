@@ -4,7 +4,7 @@ import AccountMenu from "@/components/AccountMenu";
 import NavMenu from "@/components/NavMenu";
 import NavLinks from "@/components/NavLinks";
 import Logo from "@/components/Logo";
-import {getNavPages} from "@/app/routes/config";
+import {getNavPages} from "@/app/routes";
 import LoginIcon from "@mui/icons-material/Login";
 import {useNavigate} from "react-router-dom";
 

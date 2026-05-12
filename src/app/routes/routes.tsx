@@ -1,9 +1,9 @@
 import {type ReactNode} from "react";
 
-import HomePage from "@/pages/HomePage.tsx";
-import LoginPage from "@/pages/LoginPage.tsx";
-import SummaryPage from "@/pages/SummaryPage.tsx";
-import AttendancePage from "@/pages/AttendancePage.tsx";
+import HomePage from "@/app/pages/HomePage.tsx";
+import LoginPage from "@/app/pages/LoginPage.tsx";
+import SummaryPage from "@/app/pages/SummaryPage.tsx";
+import AttendancePage from "@/app/pages/AttendancePage.tsx";
 
 import LoginLayout from "@/app/layouts/LoginLayout.tsx";
 

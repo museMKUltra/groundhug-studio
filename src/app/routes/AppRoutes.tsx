@@ -1,7 +1,7 @@
 import {Route, Routes} from "react-router-dom";
 import MainLayout from "@/app/layouts/MainLayout.tsx";
 import GuardPipeline from "@/app/routes/GuardPipeline.tsx";
-import {routes} from "./config.tsx";
+import {routes} from "./routes.tsx";
 
 export default function AppRoutes() {
     return (

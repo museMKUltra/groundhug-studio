@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import {useAuth} from "@/features/auth/hooks";
+import {useAuth} from "@/features/auth/hooks.ts";
 import {useUsers} from "@/features/users/hooks.ts";
 import {useSnackbar} from "@/context/SnackbarContext.ts";
 

@@ -1,6 +1,6 @@
 import {Box, Button,} from "@mui/material";
 import {NavLink} from "react-router-dom";
-import type {AppRoute} from "@/app/routes/config";
+import type {AppRoute} from "@/app/routes/routes.tsx";
 
 interface Props {
     pages: AppRoute[];

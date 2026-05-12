@@ -8,7 +8,7 @@ interface Props {
     children: ReactNode;
 }
 
-export function AppProviders({children}: Props) {
+export default function AppProviders({children}: Props) {
     return (
         <ThemeProviders>
             <UiProviders>
