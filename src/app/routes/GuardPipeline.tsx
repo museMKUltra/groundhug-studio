@@ -1,6 +1,6 @@
 import {Outlet, useLocation} from "react-router-dom";
-import {useAuth} from "@/features/auth/hooks";
-import type {Guard} from "@/routes/guards";
+import {useAuth} from "@/features/auth/hooks.ts";
+import type {Guard} from "@/app/routes/guards.tsx";
 
 export default function GuardPipeline({guards}: { guards?: Guard[] }) {
     const {user, isInitializing} = useAuth();

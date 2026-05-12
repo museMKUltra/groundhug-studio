@@ -1,18 +1,18 @@
 import {type ReactNode} from "react";
 
-import HomePage from "@/pages/HomePage";
-import LoginPage from "@/pages/LoginPage";
-import SummaryPage from "@/pages/SummaryPage";
-import AttendancePage from "@/pages/AttendancePage";
+import HomePage from "@/pages/HomePage.tsx";
+import LoginPage from "@/pages/LoginPage.tsx";
+import SummaryPage from "@/pages/SummaryPage.tsx";
+import AttendancePage from "@/pages/AttendancePage.tsx";
 
-import LoginLayout from "@/layouts/LoginLayout";
+import LoginLayout from "@/layouts/LoginLayout.tsx";
 
-import {SessionProvider} from "@/features/attendance/SessionProvider";
-import {LabelProvider} from "@/features/attendance/LabelProvider";
+import {SessionProvider} from "@/features/attendance/SessionProvider.tsx";
+import {LabelProvider} from "@/features/attendance/LabelProvider.tsx";
 
-import {authGuard, type Guard, guestGuard, roleGuard} from "@/routes/guards";
-import type {Role} from "@/features/auth/types";
-import HomeLayout from "@/layouts/HomeLayout";
+import {authGuard, type Guard, guestGuard, roleGuard} from "@/app/routes/guards.tsx";
+import type {Role} from "@/features/auth/types.ts";
+import HomeLayout from "@/layouts/HomeLayout.tsx";
 
 export interface AppRoute {
     path: string;

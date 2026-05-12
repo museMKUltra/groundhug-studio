@@ -1,6 +1,6 @@
 import {type Location, Navigate} from "react-router-dom";
 import type {ReactNode} from "react";
-import type {Role} from "@/features/auth/types";
+import type {Role} from "@/features/auth/types.ts";
 
 type GuardContext = {
     user: { role: Role } | null;
