@@ -1,25 +1,28 @@
-import React, {useMemo, useState} from "react";
-import {ClockContext} from "./useClockContext.ts";
-import {SystemClock} from "./SystemClock.ts";
-import {DemoClock} from "./DemoClock.ts";
-import {ClockDebugContext} from "./useClockDebug.ts";
+import {useMemo, useState} from "react";
 
-export type ClockMode = "system" | "demo";
+import {ClockContext} from "./useClockContext";
+import {SystemClock} from "./SystemClock";
+import {DemoClock} from "./DemoClock";
+import {ClockDebugContext} from "./useClockDebug";
 
-interface ClockProviderProps {
-    mode: ClockMode;
-    children: React.ReactNode;
-}
+import {useAuth} from "@/features/auth/hooks.ts";
 
 const systemClock = new SystemClock();
 const demoClock = new DemoClock();
 
-export function ClockProvider({mode, children}: ClockProviderProps) {
+export function ClockProvider({children}: {children: React.ReactNode}) {
+    const {user} = useAuth();
     const [, forceUpdate] = useState(0);
 
-    const clock = mode === "demo" ? demoClock : systemClock;
+    const mode = user?.isGuest ? "demo" : "system";
 
-    const api = useMemo(() => ({
+    const clock = useMemo(() => {
+        return mode === "demo"
+            ? demoClock
+            : systemClock;
+    }, [mode]);
+
+    const debugApi = useMemo(() => ({
         addHours: (h: number) => {
             demoClock.addHours(h);
             forceUpdate(x => x + 1);
@@ -37,7 +40,7 @@ export function ClockProvider({mode, children}: ClockProviderProps) {
 
     return (
         <ClockContext.Provider value={clock}>
-            <ClockDebugContext.Provider value={api}>
+            <ClockDebugContext.Provider value={debugApi}>
                 {children}
             </ClockDebugContext.Provider>
         </ClockContext.Provider>
