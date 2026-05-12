@@ -17,7 +17,7 @@ import MonthlyPreviewButton from "@/shared/components/MonthlyPreviewButton.tsx";
 import {useAuth} from "@/features/auth/hooks.ts";
 import {formatMinutes} from "@/features/attendance/utils.ts";
 import {formatCurrency} from "@/shared/utils/currency.ts";
-import {useWorkSummary} from "@/features/attendance/useWorkSummary.ts";
+import {useWorkSummary} from "@/features/attendance/presentation/hooks/useWorkSummary"
 
 export default function SummaryPage() {
     const pageSize = 6;
