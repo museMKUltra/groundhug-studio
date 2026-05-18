@@ -15,7 +15,7 @@ export interface SettingsDialogHandle {
 }
 
 const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(_, ref) {
-    const {user, isAdmin, hourlyRate, updateUser, setHourlyRate} = useAuth();
+    const {user, isSalaryVisible, hourlyRate, updateUser, setHourlyRate} = useAuth();
     const {showError, showSuccess} = useSnackbar();
     const {update} = useUsers();
     const {createEmployeeRate} = useEmployeeRate();
@@ -124,7 +124,7 @@ const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(
                 />
 
                 {
-                    isAdmin && <ViewEditField
+                    isSalaryVisible && <ViewEditField
                         label="Hourly Rate"
                         value={String(rate)}
                         isEditing={isEditing}

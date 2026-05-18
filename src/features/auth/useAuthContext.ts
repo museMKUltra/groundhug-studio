@@ -6,11 +6,13 @@ export type AuthContextType = {
     user: User | null;
     hourlyRate: number;
     expiresAt: string | null;
+    permissions: string[];
     isInitializing: boolean;
     setUser: (user: User | null) => void;
     updateUser: (updates: Partial<User>) => void;
     setHourlyRate: (rate: number) => void;
     setExpiresAt: (expiresAt: string | null) => void;
+    setPermissions: (permissions: string[]) => void;
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);

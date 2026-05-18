@@ -22,7 +22,7 @@ import {isDraft} from "@/features/attendance/domain/utils/status.ts";
 export default function SummaryPage() {
     const pageSize = 6;
 
-    const {isAdmin} = useAuth();
+    const {isSalaryVisible} = useAuth();
     const {loading, page, setPage, list, totalPages} = useWorkSummary(pageSize)
 
     const listLength = list.length || 0;
@@ -43,7 +43,7 @@ export default function SummaryPage() {
                             <TableCell>Month</TableCell>
                             <TableCell>Total Time</TableCell>
                             {
-                                isAdmin && (<>
+                                isSalaryVisible && (<>
                                     <TableCell>Hourly Rate</TableCell>
                                     <TableCell>Total Salary</TableCell>
                                 </>)
@@ -79,7 +79,7 @@ export default function SummaryPage() {
                                         </TableCell>
 
                                         {
-                                            isAdmin && (<>
+                                            isSalaryVisible && (<>
                                                 <TableCell>
                                                     {isDraft(item.status) ? '--' : formatCurrency(item.hourlyRate)}
                                                 </TableCell>

@@ -65,8 +65,8 @@ export const routes: AppRoute[] = [
         path: "/summary",
         element: <SummaryPage/>,
         label: "Summary",
-        roles: ["ADMIN"],
-        guards: [roleGuard(["ADMIN"])],
+        roles: ["ADMIN", "PREMIUM"],
+        guards: [roleGuard(["ADMIN", "PREMIUM"])],
     },
 ];
 

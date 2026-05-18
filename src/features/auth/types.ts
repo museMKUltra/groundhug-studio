@@ -11,15 +11,17 @@ export interface AuthResponse {
     token: string;
 }
 
+export type Role = "ADMIN" | "PREMIUM" | "USER";
+
 export interface MeResponse {
     id: number;
     name: string;
     email: string;
     hourlyRate: number;
     expiresAt: string | null;
+    role: Role;
+    permissions: string[];
 }
-
-export type Role = "ADMIN" | "USER";
 
 export type User = {
     sub: string;

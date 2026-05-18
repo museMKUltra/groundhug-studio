@@ -20,7 +20,7 @@ interface Props {
 }
 
 export default function MonthlySummaryDialog({open, onClose, monthSummary}: Props) {
-    const {isAdmin} = useAuth();
+    const {isSalaryVisible} = useAuth();
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
@@ -34,7 +34,7 @@ export default function MonthlySummaryDialog({open, onClose, monthSummary}: Prop
                         <Typography>
                             Total Time: {formatMinutes(monthSummary.totalMinutes)}
                         </Typography>
-                        {isAdmin && <>
+                        {isSalaryVisible && <>
                             <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
                             <Typography fontWeight="bold">
                                 Total Salary: {formatCurrency(monthSummary.salaryAmount)}

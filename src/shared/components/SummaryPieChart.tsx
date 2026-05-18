@@ -10,8 +10,8 @@ interface Props {
 }
 
 export default function LabelPieChart({summaryLabels}: Props) {
-    const {isAdmin} = useAuth();
-    const series = getPieSeries(summaryLabels, isAdmin);
+    const {isSalaryVisible} = useAuth();
+    const series = getPieSeries(summaryLabels, isSalaryVisible);
 
     return (
         <Box sx={{

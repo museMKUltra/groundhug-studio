@@ -11,7 +11,7 @@ import MonthlyPreviewCard from "@/shared/components/MonthlyPreviewCard.tsx";
 import {formatCurrency} from "@/shared/utils/currency.ts";
 
 export default function AttendancePage() {
-    const {isAdmin, hourlyRate} = useAuth();
+    const {isSalaryVisible, hourlyRate} = useAuth();
     const {
         session,
         todaySummary,
@@ -67,7 +67,7 @@ export default function AttendancePage() {
                             From: {today()}
                         </Typography>
                         {
-                            isAdmin
+                            isSalaryVisible
                                 ? <>
                                     <Typography>
                                         Hours: <Box component="span"

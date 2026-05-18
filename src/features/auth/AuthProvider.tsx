@@ -11,6 +11,7 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [hourlyRate, setHourlyRate] = useState<number>(0);
     const [expiresAt, setExpiresAt] = useState<string | null>(null);
+    const [permissions, setPermissions] = useState<string[]>([]);
     const [isInitializing, setIsInitializing] = useState(true);
     const isRefreshing = useRef(false);
 
@@ -48,11 +49,13 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
             user,
             hourlyRate,
             expiresAt,
+            permissions,
             isInitializing,
             setUser,
             updateUser,
             setHourlyRate,
-            setExpiresAt
+            setExpiresAt,
+            setPermissions,
         }}>
             {children}
         </AuthContext.Provider>

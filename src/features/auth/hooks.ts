@@ -12,11 +12,13 @@ export const useAuth = () => {
         user,
         hourlyRate,
         expiresAt,
+        permissions,
         isInitializing,
         setUser,
         updateUser,
         setHourlyRate,
-        setExpiresAt
+        setExpiresAt,
+        setPermissions,
     } = useAuthContext();
 
     const setMe = async () => {
@@ -24,6 +26,7 @@ export const useAuth = () => {
 
         setHourlyRate(me.hourlyRate);
         setExpiresAt(me.expiresAt);
+        setPermissions(me.permissions);
     }
 
     const login = async (email: string, password: string) => {
@@ -67,6 +70,10 @@ export const useAuth = () => {
         }
     };
 
+    function hasPermissions(permission: string) {
+        return permissions?.includes(permission) ?? false;
+    }
+
     return {
         guest,
         login,
@@ -74,7 +81,7 @@ export const useAuth = () => {
         loading,
         user,
         isInitializing,
-        isAdmin: user?.role === "ADMIN",
+        isSalaryVisible: hasPermissions("MANAGE_OWN_HOURLY_RATE"),
         expiresAt,
         hourlyRate,
         setMe,
