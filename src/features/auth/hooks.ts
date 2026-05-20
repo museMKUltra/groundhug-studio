@@ -10,12 +10,9 @@ export const useAuth = () => {
 
     const {
         user,
-        hourlyRate,
-        expiresAt,
         isInitializing,
         setUser,
         updateUser,
-        setHourlyRate,
     } = useAuthContext();
 
     const login = async (email: string, password: string) => {
@@ -66,10 +63,7 @@ export const useAuth = () => {
         loading,
         user,
         isInitializing,
-        expiresAt,
-        hourlyRate,
         updateUser,
-        setHourlyRate,
     };
 };
 
@@ -84,3 +78,17 @@ export const usePermissions = () => {
         canManageOwnHourlyRate: hasPermissions("MANAGE_OWN_HOURLY_RATE"),
     }
 }
+
+export const useMe = () => {
+    const {
+        hourlyRate,
+        expiresAt,
+        setHourlyRate,
+    } = useAuthContext();
+
+    return {
+        hourlyRate,
+        expiresAt,
+        setHourlyRate
+    }
+};

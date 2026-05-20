@@ -3,7 +3,7 @@ import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typogr
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
-import {useAuth, usePermissions} from "@/features/auth/hooks.ts";
+import {useAuth, useMe, usePermissions} from "@/features/auth/hooks.ts";
 import {useUsers} from "@/features/users/hooks.ts";
 import {useEmployeeRate} from "@/features/attendance/hooks.ts";
 import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
@@ -15,7 +15,8 @@ export interface SettingsDialogHandle {
 }
 
 const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(_, ref) {
-    const {user, hourlyRate, updateUser, setHourlyRate} = useAuth();
+    const {user, updateUser} = useAuth();
+    const {hourlyRate, setHourlyRate} = useMe();
     const {canManageOwnHourlyRate} = usePermissions();
     const {showError, showSuccess} = useSnackbar();
     const {update} = useUsers();

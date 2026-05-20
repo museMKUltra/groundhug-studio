@@ -3,13 +3,14 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import {Outlet} from "react-router-dom";
 import {Box, Container, Stack, Typography} from "@mui/material";
 
-import {useAuth} from "@/features/auth/hooks.ts";
+import {useAuth, useMe} from "@/features/auth/hooks.ts";
 import Header from "@/shared/components/Header.tsx";
 
 dayjs.extend(relativeTime);
 
 export default function MainLayout() {
-    const {user, expiresAt} = useAuth();
+    const {user} = useAuth();
+    const {expiresAt} = useMe();
 
     const userName = user?.name || "";
     const isGuest = user?.isGuest ?? false;
