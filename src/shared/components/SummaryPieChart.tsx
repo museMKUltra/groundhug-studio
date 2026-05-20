@@ -3,15 +3,15 @@ import {Box} from "@mui/material";
 
 import type {SummaryLabel} from "@/features/attendance/types.ts";
 import {getPieSeries} from "@/features/attendance/utils.ts";
-import {useAuth} from "@/features/auth/hooks.ts";
+import {usePermissions} from "@/features/auth/hooks.ts";
 
 interface Props {
     summaryLabels: SummaryLabel[];
 }
 
 export default function LabelPieChart({summaryLabels}: Props) {
-    const {isSalaryVisible} = useAuth();
-    const series = getPieSeries(summaryLabels, isSalaryVisible);
+    const {canManageOwnHourlyRate} = usePermissions();
+    const series = getPieSeries(summaryLabels, canManageOwnHourlyRate);
 
     return (
         <Box sx={{

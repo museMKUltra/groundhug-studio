@@ -13,7 +13,7 @@ import {
     Typography
 } from "@mui/material";
 import MonthlyPreviewButton from "@/shared/components/MonthlyPreviewButton.tsx";
-import {useAuth} from "@/features/auth/hooks.ts";
+import {usePermissions} from "@/features/auth/hooks.ts";
 import {formatMinutes} from "@/features/attendance/utils.ts";
 import {formatCurrency} from "@/shared/utils/currency.ts";
 import {useWorkSummary} from "@/features/attendance/presentation/hooks/useWorkSummary"
@@ -22,7 +22,7 @@ import {isDraft} from "@/features/attendance/domain/utils/status.ts";
 export default function SummaryPage() {
     const pageSize = 6;
 
-    const {isSalaryVisible} = useAuth();
+    const {canManageOwnHourlyRate} = usePermissions();
     const {loading, page, setPage, list, totalPages} = useWorkSummary(pageSize)
 
     const listLength = list.length || 0;
@@ -43,7 +43,7 @@ export default function SummaryPage() {
                             <TableCell>Month</TableCell>
                             <TableCell>Total Time</TableCell>
                             {
-                                isSalaryVisible && (<>
+                                canManageOwnHourlyRate && (<>
                                     <TableCell>Hourly Rate</TableCell>
                                     <TableCell>Total Salary</TableCell>
                                 </>)
@@ -79,7 +79,7 @@ export default function SummaryPage() {
                                         </TableCell>
 
                                         {
-                                            isSalaryVisible && (<>
+                                            canManageOwnHourlyRate && (<>
                                                 <TableCell>
                                                     {isDraft(item.status) ? '--' : formatCurrency(item.hourlyRate)}
                                                 </TableCell>

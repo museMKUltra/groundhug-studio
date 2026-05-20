@@ -12,7 +12,6 @@ export const useAuth = () => {
         user,
         hourlyRate,
         expiresAt,
-        permissions,
         isInitializing,
         setUser,
         updateUser,
@@ -60,10 +59,6 @@ export const useAuth = () => {
         }
     };
 
-    function hasPermissions(permission: string) {
-        return permissions?.includes(permission) ?? false;
-    }
-
     return {
         guest,
         login,
@@ -71,10 +66,21 @@ export const useAuth = () => {
         loading,
         user,
         isInitializing,
-        isSalaryVisible: hasPermissions("MANAGE_OWN_HOURLY_RATE"),
         expiresAt,
         hourlyRate,
         updateUser,
         setHourlyRate,
     };
 };
+
+export const usePermissions = () => {
+    const {permissions} = useAuthContext();
+
+    function hasPermissions(permission: string) {
+        return permissions?.includes(permission) ?? false;
+    }
+
+    return {
+        canManageOwnHourlyRate: hasPermissions("MANAGE_OWN_HOURLY_RATE"),
+    }
+}

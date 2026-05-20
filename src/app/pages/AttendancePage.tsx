@@ -4,14 +4,15 @@ import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
 import {useSessions} from "@/features/attendance/hooks.ts";
-import {useAuth} from "@/features/auth/hooks.ts";
+import {useAuth, usePermissions} from "@/features/auth/hooks.ts";
 import Sessions from "@/shared/components/Sessions.tsx";
 import AttendanceCard from "@/shared/components/AttendanceCard.tsx";
 import MonthlyPreviewCard from "@/shared/components/MonthlyPreviewCard.tsx";
 import {formatCurrency} from "@/shared/utils/currency.ts";
 
 export default function AttendancePage() {
-    const {isSalaryVisible, hourlyRate} = useAuth();
+    const {hourlyRate} = useAuth();
+    const {canManageOwnHourlyRate} = usePermissions();
     const {
         session,
         todaySummary,
@@ -67,7 +68,7 @@ export default function AttendancePage() {
                             From: {today()}
                         </Typography>
                         {
-                            isSalaryVisible
+                            canManageOwnHourlyRate
                                 ? <>
                                     <Typography>
                                         Hours: <Box component="span"

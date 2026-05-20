@@ -3,7 +3,7 @@ import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typogr
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
-import {useAuth} from "@/features/auth/hooks.ts";
+import {useAuth, usePermissions} from "@/features/auth/hooks.ts";
 import {useUsers} from "@/features/users/hooks.ts";
 import {useEmployeeRate} from "@/features/attendance/hooks.ts";
 import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
@@ -15,7 +15,8 @@ export interface SettingsDialogHandle {
 }
 
 const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(_, ref) {
-    const {user, isSalaryVisible, hourlyRate, updateUser, setHourlyRate} = useAuth();
+    const {user, hourlyRate, updateUser, setHourlyRate} = useAuth();
+    const {canManageOwnHourlyRate} = usePermissions();
     const {showError, showSuccess} = useSnackbar();
     const {update} = useUsers();
     const {createEmployeeRate} = useEmployeeRate();
@@ -124,7 +125,7 @@ const SettingsDialog = forwardRef<SettingsDialogHandle>(function SettingsDialog(
                 />
 
                 {
-                    isSalaryVisible && <ViewEditField
+                    canManageOwnHourlyRate && <ViewEditField
                         label="Hourly Rate"
                         value={String(rate)}
                         isEditing={isEditing}

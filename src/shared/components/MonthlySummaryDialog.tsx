@@ -1,17 +1,9 @@
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Stack,
-    Typography,
-} from "@mui/material";
+import {Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography,} from "@mui/material";
 import type {Summary} from "@/features/attendance/types.ts";
 import SummaryPieChart from "@/shared/components/SummaryPieChart.tsx";
 import {formatMinutes} from "@/features/attendance/utils.ts";
 import {formatCurrency} from "@/shared/utils/currency.ts";
-import {useAuth} from "@/features/auth/hooks.ts";
+import {usePermissions} from "@/features/auth/hooks.ts";
 
 interface Props {
     open: boolean;
@@ -20,7 +12,7 @@ interface Props {
 }
 
 export default function MonthlySummaryDialog({open, onClose, monthSummary}: Props) {
-    const {isSalaryVisible} = useAuth();
+    const {canManageOwnHourlyRate} = usePermissions();
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
@@ -34,7 +26,7 @@ export default function MonthlySummaryDialog({open, onClose, monthSummary}: Prop
                         <Typography>
                             Total Time: {formatMinutes(monthSummary.totalMinutes)}
                         </Typography>
-                        {isSalaryVisible && <>
+                        {canManageOwnHourlyRate && <>
                             <Typography>Hourly Rate: {formatCurrency(monthSummary.hourlyRate)}</Typography>
                             <Typography fontWeight="bold">
                                 Total Salary: {formatCurrency(monthSummary.salaryAmount)}
