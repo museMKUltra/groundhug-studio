@@ -5,16 +5,11 @@ import {Box, Container, Stack, Typography} from "@mui/material";
 
 import {useAuth} from "@/features/auth/hooks.ts";
 import Header from "@/shared/components/Header.tsx";
-import {useEffect} from "react";
 
 dayjs.extend(relativeTime);
 
 export default function MainLayout() {
-    const {user, setMe, expiresAt} = useAuth();
-
-    useEffect(() => {
-        setMe();
-    }, []);
+    const {user, expiresAt} = useAuth();
 
     const userName = user?.name || "";
     const isGuest = user?.isGuest ?? false;

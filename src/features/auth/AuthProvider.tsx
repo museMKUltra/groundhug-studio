@@ -3,7 +3,7 @@ import {jwtDecode} from "jwt-decode";
 
 import type {User} from "./types";
 import {AuthContext} from "./useAuthContext";
-import {refreshApi} from "./api";
+import {meApi, refreshApi} from "./api";
 
 import {tokenStorage} from "@/features/auth/tokenStorage.ts";
 
@@ -36,9 +36,28 @@ export const AuthProvider = ({children}: { children: React.ReactNode }) => {
         }
     };
 
+    const setMe = async () => {
+        try {
+            const me = await meApi();
+
+            setHourlyRate(me.hourlyRate);
+            setExpiresAt(me.expiresAt);
+            setPermissions(me.permissions);
+        } catch (err) {
+            console.error("Failed to fetch me data:", err);
+            return;
+        }
+    }
+
     useEffect(() => {
         refresh();
     }, []);
+
+    useEffect(() => {
+        if (user === null) return;
+
+        setMe();
+    }, [user]);
 
     const updateUser = (updates: Partial<User>) => {
         setUser(prev => prev ? {...prev, ...updates} : prev);

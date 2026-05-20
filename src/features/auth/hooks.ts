@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {guestApi, loginApi, logoutApi, meApi} from "./api";
+import {guestApi, loginApi, logoutApi} from "./api";
 import type {User} from "./types";
 import {jwtDecode} from "jwt-decode";
 import {useAuthContext} from "./useAuthContext";
@@ -17,17 +17,7 @@ export const useAuth = () => {
         setUser,
         updateUser,
         setHourlyRate,
-        setExpiresAt,
-        setPermissions,
     } = useAuthContext();
-
-    const setMe = async () => {
-        const me = await meApi();
-
-        setHourlyRate(me.hourlyRate);
-        setExpiresAt(me.expiresAt);
-        setPermissions(me.permissions);
-    }
 
     const login = async (email: string, password: string) => {
         setLoading(true);
@@ -84,7 +74,6 @@ export const useAuth = () => {
         isSalaryVisible: hasPermissions("MANAGE_OWN_HOURLY_RATE"),
         expiresAt,
         hourlyRate,
-        setMe,
         updateUser,
         setHourlyRate,
     };
