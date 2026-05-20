@@ -33,7 +33,7 @@ export const useAuth = () => {
         }
     };
 
-    const guest = async (name: string) => {
+    const tryAsGuest = async (name: string) => {
         setLoading(true);
         try {
             const data = await guestApi({name});
@@ -60,7 +60,7 @@ export const useAuth = () => {
     };
 
     return {
-        guest,
+        tryAsGuest,
         login,
         logout,
         loading,

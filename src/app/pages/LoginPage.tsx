@@ -10,7 +10,7 @@ import type {AxiosError} from "axios";
 type Mode = "login" | "register" | "guest";
 
 export default function LoginPage() {
-    const {guest, login, loading} = useAuth();
+    const {tryAsGuest, login, loading} = useAuth();
     const {register} = useUsers();
     const {showError, showSuccess} = useSnackbar();
 
@@ -37,7 +37,7 @@ export default function LoginPage() {
                 showSuccess("Register successful. Please login.");
             }
             if (mode === "guest") {
-                await guest(name);
+                await tryAsGuest(name);
             }
         } catch (err: unknown) {
             const error = err as AxiosError<{
