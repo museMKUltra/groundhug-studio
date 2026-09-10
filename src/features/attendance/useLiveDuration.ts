@@ -39,7 +39,7 @@ export function useLiveDuration(
         setDurationText(getLiveDuration());
     }, [getLiveDuration]);
 
-    const notifyBreakingTime = () => {
+    const notifyBreakTime = () => {
         const notification = () => new Notification(BREAK_TIME_MINUTES + " minutes elapsed", {
             body: "You have been clocked in for " + BREAK_TIME_MINUTES + " minutes.",
         });
@@ -53,17 +53,22 @@ export function useLiveDuration(
         }
     };
 
+    const checkBreakTime = () => {
+        if (!breakTimeNotified.current && isTimeToBreak()) {
+            breakTimeNotified.current = true;
+            setShowBreakTimeAlert(true);
+            notifyBreakTime();
+        }
+    }
+
     const isTimeToBreak = () => getSeconds() >= BREAK_TIME_MINUTES * 60;
 
     useEffect(() => {
+        checkBreakTime();
+
         const timer = setInterval(() => {
             setDurationText(getLiveDuration());
-
-            if (!breakTimeNotified.current && isTimeToBreak()) {
-                breakTimeNotified.current = true;
-                setShowBreakTimeAlert(true);
-                notifyBreakingTime();
-            }
+            checkBreakTime();
         }, 1000);
 
         return () => clearInterval(timer);

@@ -117,7 +117,7 @@ export default function AttendanceCard(
             <DialogTitle>{BREAK_TIME_MINUTES} Minutes Elapsed</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    You have been clocked in for {BREAK_TIME_MINUTES} minutes. Time to take a break?
+                    You have been clocked in for {BREAK_TIME_MINUTES} minutes.
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
