@@ -15,10 +15,13 @@ export function useLiveDuration(
         return null;
     }, [session, localStartTime]);
 
+    const getSeconds = () => {
+        if (startTime === null) return 0;
+        return Math.floor((clock.now() - startTime) / 1000);
+    }
+
     const getLiveDuration = useCallback(() => {
-        if (startTime === null) return "";
-        const seconds = Math.floor((clock.now() - startTime) / 1000);
-        return formatDuration(seconds, true);
+        return formatDuration(getSeconds(), true);
     }, [startTime, clock]);
 
     const [durationText, setDurationText] = useState("");
