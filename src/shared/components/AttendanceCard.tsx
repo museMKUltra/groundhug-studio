@@ -70,8 +70,9 @@ export default function AttendanceCard(
         durationText,
         startLocalTime,
         resetLocalTime,
-        showThirtyMinAlert,
-        dismissThirtyMinAlert,
+        showBreakTimeAlert,
+        dismissBreakTimeAlert,
+        BREAK_TIME_MINUTES
     } = useLiveDuration(session);
 
     const getClockInAndOutRequest = (): ClockInAndOutRequest => {
@@ -112,15 +113,15 @@ export default function AttendanceCard(
 
     return (
         <>
-        <Dialog open={showThirtyMinAlert} onClose={dismissThirtyMinAlert}>
-            <DialogTitle>30 Minutes Elapsed</DialogTitle>
+        <Dialog open={showBreakTimeAlert} onClose={dismissBreakTimeAlert}>
+            <DialogTitle>{BREAK_TIME_MINUTES} Minutes Elapsed</DialogTitle>
             <DialogContent>
                 <DialogContentText>
-                    You have been clocked in for 30 minutes. Time to take a break?
+                    You have been clocked in for {BREAK_TIME_MINUTES} minutes. Time to take a break?
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={dismissThirtyMinAlert}>Dismiss</Button>
+                <Button onClick={dismissBreakTimeAlert}>Dismiss</Button>
             </DialogActions>
         </Dialog>
         <Card>
