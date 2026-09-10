@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {Box, Button, Card, CardContent, CircularProgress, Stack, Typography,} from "@mui/material";
+import {Box, Button, Card, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, Typography,} from "@mui/material";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
 
@@ -69,7 +69,9 @@ export default function AttendanceCard(
     const {
         durationText,
         startLocalTime,
-        resetLocalTime
+        resetLocalTime,
+        showThirtyMinAlert,
+        dismissThirtyMinAlert,
     } = useLiveDuration(session);
 
     const getClockInAndOutRequest = (): ClockInAndOutRequest => {
@@ -109,6 +111,18 @@ export default function AttendanceCard(
     };
 
     return (
+        <>
+        <Dialog open={showThirtyMinAlert} onClose={dismissThirtyMinAlert}>
+            <DialogTitle>30 Minutes Elapsed</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    You have been clocked in for 30 minutes. Time to take a break?
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={dismissThirtyMinAlert}>Dismiss</Button>
+            </DialogActions>
+        </Dialog>
         <Card>
             <CardContent>
                 <Stack spacing={2}>
@@ -201,5 +215,6 @@ export default function AttendanceCard(
                 </Stack>
             </CardContent>
         </Card>
+        </>
     );
 }

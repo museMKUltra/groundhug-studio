@@ -1,7 +1,9 @@
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import dayjs from "dayjs";
 import {formatDuration} from "@/shared/utils/duration";
 import {useClock} from "@/features/clock/useClockContext.ts";
+
+const THIRTY_MINUTES_SECONDS = 30 * 60;
 
 export function useLiveDuration(
     session: { clockIn: string } | null
@@ -25,6 +27,13 @@ export function useLiveDuration(
     }, [startTime, clock]);
 
     const [durationText, setDurationText] = useState("");
+    const [showThirtyMinAlert, setShowThirtyMinAlert] = useState(false);
+    const thirtyMinNotified = useRef(false);
+
+    useEffect(() => {
+        thirtyMinNotified.current = false;
+        setShowThirtyMinAlert(false);
+    }, [startTime]);
 
     useEffect(() => {
         setDurationText(getLiveDuration());
@@ -33,6 +42,25 @@ export function useLiveDuration(
     useEffect(() => {
         const timer = setInterval(() => {
             setDurationText(getLiveDuration());
+
+            if (!thirtyMinNotified.current && getSeconds() >= THIRTY_MINUTES_SECONDS) {
+                thirtyMinNotified.current = true;
+                setShowThirtyMinAlert(true);
+
+                if (Notification.permission === "granted") {
+                    new Notification("30 minutes elapsed", {
+                        body: "You have been clocked in for 30 minutes.",
+                    });
+                } else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            new Notification("30 minutes elapsed", {
+                                body: "You have been clocked in for 30 minutes.",
+                            });
+                        }
+                    });
+                }
+            }
         }, 1000);
 
         return () => clearInterval(timer);
@@ -40,10 +68,13 @@ export function useLiveDuration(
 
     const startLocalTime = () => setLocalStartTime(clock.now());
     const resetLocalTime = () => setLocalStartTime(null);
+    const dismissThirtyMinAlert = () => setShowThirtyMinAlert(false);
 
     return {
         durationText,
         startLocalTime,
         resetLocalTime,
+        showThirtyMinAlert,
+        dismissThirtyMinAlert,
     };
 }
