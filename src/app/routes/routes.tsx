@@ -4,6 +4,7 @@ import HomePage from "@/app/pages/HomePage.tsx";
 import LoginPage from "@/app/pages/LoginPage.tsx";
 import SummaryPage from "@/app/pages/SummaryPage.tsx";
 import AttendancePage from "@/app/pages/AttendancePage.tsx";
+import ProjectsPage from "@/app/pages/ProjectsPage.tsx";
 
 import LoginLayout from "@/app/layouts/LoginLayout.tsx";
 
@@ -60,6 +61,12 @@ export const routes: AppRoute[] = [
                 </SessionProvider>
             </LabelProvider>
         ),
+    },
+    {
+        path: "/projects",
+        element: <ProjectsPage/>,
+        label: "Projects",
+        guards: [authGuard],
     },
     {
         path: "/summary",
