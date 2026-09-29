@@ -15,22 +15,23 @@ import type {
     WorkSummaryResponse,
 } from "./types";
 
-export const getPeriodSessionsApi = async (startDate: string, endDate: string) => {
-    const res = await axios.get<PeriodSessionsResponse>("/attendance/period-sessions", {
+export const getPeriodSessionsApi = async (projectId: number, startDate: string, endDate: string) => {
+    const res = await axios.get<PeriodSessionsResponse>(`/attendance/projects/${projectId}/period-sessions`, {
         params: {startDate, endDate}
     });
     return res.data;
 };
 
-export const getActiveSessionApi = async () => {
-    const res = await axios.get<ActiveSessionResponse>("/attendance/active-session");
+export const getActiveSessionApi = async (projectId: number) => {
+    const res = await axios.get<ActiveSessionResponse>(`/attendance/projects/${projectId}/active-session`);
     return res.data;
 };
 
 export const createSessionApi = async (
+    projectId: number,
     data: CreateSessionRequest,
 ) => {
-    const res = await axios.post<Session>(`/attendance/sessions`, data);
+    const res = await axios.post<Session>(`/attendance/projects/${projectId}/sessions`, data);
     return res.data;
 };
 
@@ -48,13 +49,13 @@ export const deleteSessionApi = async (
     await axios.delete<Session>(`/attendance/sessions/${id}`);
 };
 
-export const clockInApi = async (data?: ClockInAndOutRequest) => {
-    const res = await axios.post<ActiveSessionResponse>("/attendance/clock-in", data);
+export const clockInApi = async (projectId: number, data?: ClockInAndOutRequest) => {
+    const res = await axios.post<ActiveSessionResponse>(`/attendance/projects/${projectId}/clock-in`, data);
     return res.data;
 };
 
-export const clockOutApi = async (data?: ClockInAndOutRequest) => {
-    const res = await axios.post<ActiveSessionResponse>("/attendance/clock-out", data);
+export const clockOutApi = async (projectId: number, data?: ClockInAndOutRequest) => {
+    const res = await axios.post<ActiveSessionResponse>(`/attendance/projects/${projectId}/clock-out`, data);
     return res.data;
 };
 
@@ -77,16 +78,16 @@ export const confirmWorkSummaryApi = async (summaryId: string) => {
     return res.data;
 };
 
-export const getLabelsApi = async () => {
-    const res = await axios.get<Label[]>("/attendance/labels");
+export const getLabelsApi = async (projectId: number) => {
+    const res = await axios.get<Label[]>(`/attendance/projects/${projectId}/labels`);
     return res.data;
 };
 
-export const createLabelApi = async (data: {
+export const createLabelApi = async (projectId: number, data: {
     name: string;
     color: string;
 }) => {
-    const res = await axios.post<Label>("/attendance/labels", data);
+    const res = await axios.post<Label>(`/attendance/projects/${projectId}/labels`, data);
     return res.data;
 };
 
@@ -102,8 +103,8 @@ export const deleteLabelApi = async (id: number) => {
     await axios.delete(`/attendance/labels/${id}`);
 };
 
-export const reorderLabelsApi = async (data: ReorderLabelsRequest) => {
-    await axios.post(`/attendance/labels/reorder`, data);
+export const reorderLabelsApi = async (projectId: number, data: ReorderLabelsRequest) => {
+    await axios.post(`/attendance/projects/${projectId}/labels/reorder`, data);
 };
 
 export const createEmployeeRateApi = async (data: EmployeeRateRequest) => {

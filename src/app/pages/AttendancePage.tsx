@@ -1,4 +1,6 @@
 import {useEffect} from "react";
+import {Navigate} from "react-router-dom";
+import {isValidProjectId, useProjectId} from "@/features/projects/hooks.ts";
 import {Box, Card, CardContent, Stack, Typography,} from "@mui/material";
 import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 import dayjs from "dayjs";
@@ -11,6 +13,9 @@ import MonthlyPreviewCard from "@/shared/components/MonthlyPreviewCard.tsx";
 import {formatCurrency} from "@/shared/utils/currency.ts";
 
 export default function AttendancePage() {
+    const projectId = useProjectId();
+    const validProjectId = isValidProjectId(projectId);
+
     const {hourlyRate} = useMe();
     const {canManageOwnHourlyRate} = usePermissions();
     const {
@@ -32,6 +37,8 @@ export default function AttendancePage() {
     };
 
     useEffect(() => {
+        if (!validProjectId) return;
+
         const init = async () => {
             try {
                 await handleActiveSession();
@@ -41,7 +48,7 @@ export default function AttendancePage() {
         };
 
         init();
-    }, []);
+    }, [projectId]);
 
     const todayHours = todaySummary?.totalHours || 0;
     const displayTodayHours = todayHours.toFixed(2);
@@ -55,6 +62,10 @@ export default function AttendancePage() {
         }
         const {year, month, date} = todaySummary;
         return dayjs(`${year}-${month}-${date}`).format("YYYY-MM-DD");
+    }
+
+    if (!validProjectId) {
+        return <Navigate to="/projects" replace/>;
     }
 
     return (

@@ -13,8 +13,10 @@ import {
     updateSessionApi
 } from "./api.ts";
 import type {ClockInAndOutRequest, CreateSessionRequest, Session, Summary, UpdateSessionRequest} from "./types";
+import {useProjectId} from "@/features/projects/hooks.ts";
 
 export const useSessions = () => {
+    const projectId = useProjectId();
     const [loading, setLoading] = useState(false);
     const [session, setSession] = useState<Session | null>(null);
     const [periodSessions, setPeriodSessions] = useState<Session[]>([]);
@@ -33,7 +35,7 @@ export const useSessions = () => {
         return active ? session : null;
     };
 
-    const getActiveSession = () => withLoading(getActiveSessionApi);
+    const getActiveSession = () => withLoading(() => getActiveSessionApi(projectId));
 
     const handleActiveSession = async () => {
         const res = await getActiveSession();
@@ -42,24 +44,24 @@ export const useSessions = () => {
     };
 
     const clockIn = async (data?: ClockInAndOutRequest) => {
-        const res = await withLoading(() => clockInApi(data));
+        const res = await withLoading(() => clockInApi(projectId, data));
         setSession(normalizeSession(res.active, res.session));
         setTodaySummary(res?.summary);
     };
 
     const clockOut = async (data?: ClockInAndOutRequest) => {
-        const res = await withLoading(() => clockOutApi(data));
+        const res = await withLoading(() => clockOutApi(projectId, data));
         setSession(normalizeSession(res.active, res.session));
         setTodaySummary(res?.summary);
     };
 
     const handlePeriodSessions = async (startDate: string, endDate: string) => {
-        const res = await getPeriodSessionsApi(startDate, endDate);
+        const res = await getPeriodSessionsApi(projectId, startDate, endDate);
         setPeriodSessions(res);
     }
 
     const createSession = async (data: CreateSessionRequest) => {
-        return await createSessionApi(data);
+        return await createSessionApi(projectId, data);
     }
 
     const updateSession = async (id: number, data: UpdateSessionRequest) => {

@@ -3,8 +3,10 @@ import {SessionContext} from "./SessionContext";
 import {getPeriodSessionsApi} from "./api";
 import type {Session} from "./types";
 import dayjs from "dayjs";
+import {useProjectId} from "@/features/projects/hooks.ts";
 
 export const SessionProvider = ({children}: { children: React.ReactNode }) => {
+    const projectId = useProjectId();
     const startTime = useRef<dayjs.Dayjs | null>(null);
     const endTime = useRef<dayjs.Dayjs | null>(null);
 
@@ -23,7 +25,7 @@ export const SessionProvider = ({children}: { children: React.ReactNode }) => {
     const fetchPeriodSessions = async (startDate: string, endDate: string) => {
         setLoading(true);
         try {
-            const res = await getPeriodSessionsApi(startDate, endDate);
+            const res = await getPeriodSessionsApi(projectId, startDate, endDate);
             setPeriodSessions(res);
         } finally {
             setLoading(false);

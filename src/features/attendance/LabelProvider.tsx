@@ -2,8 +2,10 @@ import {useEffect, useState} from "react";
 import {LabelContext} from "./LabelContext";
 import {createLabelApi, deleteLabelApi, getLabelsApi, reorderLabelsApi, updateLabelApi} from "./api";
 import type {CreateLabelRequest, Label} from "./types";
+import {isValidProjectId, useProjectId} from "@/features/projects/hooks.ts";
 
 export const LabelProvider = ({children}: { children: React.ReactNode }) => {
+    const projectId = useProjectId();
     const [globalLabels, setGlobalLabels] = useState<Label[]>([]);
     const [sortableLabels, setSortableLabels] = useState<Label[]>([]);
     const [loading, setLoading] = useState(false);
@@ -11,7 +13,7 @@ export const LabelProvider = ({children}: { children: React.ReactNode }) => {
     const fetchLabels = async () => {
         setLoading(true);
         try {
-            const data = await getLabelsApi();
+            const data = await getLabelsApi(projectId);
 
             setGlobalLabels(data.filter(l => l.isGlobal));
             setSortableLabels(data.filter(l => !l.isGlobal));
@@ -21,7 +23,7 @@ export const LabelProvider = ({children}: { children: React.ReactNode }) => {
     };
 
     const createLabel = async (data: CreateLabelRequest) => {
-        const newLabel = await createLabelApi({name: data.name, color: data.color});
+        const newLabel = await createLabelApi(projectId, {name: data.name, color: data.color});
         setSortableLabels((prev) => [...prev, newLabel]);
     };
 
@@ -36,12 +38,13 @@ export const LabelProvider = ({children}: { children: React.ReactNode }) => {
     };
 
     const reorderLabels = async (ids: number[]) => {
-        await reorderLabelsApi({ids});
+        await reorderLabelsApi(projectId, {ids});
     };
 
     useEffect(() => {
+        if (!isValidProjectId(projectId)) return;
         fetchLabels();
-    }, []);
+    }, [projectId]);
 
     return (
         <LabelContext.Provider value={{
