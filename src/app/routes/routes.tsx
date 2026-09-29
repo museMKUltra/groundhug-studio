@@ -50,9 +50,15 @@ export const routes: AppRoute[] = [
         layout: <LoginLayout/>,
     },
     {
-        path: "/attendance",
+        path: "/projects",
+        element: <ProjectsPage/>,
+        label: "Projects",
+        guards: [authGuard],
+    },
+    {
+        // no label → not shown in nav
+        path: "/projects/:projectId/attendance",
         element: <AttendancePage/>,
-        label: "Attendance",
         guards: [authGuard],
         wrapper: (node) => (
             <LabelProvider>
@@ -61,12 +67,6 @@ export const routes: AppRoute[] = [
                 </SessionProvider>
             </LabelProvider>
         ),
-    },
-    {
-        path: "/projects",
-        element: <ProjectsPage/>,
-        label: "Projects",
-        guards: [authGuard],
     },
     {
         path: "/summary",

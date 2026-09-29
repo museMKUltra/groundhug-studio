@@ -21,7 +21,9 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import UnarchiveIcon from "@mui/icons-material/Unarchive";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import dayjs from "dayjs";
+import {useNavigate} from "react-router-dom";
 import type {AxiosError} from "axios";
 import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 import {
@@ -44,6 +46,7 @@ type Draft = {
 
 export default function ProjectsPage() {
     const {showError, showSuccess} = useSnackbar();
+    const navigate = useNavigate();
 
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(false);
@@ -205,6 +208,21 @@ export default function ProjectsPage() {
                                             Created {dayjs(project.createdAt).format("YYYY-MM-DD")}
                                         </Typography>
                                     </Box>
+
+                                    {!archived && (
+                                        <Tooltip title="Go to attendance">
+                                            <span>
+                                                <IconButton
+                                                    size="small"
+                                                    color="primary"
+                                                    disabled={loading}
+                                                    onClick={() => navigate(`/projects/${project.id}/attendance`)}
+                                                >
+                                                    <AccessTimeIcon fontSize="small"/>
+                                                </IconButton>
+                                            </span>
+                                        </Tooltip>
+                                    )}
 
                                     {!archived && (
                                         <Tooltip title="Edit">
