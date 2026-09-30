@@ -1,5 +1,5 @@
 import {useEffect} from "react";
-import {Box, Card, CardContent, Stack, Typography,} from "@mui/material";
+import {Box, Card, CardContent, Divider, Stack, Typography,} from "@mui/material";
 import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
@@ -9,6 +9,7 @@ import Sessions from "@/shared/components/Sessions.tsx";
 import AttendanceCard from "@/shared/components/AttendanceCard.tsx";
 import MonthlyPreviewCard from "@/shared/components/MonthlyPreviewCard.tsx";
 import {formatCurrency} from "@/shared/utils/currency.ts";
+import {useProjectContext} from "@/features/projects/ProjectContext.tsx";
 
 export default function AttendancePage() {
     const {hourlyRate} = useMe();
@@ -23,6 +24,7 @@ export default function AttendancePage() {
         updateSession,
     } = useSessions();
 
+    const {project} = useProjectContext();
     const {showError} = useSnackbar();
 
     const handleError = (err: unknown) => {
@@ -55,27 +57,26 @@ export default function AttendancePage() {
             {/* Today */}
             <Card>
                 <CardContent>
-                    <Stack spacing={1}>
-                        <Typography variant="h6">Today's Process</Typography>
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        alignItems="center"
+                        flexWrap="wrap"
+                        useFlexGap
+                        divider={<Divider orientation="vertical" flexItem/>}
+                    >
+                        <Typography variant="h6" fontWeight="bold">{project.name}</Typography>
+                        <Typography color="text.secondary">{today()}</Typography>
                         <Typography>
-                            From: {today()}
+                            Hours: <Box component="span" fontWeight="bold">{displayTodayHours}</Box>
+                            {canManageOwnHourlyRate && <> / {todayMostHours}h</>}
                         </Typography>
-                        {
-                            canManageOwnHourlyRate
-                                ? <>
-                                    <Typography>
-                                        Hours: <Box component="span"
-                                                    fontWeight="bold">{displayTodayHours}</Box> / {todayMostHours}h
-                                    </Typography>
-                                    <Typography>
-                                        Salary: <Box component="span"
-                                                     fontWeight="bold">{todaySalary}</Box> / {todayMostSalary}
-                                    </Typography>
-                                </>
-                                : <Typography>
-                                    Hours: <Box component="span" fontWeight="bold">{displayTodayHours}</Box>
-                                </Typography>
-                        }
+                        {canManageOwnHourlyRate && (
+                            <Typography>
+                                Salary: <Box component="span"
+                                             fontWeight="bold">{todaySalary}</Box> / {todayMostSalary}
+                            </Typography>
+                        )}
                     </Stack>
                 </CardContent>
             </Card>
