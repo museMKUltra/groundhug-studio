@@ -71,7 +71,7 @@ export default function HomePage() {
                 <Button
                     variant="contained"
                     size="large"
-                    onClick={() => navigate("/attendance")}
+                    onClick={() => navigate("/projects")}
                     sx={{px: 5, py: 1.5, borderRadius: 3, fontSize: "1rem"}}
                 >
                     Start Your Journey

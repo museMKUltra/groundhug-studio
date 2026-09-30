@@ -11,7 +11,7 @@ export type Guard = (ctx: GuardContext, node: ReactNode) => ReactNode;
 
 export const guestGuard: Guard = (ctx, node) => {
     if (ctx.user) {
-        const from = ctx.location.state?.from?.pathname || "/attendance";
+        const from = ctx.location.state?.from?.pathname || "/projects";
 
         return <Navigate to={from} replace/>;
     }
@@ -43,7 +43,7 @@ export const roleGuard = (roles: Role[]): Guard => (ctx, node) => {
     }
 
     if (!roles.includes(ctx?.user?.role)) {
-        return <Navigate to="/attendance" replace/>;
+        return <Navigate to="/projects" replace/>;
     }
 
     return node;
