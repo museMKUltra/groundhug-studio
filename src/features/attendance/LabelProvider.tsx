@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {LabelContext} from "./LabelContext";
 import {createLabelApi, deleteLabelApi, getLabelsApi, reorderLabelsApi, updateLabelApi} from "./api";
 import type {CreateLabelRequest, Label} from "./types";
-import {isValidProjectId, useProjectId} from "@/features/projects/hooks.ts";
+import {useProjectId} from "@/features/projects/hooks.ts";
 
 export const LabelProvider = ({children}: { children: React.ReactNode }) => {
     const projectId = useProjectId();
@@ -42,7 +42,6 @@ export const LabelProvider = ({children}: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-        if (!isValidProjectId(projectId)) return;
         fetchLabels();
     }, [projectId]);
 

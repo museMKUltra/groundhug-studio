@@ -10,6 +10,7 @@ import LoginLayout from "@/app/layouts/LoginLayout.tsx";
 
 import {SessionProvider} from "@/features/attendance/SessionProvider.tsx";
 import {LabelProvider} from "@/features/attendance/LabelProvider.tsx";
+import {ProjectProvider} from "@/features/projects/ProjectProvider.tsx";
 
 import {authGuard, type Guard, guestGuard, roleGuard} from "@/app/routes/guards.tsx";
 import type {Role} from "@/features/auth/types.ts";
@@ -61,11 +62,13 @@ export const routes: AppRoute[] = [
         element: <AttendancePage/>,
         guards: [authGuard],
         wrapper: (node) => (
-            <LabelProvider>
-                <SessionProvider>
-                    {node}
-                </SessionProvider>
-            </LabelProvider>
+            <ProjectProvider>
+                <LabelProvider>
+                    <SessionProvider>
+                        {node}
+                    </SessionProvider>
+                </LabelProvider>
+            </ProjectProvider>
         ),
     },
     {

@@ -1,6 +1,11 @@
 import axios from "@/app/api/axios";
 import type {CreateProjectRequest, Project, UpdateProjectRequest} from "./types";
 
+export const getProjectApi = async (id: number) => {
+    const res = await axios.get<Project>(`/projects/${id}`);
+    return res.data;
+};
+
 export const getProjectsApi = async () => {
     const res = await axios.get<Project[]>("/projects");
     return res.data;
