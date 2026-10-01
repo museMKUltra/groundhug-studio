@@ -3,14 +3,15 @@ import MonthlySummaryDialog from "@/shared/components/MonthlySummaryDialog.tsx";
 import {useMonthlyPreview} from "@/shared/hooks/useMonthlyPreview.ts";
 
 interface Props {
+    projectId: number;
     year: number;
     month: number;
     textContent: string;
     size?: "small" | "medium" | "large";
 }
 
-export default function MonthlyPreviewButton({year, month, textContent, size = "medium"}: Props) {
-    const {monthSummary, loading, open, setOpen, handleOpenPreview} = useMonthlyPreview(year, month);
+export default function MonthlyPreviewButton({projectId, year, month, textContent, size = "medium"}: Props) {
+    const {monthSummary, loading, open, setOpen, handleOpenPreview} = useMonthlyPreview(projectId, year, month);
 
     return <>
         <Button

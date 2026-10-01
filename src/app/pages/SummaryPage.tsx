@@ -95,6 +95,7 @@ export default function SummaryPage() {
 
                                         <TableCell>
                                             <MonthlyPreviewButton
+                                                projectId={item.project.id}
                                                 year={item.year}
                                                 month={item.month}
                                                 textContent="Preview"

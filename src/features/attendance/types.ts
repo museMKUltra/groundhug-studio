@@ -1,3 +1,5 @@
+import type {Project} from "@/features/projects/types.ts";
+
 export type Status = "ACTIVE" | "COMPLETED" | "DRAFT" | string;
 
 export interface Label {
@@ -37,6 +39,7 @@ export interface Summary {
     salaryAmount: number;
     status?: Status;
     labels?: SummaryLabel[];
+    project: Project;
 }
 
 export type WorkSummary = {
@@ -47,6 +50,7 @@ export type WorkSummary = {
     status: Status
     hourlyRate: number
     salaryAmount: number
+    project: Project
 }
 
 type Page = {

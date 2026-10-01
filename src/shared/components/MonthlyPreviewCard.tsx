@@ -2,17 +2,18 @@ import {Card, CardContent, Stack, Typography,} from "@mui/material";
 import MonthlyPreviewButton from "@/shared/components/MonthlyPreviewButton.tsx";
 
 interface Props {
+    projectId: number;
     year: number;
     month: number;
 }
 
-export default function MonthlyPreviewCard({year, month}: Props) {
+export default function MonthlyPreviewCard({projectId, year, month}: Props) {
     return (
         <Card>
             <CardContent>
                 <Stack spacing={2}>
                     <Typography variant="h6">Monthly</Typography>
-                    <MonthlyPreviewButton year={year} month={month} textContent="Preview Month"/>
+                    <MonthlyPreviewButton projectId={projectId} year={year} month={month} textContent="Preview Month"/>
                 </Stack>
             </CardContent>
         </Card>

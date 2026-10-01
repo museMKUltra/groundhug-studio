@@ -103,8 +103,8 @@ export const useSummary = () => {
         }
     };
 
-    const getWorkSummaryPreview = (year: number, month: number) =>
-        withLoading(() => getWorkSummaryPreviewApi(year, month));
+    const getWorkSummaryPreview = (projectId: number, year: number, month: number) =>
+        withLoading(() => getWorkSummaryPreviewApi(projectId, year, month));
 
     const getWorkSummaryList = (page: number, size: number) =>
         withLoading(() => getWorkSummaryListApi(page, size));
@@ -112,8 +112,8 @@ export const useSummary = () => {
     const confirmWorkSummary = (summaryId: string) =>
         withLoading(() => confirmWorkSummaryApi(summaryId));
 
-    const previewSummary = async (year: number, month: number) => {
-        const res = await getWorkSummaryPreview(year, month);
+    const previewSummary = async (projectId: number, year: number, month: number) => {
+        const res = await getWorkSummaryPreview(projectId, year, month);
         setMonthSummary(res);
     };
 

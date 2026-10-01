@@ -3,7 +3,7 @@ import type {AxiosError} from "axios";
 import {useSummary} from "@/features/attendance/hooks.ts";
 import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
 
-export function useMonthlyPreview(year: number, month: number) {
+export function useMonthlyPreview(projectId: number, year: number, month: number) {
     const {monthSummary, loading, previewSummary} = useSummary();
     const {showError} = useSnackbar();
     const [open, setOpen] = useState(false);
@@ -11,7 +11,7 @@ export function useMonthlyPreview(year: number, month: number) {
     const handleOpenPreview = async () => {
         if (year === 0 || month === 0) return;
         try {
-            await previewSummary(year, month);
+            await previewSummary(projectId, year, month);
             setOpen(true);
         } catch (err) {
             const error = err as AxiosError<{ error?: string }>;

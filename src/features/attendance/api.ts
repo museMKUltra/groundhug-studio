@@ -59,9 +59,9 @@ export const clockOutApi = async (projectId: number, data?: ClockInAndOutRequest
     return res.data;
 };
 
-export const getWorkSummaryPreviewApi = async (year: number, month: number) => {
+export const getWorkSummaryPreviewApi = async (projectId: number, year: number, month: number) => {
     const res = await axios.get<Summary>(`/work-summary/preview`, {
-        params: {year, month},
+        params: {year, month, projectId},
     });
     return res.data;
 };
