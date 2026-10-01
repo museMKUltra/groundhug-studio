@@ -26,7 +26,14 @@ describe("useWorkSummary", () => {
                 totalMinutes: 10,
                 status: "DRAFT",
                 hourlyRate: 100,
-                salaryAmount: 1000
+                salaryAmount: 1000,
+                project: {
+                    id: 1,
+                    name: "Default",
+                    description: null,
+                    status: "ACTIVE",
+                    createdAt: "2026-09-18T13:24:47Z"
+                }
             }],
             page: {
                 size: 10,
@@ -51,7 +58,14 @@ describe("useWorkSummary", () => {
             totalMinutes: 10,
             status: "DRAFT",
             hourlyRate: 100,
-            salaryAmount: 1000
+            salaryAmount: 1000,
+            project: {
+                id: 1,
+                name: "Default",
+                description: null,
+                status: "ACTIVE",
+                createdAt: "2026-09-18T13:24:47Z"
+            }
         }]);
         expect(result.current.totalPages).toBe(3);
     });
@@ -69,7 +83,14 @@ describe("useWorkSummary", () => {
                 totalMinutes: 10,
                 status: "DRAFT",
                 hourlyRate: 100,
-                salaryAmount: 1000
+                salaryAmount: 1000,
+                project: {
+                    id: 1,
+                    name: "Default",
+                    description: null,
+                    status: "ACTIVE",
+                    createdAt: "2026-09-18T13:24:47Z"
+                }
             }],
             page: {
                 size: 10,
