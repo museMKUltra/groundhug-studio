@@ -41,6 +41,7 @@ export default function SummaryPage() {
                         <TableRow>
                             <TableCell>Year</TableCell>
                             <TableCell>Month</TableCell>
+                            <TableCell>Project</TableCell>
                             <TableCell>Total Time</TableCell>
                             {
                                 canManageOwnHourlyRate && (<>
@@ -73,6 +74,8 @@ export default function SummaryPage() {
                                         <TableCell>{item.year}</TableCell>
 
                                         <TableCell>{item.month}</TableCell>
+
+                                        <TableCell>{item.project.name}</TableCell>
 
                                         <TableCell>
                                             {isDraft(item.status) ? '--' : formatMinutes(item.totalMinutes)}
