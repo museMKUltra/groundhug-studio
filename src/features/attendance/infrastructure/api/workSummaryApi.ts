@@ -4,7 +4,7 @@ import type {OptionsResponse, WorkSummaryResponse} from "../../types";
 export const getWorkSummaryListApi = async (
     page: number,
     size: number,
-    projectId?: number,
+    projectId: number,
 ): Promise<WorkSummaryResponse> => {
     const res = await axios.get("/work-summary/list", {
         params: {page, size, projectId},

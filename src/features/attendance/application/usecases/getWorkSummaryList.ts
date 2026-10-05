@@ -3,7 +3,7 @@ import type {WorkSummaryRepository} from "../../domain/repositories/workSummaryR
 export const createGetWorkSummaryListUseCase = (
     repo: WorkSummaryRepository,
 ) => {
-    return async (page: number, size: number, projectId?: number) => {
+    return async (page: number, size: number, projectId: number) => {
         return repo.getList(page, size, projectId);
     };
 };

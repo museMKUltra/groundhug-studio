@@ -34,7 +34,7 @@ export const useWorkSummary = (pageSize: number = 10) => {
             setLoading(true);
 
             const [dataResult, optionsResult] = await Promise.allSettled([
-                getWorkSummaryList(page - 1, pageSize),
+                getWorkSummaryList(page - 1, pageSize, projectId),
                 getWorkSummaryOptions(),
             ]);
 
@@ -58,16 +58,7 @@ export const useWorkSummary = (pageSize: number = 10) => {
         try {
             setLoading(true);
 
-            const data = projectId
-                ? await getWorkSummaryList(
-                    page - 1,
-                    pageSize,
-                    projectId,
-                )
-                : await getWorkSummaryList(
-                    page - 1,
-                    pageSize,
-                );
+            const data = await getWorkSummaryList(page - 1, pageSize, projectId);
 
             setData(data);
         } catch (error) {
