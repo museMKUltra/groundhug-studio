@@ -14,9 +14,9 @@ describe("getWorkSummaryList use case", () => {
 
         const useCase = createGetWorkSummaryListUseCase(mockRepo);
 
-        const result = await useCase(0, 10);
+        const result = await useCase(0, 10, 0);
 
-        expect(mockRepo.getList).toHaveBeenCalledWith(0, 10);
+        expect(mockRepo.getList).toHaveBeenCalledWith(0, 10, 0);
         expect(result.content).toEqual([{id: 1}]);
     });
 });

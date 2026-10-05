@@ -112,6 +112,41 @@ describe("useWorkSummary", () => {
             result.current.setPage(2);
         });
 
-        expect(mockedGetList).toHaveBeenCalledWith(1, 10);
+        // initial
+        expect(mockedGetList).toHaveBeenNthCalledWith(1, 0, 10, 0);
+        // page 2
+        expect(mockedGetList).toHaveBeenNthCalledWith(2, 1, 10, 0);
+    });
+
+    it("changes project triggers reload", async () => {
+        const mockedGetList = vi.mocked(
+            repo.workSummaryRepository.getList
+        );
+
+        mockedGetList.mockResolvedValue({
+            content: [],
+            page: {
+                size: 10,
+                number: 0,
+                totalElements: 0,
+                totalPages: 0
+            },
+        });
+
+        const {result} = renderHook(() =>
+            useWorkSummary(10)
+        );
+
+        await waitFor(() => {
+            expect(result.current.loading).toBe(false);
+        });
+
+        await act(async () => {
+            result.current.setProjectId(9);
+        });
+
+        await waitFor(() => {
+            expect(mockedGetList).toHaveBeenCalledWith(0, 10, 9);
+        });
     });
 });
