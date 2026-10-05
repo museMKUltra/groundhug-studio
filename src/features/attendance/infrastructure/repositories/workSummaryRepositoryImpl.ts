@@ -1,8 +1,11 @@
 import type {WorkSummaryRepository} from "../../domain/repositories/workSummaryRepository";
-import {getWorkSummaryListApi} from "../api/workSummaryApi";
+import {getWorkSummaryListApi, getWorkSummaryOptionsApi} from "../api/workSummaryApi";
 
 export const workSummaryRepository: WorkSummaryRepository = {
-    getList(page, size) {
-        return getWorkSummaryListApi(page, size);
+    getList(page, size, projectId) {
+        return getWorkSummaryListApi(page, size, projectId);
+    },
+    getOptions() {
+        return getWorkSummaryOptionsApi();
     },
 };

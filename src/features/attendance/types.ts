@@ -65,6 +65,17 @@ export type WorkSummaryResponse = {
     page: Page
 }
 
+type Period = {
+    year: number;
+    month: number;
+}
+
+export type OptionsResponse = {
+    projects: Project[];
+    periods: Period[];
+};
+
+
 export type PeriodSessionsResponse = Session[];
 
 export interface ActiveSessionResponse {

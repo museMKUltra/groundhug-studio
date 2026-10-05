@@ -9,6 +9,7 @@ describe("getWorkSummaryList use case", () => {
                 content: [{id: 1}],
                 page: {totalPages: 2},
             }),
+            getOptions: vi.fn(),
         };
 
         const useCase = createGetWorkSummaryListUseCase(mockRepo);

@@ -1,5 +1,7 @@
-import type {WorkSummaryResponse} from "../../types";
+import type {OptionsResponse, WorkSummaryResponse} from "../../types";
 
 export interface WorkSummaryRepository {
-    getList(page: number, size: number): Promise<WorkSummaryResponse>;
+    getList(page: number, size: number, projectId?: number): Promise<WorkSummaryResponse>;
+
+    getOptions(): Promise<OptionsResponse>;
 }
