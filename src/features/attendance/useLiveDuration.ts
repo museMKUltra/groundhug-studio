@@ -6,6 +6,7 @@ import {useClock} from "@/features/clock/useClockContext.ts";
 export function useLiveDuration(
     session: { clockIn: string } | null
 ) {
+    const [seconds, setSeconds] = useState(0);
     const clock = useClock();
     const [localStartTime, setLocalStartTime] = useState<number | null>(null);
 
@@ -18,6 +19,7 @@ export function useLiveDuration(
     const getLiveDuration = useCallback(() => {
         if (startTime === null) return "";
         const seconds = Math.floor((clock.now() - startTime) / 1000);
+        setSeconds(seconds);
         return formatDuration(seconds, true);
     }, [startTime, clock]);
 
@@ -39,6 +41,7 @@ export function useLiveDuration(
     const resetLocalTime = () => setLocalStartTime(null);
 
     return {
+        seconds,
         durationText,
         startLocalTime,
         resetLocalTime,
