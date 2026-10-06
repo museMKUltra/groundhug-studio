@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "TickBun time tracker and break reminder",
   "permissions": [
+    "storage",
     "alarms",
     "notifications",
     "tabs"
@@ -12,6 +13,24 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:5173/*",
+      "https://spring-api-starter-production-0867.up.railway.app/*"
+    ]
   }
 }

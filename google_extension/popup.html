@@ -1,15 +1,303 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>TickBun</title>
-</head>
-<body>
-<h1>TickBun</h1>
+    <meta charset="UTF-8">
 
-<button id="start">
-    Start 10 second test
-</button>
+    <meta
+            content="width=device-width, initial-scale=1.0"
+            name="viewport"
+    >
+
+    <title>TickBun</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            width: 320px;
+            min-height: 250px;
+
+            font-family: -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+
+            background: #ffffff;
+            color: #1d192b;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+
+            object-fit: contain;
+        }
+
+        .title {
+            margin: 0;
+
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            margin: 2px 0 0;
+
+            font-size: 12px;
+            color: #777;
+        }
+
+        .setting-label {
+            margin-bottom: 8px;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .duration-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin-bottom: 16px;
+
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .duration-unit {
+            margin-left: 6px;
+
+            font-size: 14px;
+            font-weight: 500;
+            color: #777;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .adjust-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 32px;
+            height: 32px;
+
+            padding: 0;
+
+            border: 1px solid #ddd;
+            border-radius: 50%;
+
+            background: #fff;
+            color: #1d192b;
+
+            font-size: 20px;
+            line-height: 1;
+
+            cursor: pointer;
+        }
+
+        .adjust-button:hover {
+            background: #f5f5f5;
+        }
+
+        .adjust-button:active {
+            background: #eeeeee;
+        }
+
+        #duration {
+            flex: 1;
+
+            height: 4px;
+
+            cursor: pointer;
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+
+            margin-top: 6px;
+
+            font-size: 11px;
+            color: #888;
+        }
+
+        .quick-section {
+            margin-top: 24px;
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .quick-button {
+            flex: 1;
+
+            padding: 8px 0;
+
+            border: 1px solid #ddd;
+            border-radius: 8px;
+
+            background: #fff;
+            color: #1d192b;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .quick-button:hover {
+            background: #f5f5f5;
+        }
+
+        .quick-button.active {
+            border-color: #1d192b;
+            background: #1d192b;
+            color: #fff;
+        }
+
+        .status {
+            min-height: 16px;
+
+            margin-top: 16px;
+
+            text-align: center;
+
+            font-size: 11px;
+            color: #888;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <img
+                alt="TickBun"
+                class="logo"
+                src="icon.png"
+        >
+
+        <div>
+            <h1 class="title">TickBun</h1>
+            <p class="subtitle">Time Tracker & Break Reminder</p>
+        </div>
+    </div>
+
+
+    <div class="setting-label">
+        Focus duration
+    </div>
+
+
+    <div class="duration-display">
+        <span id="duration-value">30</span>
+        <span class="duration-unit">min</span>
+    </div>
+
+
+    <div class="slider-row">
+
+        <button
+                aria-label="Decrease duration"
+                class="adjust-button"
+                id="decrease"
+                type="button"
+        >
+            −
+        </button>
+
+        <input
+                id="duration"
+                max="100"
+                min="5"
+                step="5"
+                type="range"
+                value="30"
+        >
+
+        <button
+                aria-label="Increase duration"
+                class="adjust-button"
+                id="increase"
+                type="button"
+        >
+            +
+        </button>
+
+    </div>
+
+
+    <div class="range-labels">
+        <span>5 min</span>
+        <span>100 min</span>
+    </div>
+
+
+    <div class="quick-section">
+
+        <div class="setting-label">
+            Quick select
+        </div>
+
+        <div class="quick-buttons">
+
+            <button
+                    class="quick-button"
+                    data-duration="30"
+                    type="button"
+            >
+                30
+            </button>
+
+            <button
+                    class="quick-button"
+                    data-duration="60"
+                    type="button"
+            >
+                60
+            </button>
+
+            <button
+                    class="quick-button"
+                    data-duration="90"
+                    type="button"
+            >
+                90
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script src="popup.js"></script>
+
 </body>
 </html>
