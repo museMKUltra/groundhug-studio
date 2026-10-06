@@ -4,13 +4,13 @@ const MAX_DURATION_MINUTES = 100;
 const STEP_MINUTES = 5;
 
 const TICKBUN_URLS = [
-    "http://localhost:5173/*",
-    "https://tickbun.com/*"
+    // "http://localhost:5173/*",
+    "https://spring-api-starter-production-0867.up.railway.app/*"
 ];
 
 const ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://tickbun.com"
+    // "http://localhost:5173",
+    "https://spring-api-starter-production-0867.up.railway.app"
 ];
 
 console.log("TickBun service worker started");
