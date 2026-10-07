@@ -33,6 +33,7 @@ import {
 } from "@dnd-kit/core";
 import {arrayMove, SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import {CSS} from "@dnd-kit/utilities";
+import {useProjectId} from "@/features/projects/hooks.ts";
 
 type Props = {
     open: boolean;
@@ -41,8 +42,8 @@ type Props = {
     setSortableLabels: (labels: Label[]) => void;
     onClose: () => void;
     onCreate: (data: CreateLabelRequest) => Promise<void>;
-    onUpdate: (id: number, label: Label) => Promise<void>;
-    onDelete: (id: number) => Promise<void>;
+    onUpdate: (projectId: number, id: number, label: Label) => Promise<void>;
+    onDelete: (projectId: number, id: number) => Promise<void>;
     onReorder: (ids: number[]) => Promise<void>;
     onError: (err: unknown) => void;
     onSuccess: (message: string) => void;
@@ -113,6 +114,8 @@ export default function LabelDialog({
     const [editingId, setEditingId] = useState<number | "new" | null>(null);
     const [draft, setDraft] = useState<Label | null>(null);
 
+    const projectId = useProjectId()
+
     const pointerSensor = useSensor(PointerSensor, {
         activationConstraint: {
             delay: 0,
@@ -169,7 +172,7 @@ export default function LabelDialog({
         if (!window.confirm(`Delete "${label.name}"?`)) return;
         try {
             setLoading(true);
-            await onDelete(label.id);
+            await onDelete(projectId, label.id);
             onSuccess("Label deleted successfully");
         } catch (e) {
             onError(e);
@@ -206,7 +209,7 @@ export default function LabelDialog({
                 });
                 onSuccess("Label created");
             } else {
-                await onUpdate(draft.id, draft);
+                await onUpdate(projectId, draft.id, draft);
                 onSuccess("Label updated");
             }
 

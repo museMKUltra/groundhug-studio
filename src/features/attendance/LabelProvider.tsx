@@ -27,13 +27,13 @@ export const LabelProvider = ({children}: { children: React.ReactNode }) => {
         setSortableLabels((prev) => [...prev, newLabel]);
     };
 
-    const updateLabel = async (id: number, updated: Label) => {
-        const res = await updateLabelApi(id, {name: updated.name, color: updated.color});
+    const updateLabel = async (projectId: number, id: number, updated: Label) => {
+        const res = await updateLabelApi(projectId, id, {name: updated.name, color: updated.color});
         setSortableLabels((prev) => prev.map((l) => (l.id === id ? res : l)));
     };
 
-    const deleteLabel = async (id: number) => {
-        await deleteLabelApi(id);
+    const deleteLabel = async (projectId: number, id: number) => {
+        await deleteLabelApi(projectId, id);
         setSortableLabels((prev) => prev.filter((l) => l.id !== id));
     };
 

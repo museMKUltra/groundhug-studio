@@ -92,15 +92,16 @@ export const createLabelApi = async (projectId: number, data: {
 };
 
 export const updateLabelApi = async (
+    projectId: number,
     id: number,
     data: CreateLabelRequest
 ) => {
-    const res = await axios.put<Label>(`/attendance/labels/${id}`, data);
+    const res = await axios.put<Label>(`/attendance/projects/${projectId}/labels/${id}`, data);
     return res.data;
 };
 
-export const deleteLabelApi = async (id: number) => {
-    await axios.delete(`/attendance/labels/${id}`);
+export const deleteLabelApi = async (projectId: number, id: number) => {
+    await axios.delete(`/attendance/projects/${projectId}/labels/${id}`);
 };
 
 export const reorderLabelsApi = async (projectId: number, data: ReorderLabelsRequest) => {

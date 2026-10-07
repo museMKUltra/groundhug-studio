@@ -8,8 +8,8 @@ export type LabelContextType = {
     setSortableLabels: (labels: Label[]) => void;
     loading: boolean;
     createLabel: (data: CreateLabelRequest) => Promise<void>;
-    updateLabel: (id: number, updated: Label) => Promise<void>;
-    deleteLabel: (id: number) => Promise<void>;
+    updateLabel: (projectId: number, id: number, updated: Label) => Promise<void>;
+    deleteLabel: (projectId: number, id: number) => Promise<void>;
     reorderLabels: (ids: number[]) => Promise<void>;
 };
 
