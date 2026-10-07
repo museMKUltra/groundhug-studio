@@ -2,6 +2,7 @@ import {Route, Routes} from "react-router-dom";
 import MainLayout from "@/app/layouts/MainLayout.tsx";
 import GuardPipeline from "@/app/routes/GuardPipeline.tsx";
 import {routes} from "./routes.tsx";
+import ErrorPage from "@/app/pages/ErrorPage.tsx";
 
 export default function AppRoutes() {
     return (
@@ -25,6 +26,8 @@ export default function AppRoutes() {
                     </Route>
                 </Route>
             ))}
+
+            <Route path="*" element={<ErrorPage/>}/>
         </Routes>
     );
 }
