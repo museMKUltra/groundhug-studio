@@ -1,5 +1,20 @@
 import {useState} from "react";
-import {Box, Button, Card, CardContent, CircularProgress, Stack, Typography,} from "@mui/material";
+import {
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    IconButton,
+    Stack,
+    Switch,
+    Typography,
+} from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
 
@@ -15,12 +30,17 @@ import LabelSelect from "@/shared/components/LabelSelect.tsx";
 import LabelDialog from "@/shared/components/LabelDialog.tsx";
 import ViewEditField from "@/shared/components/ViewEditField.tsx";
 
+import {useTickBunExtension} from "@/features/attendance/infrastructure/extension/useTickBunExtension.ts";
+
 interface Props {
     session: Session | null;
     sessionLoading: boolean;
     clockIn: (data?: ClockInAndOutRequest) => Promise<void>;
     clockOut: (data?: ClockInAndOutRequest) => Promise<void>;
-    updateSession: (id: number, data: UpdateSessionRequest) => Promise<Session>;
+    updateSession: (
+        id: number,
+        data: UpdateSessionRequest
+    ) => Promise<Session>;
 }
 
 export default function AttendanceCard(
@@ -33,6 +53,7 @@ export default function AttendanceCard(
     }: Props
 ) {
     const {goDay} = useSessionContext();
+
     const {
         labels,
         globalLabels,
@@ -43,12 +64,19 @@ export default function AttendanceCard(
         deleteLabel,
         reorderLabels
     } = useLabelContext();
+
     const {showError, showSuccess} = useSnackbar();
+
     const [openLabelDialog, setOpenLabelDialog] = useState(false);
     const isActive = Boolean(session);
 
     const handleError = (err: unknown) => {
-        const error = err as AxiosError<{ error?: string; description?: string }>;
+        const error =
+            err as AxiosError<{
+                error?: string;
+                description?: string
+            }>;
+
         console.error(error);
 
         showError(
@@ -64,19 +92,36 @@ export default function AttendanceCard(
         description,
         setDescription,
         resetForm
-    } = useSessionForm(session, updateSession, handleError);
+    } = useSessionForm(
+        session,
+        updateSession,
+        handleError
+    );
 
     const {
+        seconds,
         durationText,
         startLocalTime,
         resetLocalTime
     } = useLiveDuration(session);
 
+    const {
+        isTimeUp,
+        setIsTimeUp,
+        doFocusing,
+        setDoFocusing,
+        timeSettingMinutes,
+        refreshTimeSetting,
+    } = useTickBunExtension(seconds);
+
     const getClockInAndOutRequest = (): ClockInAndOutRequest => {
         const req: ClockInAndOutRequest = {labelId};
 
         const trimmed = description.trim();
-        if (trimmed) req.description = trimmed;
+
+        if (trimmed) {
+            req.description = trimmed;
+        }
 
         return req;
     };
@@ -87,6 +132,8 @@ export default function AttendanceCard(
         try {
             await clockIn(getClockInAndOutRequest());
             showSuccess("Clock in successful");
+
+            refreshTimeSetting();
         } catch (e) {
             handleError(e);
         }
@@ -97,7 +144,9 @@ export default function AttendanceCard(
 
         try {
             await clockOut(getClockInAndOutRequest());
-            resetForm()
+
+            resetForm();
+
             showSuccess("Clock out successful");
 
             if (session?.workDate) {
@@ -113,11 +162,75 @@ export default function AttendanceCard(
             <CardContent>
                 <Stack spacing={2}>
 
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="h6">Start Your Cycle</Typography>
+                    <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                    >
+                        <Typography variant="h6">
+                            Start Your Cycle
+                        </Typography>
                     </Box>
 
                     <Stack>
+
+                        {/* Break Reminder */}
+                        {timeSettingMinutes && <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                            }}
+                        >
+                            <Box
+                                display="flex"
+                                alignItems="center"
+                                justifyContent="space-between"
+                                sx={{minHeight: 30}}
+                            >
+                                <Box
+                                    display="flex"
+                                    alignItems="center"
+                                >
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                    >
+                                        {doFocusing
+                                            ? `Remind me after ${timeSettingMinutes ?? "--"} minutes`
+                                            : "Focus without reminder"
+                                        }
+                                    </Typography>
+
+                                    {doFocusing && <IconButton
+                                        size="small"
+                                        aria-label="Refresh break reminder duration"
+                                        onClick={() => {
+                                            refreshTimeSetting().catch(
+                                                handleError
+                                            );
+                                        }}
+                                    >
+                                        <RefreshIcon fontSize="small"/>
+                                    </IconButton>}
+
+                                </Box>
+                                <Switch
+                                    size="small"
+                                    checked={doFocusing}
+                                    onChange={(event) => {
+                                        setDoFocusing(
+                                            event.target.checked
+                                        );
+                                    }}
+                                    slotProps={{
+                                        input: {
+                                            "aria-label": "Enable break reminder"
+                                        }
+                                    }}
+                                />
+                            </Box>
+                        </Box>}
+
 
                         <ViewEditField
                             label="Clock In"
@@ -125,10 +238,14 @@ export default function AttendanceCard(
                             isEditing
                             renderEdit={() => (
                                 <Typography>
-                                    {isActive ? dayjs(session!.clockIn).format("HH:mm:ss") : "--"}
+                                    {isActive
+                                        ? dayjs(session!.clockIn)
+                                            .format("HH:mm:ss")
+                                        : "--"}
                                 </Typography>
                             )}
                         />
+
 
                         <ViewEditField
                             label="Duration"
@@ -136,10 +253,13 @@ export default function AttendanceCard(
                             isEditing
                             renderEdit={() => (
                                 <Typography>
-                                    {isActive ? durationText : "--"}
+                                    {isActive
+                                        ? durationText
+                                        : "--"}
                                 </Typography>
                             )}
                         />
+
 
                         <ViewEditField
                             label="Label"
@@ -152,15 +272,21 @@ export default function AttendanceCard(
                                         size="small"
                                         value={labelId}
                                         onChange={setLabelId}
-                                        onManage={() => setOpenLabelDialog(true)}
+                                        onManage={() =>
+                                            setOpenLabelDialog(true)
+                                        }
                                     />
 
                                     <LabelDialog
                                         open={openLabelDialog}
                                         globalLabels={globalLabels}
                                         sortableLabels={sortableLabels}
-                                        setSortableLabels={setSortableLabels}
-                                        onClose={() => setOpenLabelDialog(false)}
+                                        setSortableLabels={
+                                            setSortableLabels
+                                        }
+                                        onClose={() =>
+                                            setOpenLabelDialog(false)
+                                        }
                                         onCreate={createLabel}
                                         onUpdate={updateLabel}
                                         onDelete={deleteLabel}
@@ -171,6 +297,7 @@ export default function AttendanceCard(
                                 </>
                             )}
                         />
+
 
                         <ViewEditField
                             label="Description"
@@ -183,23 +310,68 @@ export default function AttendanceCard(
 
                     </Stack>
 
-                    <Box mt={2}>
+
+                    <Box>
                         <Button
                             fullWidth
                             variant="contained"
-                            color={isActive ? "secondary" : "primary"}
-                            onClick={isActive ? handleClockOut : handleClockIn}
+                            color={
+                                isActive
+                                    ? "secondary"
+                                    : "primary"
+                            }
+                            onClick={
+                                isActive
+                                    ? handleClockOut
+                                    : handleClockIn
+                            }
                             disabled={sessionLoading}
                         >
                             {sessionLoading && (
-                                <CircularProgress size={20} sx={{mr: 1}}/>
+                                <CircularProgress
+                                    size={20}
+                                    sx={{mr: 1}}
+                                />
                             )}
-                            {isActive ? "Finish" : "Start"}
+
+                            {isActive
+                                ? "Finish"
+                                : "Start"}
                         </Button>
                     </Box>
 
                 </Stack>
             </CardContent>
+
+
+            {/* Time's Up Dialog */}
+            <Dialog
+                open={isTimeUp}
+                onClose={() => setIsTimeUp(false)}
+                aria-labelledby="break-reminder-title"
+            >
+                <DialogTitle id="break-reminder-title">
+                    Time's up! 🎉
+                </DialogTitle>
+
+                <DialogContent>
+                    <Typography>
+                        You've been focusing for{" "}
+                        {timeSettingMinutes ?? "--"} minutes.
+                        It's time to take a break.
+                    </Typography>
+                </DialogContent>
+
+                <DialogActions>
+                    <Button
+                        variant="contained"
+                        onClick={() => setIsTimeUp(false)}
+                    >
+                        Take a Break
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
         </Card>
     );
 }
