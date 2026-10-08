@@ -31,7 +31,7 @@ export function useTickBunExtension(seconds: number) {
                 return;
             }
 
-            chrome.runtime.sendMessage(
+            chrome.runtime?.sendMessage(
                 EXTENSION_ID,
                 {type: "GET_TIME_SETTING"},
                 (response: GetTimeSettingResponse) => {
@@ -85,7 +85,7 @@ export function useTickBunExtension(seconds: number) {
                 return;
             }
 
-            chrome.runtime.sendMessage(
+            chrome.runtime?.sendMessage(
                 EXTENSION_ID,
                 {type: "FOCUS_TICKBUN"},
                 (response: FocusTickBunResponse) => {
