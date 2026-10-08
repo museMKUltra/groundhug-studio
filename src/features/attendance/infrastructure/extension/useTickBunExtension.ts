@@ -15,7 +15,7 @@ interface FocusTickBunResponse {
 
 export function useTickBunExtension(seconds: number) {
     const hasFocused = useRef(false);
-    const [doFocusing, setDoFocusing] = useState(true);
+    const [withReminder, setWithReminder] = useState(true);
     const [isTimeUp, setIsTimeUp] = useState(false);
     const [timeSettingMinutes, setTimeSettingMinutes] = useState<number | null>(
         null
@@ -134,13 +134,11 @@ export function useTickBunExtension(seconds: number) {
      * have reached the configured duration.
      */
     useEffect(() => {
-        if (!doFocusing || timeSettingMinutes === null || hasFocused.current) {
+        if (!withReminder || timeSettingMinutes === null || hasFocused.current) {
             return;
         }
 
         const targetSeconds = timeSettingMinutes * 60;
-
-        console.log('seconds', seconds, targetSeconds);
         if (seconds < targetSeconds) {
             return;
         }
@@ -155,14 +153,14 @@ export function useTickBunExtension(seconds: number) {
         seconds,
         timeSettingMinutes,
         focusTickBun,
-        doFocusing,
+        withReminder,
     ]);
 
     return {
         isTimeUp,
         setIsTimeUp,
-        doFocusing,
-        setDoFocusing,
+        withReminder,
+        setWithReminder,
         timeSettingMinutes,
         refreshTimeSetting,
     };

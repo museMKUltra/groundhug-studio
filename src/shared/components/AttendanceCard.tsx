@@ -108,8 +108,8 @@ export default function AttendanceCard(
     const {
         isTimeUp,
         setIsTimeUp,
-        doFocusing,
-        setDoFocusing,
+        withReminder,
+        setWithReminder,
         timeSettingMinutes,
         refreshTimeSetting,
     } = useTickBunExtension(seconds);
@@ -195,13 +195,13 @@ export default function AttendanceCard(
                                         variant="caption"
                                         color="text.secondary"
                                     >
-                                        {doFocusing
+                                        {withReminder
                                             ? `Remind me after ${timeSettingMinutes ?? "--"} minutes`
                                             : "Focus without reminder"
                                         }
                                     </Typography>
 
-                                    {doFocusing && <IconButton
+                                    {withReminder && <IconButton
                                         size="small"
                                         aria-label="Refresh break reminder duration"
                                         onClick={() => {
@@ -216,9 +216,9 @@ export default function AttendanceCard(
                                 </Box>
                                 <Switch
                                     size="small"
-                                    checked={doFocusing}
+                                    checked={withReminder}
                                     onChange={(event) => {
-                                        setDoFocusing(
+                                        setWithReminder(
                                             event.target.checked
                                         );
                                     }}
