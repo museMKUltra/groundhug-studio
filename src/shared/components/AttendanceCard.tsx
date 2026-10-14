@@ -9,12 +9,10 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    IconButton,
     Stack,
     Switch,
     Typography,
 } from "@mui/material";
-import RefreshIcon from "@mui/icons-material/Refresh";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
 
@@ -110,7 +108,6 @@ export default function AttendanceCard(
         withReminder,
         setWithReminder,
         timeSettingMinutes,
-        refreshTimeSetting,
         finishTimer,
     } = useTickBunExtension(session);
 
@@ -193,33 +190,15 @@ export default function AttendanceCard(
                                 justifyContent="space-between"
                                 sx={{minHeight: 30}}
                             >
-                                <Box
-                                    display="flex"
-                                    alignItems="center"
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
                                 >
-                                    <Typography
-                                        variant="caption"
-                                        color="text.secondary"
-                                    >
-                                        {withReminder
-                                            ? `Remind me after ${timeSettingMinutes ?? "--"} minutes`
-                                            : "Focus without reminder"
-                                        }
-                                    </Typography>
-
-                                    {withReminder && <IconButton
-                                        size="small"
-                                        aria-label="Refresh break reminder duration"
-                                        onClick={() => {
-                                            refreshTimeSetting().catch(
-                                                handleError
-                                            );
-                                        }}
-                                    >
-                                        <RefreshIcon fontSize="small"/>
-                                    </IconButton>}
-
-                                </Box>
+                                    {withReminder
+                                        ? `Remind me after ${timeSettingMinutes ?? "--"} minutes`
+                                        : "Focus without reminder"
+                                    }
+                                </Typography>
                                 <Switch
                                     size="small"
                                     checked={withReminder}
