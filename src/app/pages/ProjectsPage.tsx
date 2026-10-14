@@ -102,7 +102,7 @@ export default function ProjectsPage() {
 
             if (draft.id === null) {
                 const created = await createProjectApi({name: draft.name.trim()});
-                setProjects((prev) => [...prev, created]);
+                setProjects((prev) => [created, ...prev]);
                 showSuccess("Project created");
             } else {
                 const updated = await updateProjectApi(draft.id, {
