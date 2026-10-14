@@ -83,17 +83,32 @@ function updateQuickButtons(duration) {
 
 
 /**
- * Slider.
+ * Slider: preview while dragging, save on release.
+ * Saving on every "input" event would reschedule the reminder
+ * (and possibly trigger it) for every intermediate value.
  */
-durationInput.addEventListener("input", async () => {
+durationInput.addEventListener("input", () => {
     const duration = Number(durationInput.value);
 
     durationValue.textContent = duration;
     updateQuickButtons(duration);
+});
 
-    await chrome.storage.local.set({
-        durationMinutes: duration
-    });
+durationInput.addEventListener("change", async () => {
+    await saveDuration(Number(durationInput.value));
+});
+
+
+/**
+ * Keep the popup in sync when the duration changes elsewhere
+ * (e.g. from the TickBun web app).
+ */
+chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "local" && changes.durationMinutes) {
+        updateUI(
+            changes.durationMinutes.newValue ?? DEFAULT_DURATION_MINUTES
+        );
+    }
 });
 
 

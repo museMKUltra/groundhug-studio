@@ -1,11 +1,13 @@
 {
   "manifest_version": 3,
   "name": "TickBun",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TickBun timer setting and break reminder",
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "alarms",
+    "notifications"
   ],
   "background": {
     "service_worker": "background.js"
@@ -27,7 +29,7 @@
   },
   "externally_connectable": {
     "matches": [
-      "https://spring-api-starter-production-0867.up.railway.app/*"
+      "http://localhost:5173/*"
     ]
   }
 }

@@ -99,7 +99,6 @@ export default function AttendanceCard(
     );
 
     const {
-        seconds,
         durationText,
         startLocalTime,
         resetLocalTime
@@ -107,12 +106,13 @@ export default function AttendanceCard(
 
     const {
         isTimeUp,
-        setIsTimeUp,
+        dismissTimeUp,
         withReminder,
         setWithReminder,
         timeSettingMinutes,
         refreshTimeSetting,
-    } = useTickBunExtension(seconds);
+        finishTimer,
+    } = useTickBunExtension(session);
 
     const getClockInAndOutRequest = (): ClockInAndOutRequest => {
         const req: ClockInAndOutRequest = {labelId};
@@ -132,18 +132,24 @@ export default function AttendanceCard(
         try {
             await clockIn(getClockInAndOutRequest());
             showSuccess("Clock in successful");
-
-            refreshTimeSetting();
         } catch (e) {
             handleError(e);
         }
     };
 
     const handleClockOut = async () => {
+        const finishingSessionId = session?.id;
+
         resetLocalTime();
 
         try {
             await clockOut(getClockInAndOutRequest());
+
+            if (finishingSessionId !== undefined) {
+                finishTimer(finishingSessionId).catch((error) => {
+                    console.error("Failed to finish TickBun timer:", error);
+                });
+            }
 
             resetForm();
 
@@ -347,7 +353,7 @@ export default function AttendanceCard(
             {/* Time's Up Dialog */}
             <Dialog
                 open={isTimeUp}
-                onClose={() => setIsTimeUp(false)}
+                onClose={dismissTimeUp}
                 aria-labelledby="break-reminder-title"
             >
                 <DialogTitle id="break-reminder-title">
@@ -365,7 +371,7 @@ export default function AttendanceCard(
                 <DialogActions>
                     <Button
                         variant="contained"
-                        onClick={() => setIsTimeUp(false)}
+                        onClick={dismissTimeUp}
                     >
                         Take a Break
                     </Button>
