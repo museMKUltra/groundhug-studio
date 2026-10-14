@@ -1,8 +1,10 @@
-const DEFAULT_DURATION_MINUTES = 30;
-
-const MIN_DURATION_MINUTES = 5;
-const MAX_DURATION_MINUTES = 100;
-const STEP_MINUTES = 5;
+import {
+    clampDuration,
+    DEFAULT_DURATION_MINUTES,
+    MAX_DURATION_MINUTES,
+    MIN_DURATION_MINUTES,
+    STEP_MINUTES
+} from "./duration.js";
 
 const durationInput = document.getElementById("duration");
 const durationValue = document.getElementById("duration-value");
@@ -11,7 +13,21 @@ const decreaseButton = document.getElementById("decrease");
 const increaseButton = document.getElementById("increase");
 
 const quickButtons = document.querySelectorAll(".quick-button");
-const status = document.getElementById("status");
+
+
+/**
+ * Apply the shared range to the slider and its labels.
+ */
+durationInput.min = String(MIN_DURATION_MINUTES);
+durationInput.max = String(MAX_DURATION_MINUTES);
+durationInput.step = String(STEP_MINUTES);
+
+document.getElementById("duration-min-label").textContent =
+    `${MIN_DURATION_MINUTES} min`;
+document.getElementById("duration-max-label").textContent =
+    `${MAX_DURATION_MINUTES} min`;
+
+updateUI(DEFAULT_DURATION_MINUTES);
 
 
 /**
@@ -40,17 +56,6 @@ async function saveDuration(duration) {
     });
 
     updateUI(value);
-}
-
-
-/**
- * Keep duration within the allowed range.
- */
-function clampDuration(duration) {
-    return Math.min(
-        MAX_DURATION_MINUTES,
-        Math.max(MIN_DURATION_MINUTES, duration)
-    );
 }
 
 
@@ -154,7 +159,151 @@ quickButtons.forEach((button) => {
 });
 
 
+/* ------------------------------------------------------------------ */
+/* Session state (public state from the service worker)                */
+/* ------------------------------------------------------------------ */
+
+const STATE_KEY = "reminderState";
+
+const sessionStatus = document.getElementById("session-status");
+const sessionStarted = document.getElementById("session-started");
+const sessionDeadline = document.getElementById("session-deadline");
+const sessionElapsed = document.getElementById("session-elapsed");
+const sessionRemaining = document.getElementById("session-remaining");
+const sessionReminder = document.getElementById("session-reminder");
+const sessionIdLabel = document.getElementById("session-id");
+
+/** Latest public state received from the service worker. */
+let publicState = null;
+
+function formatTime(timestamp) {
+    if (timestamp === null || timestamp === undefined) {
+        return "—";
+    }
+
+    return new Date(timestamp).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+function formatDuration(ms) {
+    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    const mm = String(minutes).padStart(2, "0");
+    const ss = String(seconds).padStart(2, "0");
+
+    return hours > 0 ? `${hours}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
+function describeReminder(state) {
+    if (!state.reminderEnabled) {
+        return "Off";
+    }
+
+    if (state.reminderAcknowledged) {
+        return "Acknowledged";
+    }
+
+    if (state.reminderTriggered) {
+        return "Time's up!";
+    }
+
+    return state.status === "RUNNING" ? "Scheduled" : "On";
+}
+
+function setStatusBadge(status) {
+    sessionStatus.dataset.status = status;
+    sessionStatus.textContent = status;
+}
+
 /**
- * Load settings when popup opens.
+ * Render the time-dependent rows. Called every second while running.
+ */
+function renderTimers() {
+    const state = publicState;
+    const isRunning = state?.status === "RUNNING" && state.startedAt !== null;
+
+    if (!isRunning) {
+        sessionElapsed.textContent = "—";
+        sessionRemaining.textContent = "—";
+        sessionRemaining.classList.remove("due");
+        return;
+    }
+
+    const now = Date.now();
+
+    sessionElapsed.textContent = formatDuration(now - state.startedAt);
+
+    if (state.deadline === null) {
+        sessionRemaining.textContent = "—";
+        sessionRemaining.classList.remove("due");
+        return;
+    }
+
+    const remaining = state.deadline - now;
+
+    sessionRemaining.textContent = remaining > 0
+        ? formatDuration(remaining)
+        : "Due";
+    sessionRemaining.classList.toggle("due", remaining <= 0);
+}
+
+function renderSession() {
+    const state = publicState;
+
+    if (!state) {
+        setStatusBadge("UNAVAILABLE");
+        sessionStarted.textContent = "—";
+        sessionDeadline.textContent = "—";
+        sessionReminder.textContent = "—";
+        sessionIdLabel.textContent = "";
+        renderTimers();
+        return;
+    }
+
+    setStatusBadge(state.status);
+    sessionStarted.textContent = formatTime(state.startedAt);
+    sessionDeadline.textContent = formatTime(state.deadline);
+    sessionReminder.textContent = describeReminder(state);
+    sessionIdLabel.textContent = state.sessionId
+        ? `Session ${state.sessionId}`
+        : "";
+
+    renderTimers();
+}
+
+async function loadSession() {
+    try {
+        const response = await chrome.runtime.sendMessage({type: "GET_STATE"});
+
+        publicState = response?.success ? response.state : null;
+    } catch (error) {
+        console.error("Failed to load TickBun state:", error);
+        publicState = null;
+    }
+
+    renderSession();
+}
+
+/**
+ * Re-fetch the public state whenever the worker persists a change
+ * (timer start / finish, reminder fired / acknowledged, duration change).
+ */
+chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "local" && (changes[STATE_KEY] || changes.durationMinutes)) {
+        loadSession();
+    }
+});
+
+setInterval(renderTimers, 1000);
+
+
+/**
+ * Load settings and session state when popup opens.
  */
 loadDuration();
+loadSession();

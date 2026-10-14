@@ -21,10 +21,7 @@
  *     the past, nothing happens (no duplicate reminder).
  */
 
-const DEFAULT_DURATION_MINUTES = 30;
-const MIN_DURATION_MINUTES = 5;
-const MAX_DURATION_MINUTES = 100;
-const STEP_MINUTES = 5;
+import {clampDuration, DEFAULT_DURATION_MINUTES} from "./duration.js";
 
 /**
  * Trusted TickBun web origins.
@@ -79,13 +76,6 @@ function runExclusive(task) {
 /* ------------------------------------------------------------------ */
 /* Storage                                                             */
 /* ------------------------------------------------------------------ */
-
-function clampDuration(minutes) {
-    return Math.min(
-        MAX_DURATION_MINUTES,
-        Math.max(MIN_DURATION_MINUTES, minutes)
-    );
-}
 
 async function getDurationMinutes() {
     const result = await chrome.storage.local.get(DURATION_KEY);

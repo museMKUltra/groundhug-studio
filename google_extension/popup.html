@@ -178,6 +178,96 @@
             color: #fff;
         }
 
+        .session-section {
+            margin-top: 24px;
+        }
+
+        .session-card {
+            padding: 12px 14px;
+
+            border: 1px solid #eee;
+            border-radius: 10px;
+
+            background: #fafafa;
+        }
+
+        .session-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 8px;
+        }
+
+        .session-header .setting-label {
+            margin-bottom: 0;
+        }
+
+        .badge {
+            padding: 2px 8px;
+
+            border-radius: 999px;
+
+            background: #eee;
+            color: #555;
+
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
+        .badge[data-status="RUNNING"] {
+            background: #e3f4e8;
+            color: #1e7a3c;
+        }
+
+        .badge[data-status="FINISHED"] {
+            background: #e8eaf6;
+            color: #3949ab;
+        }
+
+        .badge[data-status="UNAVAILABLE"] {
+            background: #fdecea;
+            color: #b3261e;
+        }
+
+        .session-rows {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 4px 12px;
+
+            margin: 0;
+
+            font-size: 12px;
+        }
+
+        .session-rows dt {
+            color: #777;
+        }
+
+        .session-rows dd {
+            margin: 0;
+
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+
+        .session-rows dd.due {
+            color: #b3261e;
+        }
+
+        .session-id {
+            margin-top: 8px;
+
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+
+            font-size: 10px;
+            color: #aaa;
+        }
+
         .status {
             min-height: 16px;
 
@@ -215,7 +305,7 @@
 
 
     <div class="duration-display">
-        <span id="duration-value">30</span>
+        <span id="duration-value"></span>
         <span class="duration-unit">min</span>
     </div>
 
@@ -233,11 +323,7 @@
 
         <input
                 id="duration"
-                max="100"
-                min="5"
-                step="5"
                 type="range"
-                value="30"
         >
 
         <button
@@ -253,8 +339,8 @@
 
 
     <div class="range-labels">
-        <span>5 min</span>
-        <span>100 min</span>
+        <span id="duration-min-label"></span>
+        <span id="duration-max-label"></span>
     </div>
 
 
@@ -294,10 +380,48 @@
 
     </div>
 
+
+    <section aria-live="polite" class="session-section">
+
+        <div class="session-header">
+            <div class="setting-label">
+                Current session
+            </div>
+
+            <span class="badge" data-status="IDLE" id="session-status">
+                IDLE
+            </span>
+        </div>
+
+        <div class="session-card">
+
+            <dl class="session-rows">
+                <dt>Started</dt>
+                <dd id="session-started">—</dd>
+
+                <dt>Reminder at</dt>
+                <dd id="session-deadline">—</dd>
+
+                <dt>Elapsed</dt>
+                <dd id="session-elapsed">—</dd>
+
+                <dt>Remaining</dt>
+                <dd id="session-remaining">—</dd>
+
+                <dt>Reminder</dt>
+                <dd id="session-reminder">—</dd>
+            </dl>
+
+            <div class="session-id" id="session-id"></div>
+
+        </div>
+
+    </section>
+
 </div>
 
 
-<script src="popup.js"></script>
+<script src="popup.js" type="module"></script>
 
 </body>
 </html>
