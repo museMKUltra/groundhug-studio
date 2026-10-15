@@ -65,8 +65,8 @@ function sendCommand(command: TickBunCommand) {
  * Bridge to the TickBun Chrome extension.
  *
  * The extension owns reminder scheduling (chrome.alarms). This hook
- * reports the active session to it, mirrors its state, and opens the
- * time-up dialog when the extension sends TIME_UP (or when a reconnecting
+ * reports the active session to it, mirrors its state, and signals a
+ * time-up moment when the extension sends TIME_UP (or when a reconnecting
  * page learns that an unacknowledged reminder is pending).
  */
 export function useTickBunExtension(
@@ -77,8 +77,7 @@ export function useTickBunExtension(
     const [extensionState, setExtensionState] = useState<TickBunState | null>(null);
     const [withReminder, setWithReminderState] = useState(true);
     const [timeSettingMinutes, setTimeSettingMinutes] = useState<number | null>(null);
-    /** Session whose time-up dialog is open, or null when closed. */
-    const [timeUpSessionId, setTimeUpSessionId] = useState<string | null>(null);
+    const [isTimeUp, setIsTimeUp] = useState(false);
 
     const sessionId = session ? String(session.id) : null;
     const clockInMs = session ? dayjs(session.clockIn).valueOf() : null;
@@ -88,7 +87,7 @@ export function useTickBunExtension(
         sessionIdRef.current = sessionId;
     }, [sessionId]);
 
-    const openDialog = useCallback((id: string | null) => {
+    const markTimeUp = useCallback((id: string | null) => {
         if (id === null) {
             return;
         }
@@ -98,38 +97,31 @@ export function useTickBunExtension(
             return;
         }
 
-        setTimeUpSessionId(id);
+        setIsTimeUp(true);
     }, []);
 
     /**
      * Mirror the authoritative extension state.
-     * The dialog is only closed by a lifecycle transition of its session
+     * Time-up is only cleared by a lifecycle transition of the session
      * (finished, acknowledged, replaced or re-armed), never by a
      * settings refresh alone.
      */
-    const applyState = useCallback((state: TickBunState, showDialog = false) => {
+    const applyState = useCallback((state: TickBunState, timeUp = false) => {
         setExtensionState(state);
         setTimeSettingMinutes(state.durationMinutes);
         setWithReminderState(state.reminderEnabled);
 
-        setTimeUpSessionId((current) => {
-            if (current === null) {
-                return current;
-            }
+        setIsTimeUp((current) =>
+            current &&
+            state.status === "RUNNING" &&
+            state.reminderTriggered &&
+            !state.reminderAcknowledged
+        );
 
-            const stillPending =
-                state.sessionId === current &&
-                state.status === "RUNNING" &&
-                state.reminderTriggered &&
-                !state.reminderAcknowledged;
-
-            return stillPending ? current : null;
-        });
-
-        if (showDialog) {
-            openDialog(state.sessionId);
+        if (timeUp) {
+            markTimeUp(state.sessionId);
         }
-    }, [openDialog]);
+    }, [markTimeUp]);
 
     const applyResponse = useCallback((response: CommandResponse & { success: true }) => {
         if (isTickBunState(response.state)) {
@@ -199,7 +191,7 @@ export function useTickBunExtension(
 
                 case "TIME_UP":
                     applyState(event.state);
-                    openDialog(event.sessionId);
+                    markTimeUp(event.sessionId);
                     break;
 
                 case "ERROR":
@@ -264,7 +256,7 @@ export function useTickBunExtension(
             port?.disconnect();
             port = null;
         };
-    }, [applyState, openDialog]);
+    }, [applyState, markTimeUp]);
 
     /**
      * Report the active session to the extension.
@@ -304,7 +296,7 @@ export function useTickBunExtension(
      * Tell the extension the session has finished (after clock-out).
      */
     const finishTimer = useCallback((id: number) => {
-        setTimeUpSessionId(null);
+        setIsTimeUp(false);
 
         return sendCommand({type: "FINISH_TIMER", sessionId: String(id)})
             .then(applyResponse)
@@ -312,12 +304,12 @@ export function useTickBunExtension(
     }, [applyResponse]);
 
     /**
-     * Close the time-up dialog and acknowledge it, so it is not restored
-     * after a reload and closes in other tabs as well.
+     * Clear time-up and acknowledge it, so it is not restored after a
+     * reload and clears in other tabs as well.
      */
     const dismissTimeUp = useCallback(() => {
-        const id = timeUpSessionId;
-        setTimeUpSessionId(null);
+        const id = extensionState?.sessionId ?? null;
+        setIsTimeUp(false);
 
         if (id === null) {
             return;
@@ -328,7 +320,7 @@ export function useTickBunExtension(
             .catch((error) => {
                 console.error("Failed to acknowledge TickBun reminder:", error);
             });
-    }, [timeUpSessionId, applyResponse]);
+    }, [extensionState, applyResponse]);
 
     const setWithReminder = useCallback((enabled: boolean) => {
         setWithReminderState(enabled);
@@ -362,7 +354,7 @@ export function useTickBunExtension(
     }, []);
 
     return {
-        isTimeUp: timeUpSessionId !== null,
+        isTimeUp,
         dismissTimeUp,
         withReminder,
         setWithReminder,
