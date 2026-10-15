@@ -23,6 +23,10 @@ import {useLabelContext} from "@/features/attendance/LabelContext.tsx";
 import {useSessionForm} from "@/features/attendance/useSessionForm.ts";
 import {useLiveDuration} from "@/features/attendance/useLiveDuration.ts";
 import {useSnackbar} from "@/shared/providers/SnackbarContext.ts";
+import {
+    requestNotificationPermission,
+    useTimeUpNotification
+} from "@/shared/hooks/useTimeUpNotification.ts";
 
 import LabelSelect from "@/shared/components/LabelSelect.tsx";
 import LabelDialog from "@/shared/components/LabelDialog.tsx";
@@ -111,6 +115,8 @@ export default function AttendanceCard(
         finishTimer,
     } = useTickBunExtension(session);
 
+    useTimeUpNotification(isTimeUp, timeSettingMinutes);
+
     const getClockInAndOutRequest = (): ClockInAndOutRequest => {
         const req: ClockInAndOutRequest = {labelId};
 
@@ -124,6 +130,10 @@ export default function AttendanceCard(
     };
 
     const handleClockIn = async () => {
+        if (withReminder) {
+            requestNotificationPermission();
+        }
+
         startLocalTime();
 
         try {
@@ -203,6 +213,10 @@ export default function AttendanceCard(
                                     size="small"
                                     checked={withReminder}
                                     onChange={(event) => {
+                                        if (event.target.checked) {
+                                            requestNotificationPermission();
+                                        }
+
                                         setWithReminder(
                                             event.target.checked
                                         );
