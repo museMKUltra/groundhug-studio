@@ -170,6 +170,8 @@ const sessionStarted = document.getElementById("session-started");
 const sessionDeadline = document.getElementById("session-deadline");
 const sessionElapsed = document.getElementById("session-elapsed");
 const sessionRemaining = document.getElementById("session-remaining");
+const sessionProgress = document.getElementById("session-progress");
+const sessionProgressFill = document.getElementById("session-progress-fill");
 const sessionReminder = document.getElementById("session-reminder");
 const sessionIdLabel = document.getElementById("session-id");
 
@@ -220,6 +222,14 @@ function setStatusBadge(status) {
     sessionStatus.textContent = status;
 }
 
+function setProgress(ratio, isDue) {
+    const percent = Math.round(Math.min(1, Math.max(0, ratio)) * 100);
+
+    sessionProgressFill.style.width = `${percent}%`;
+    sessionProgressFill.classList.toggle("due", isDue);
+    sessionProgress.setAttribute("aria-valuenow", String(percent));
+}
+
 /**
  * Render the time-dependent rows. Called every second while running.
  */
@@ -231,6 +241,7 @@ function renderTimers() {
         sessionElapsed.textContent = "—";
         sessionRemaining.textContent = "—";
         sessionRemaining.classList.remove("due");
+        setProgress(0, false);
         return;
     }
 
@@ -241,15 +252,18 @@ function renderTimers() {
     if (state.deadline === null) {
         sessionRemaining.textContent = "—";
         sessionRemaining.classList.remove("due");
+        setProgress(0, false);
         return;
     }
 
     const remaining = state.deadline - now;
+    const total = state.deadline - state.startedAt;
 
     sessionRemaining.textContent = remaining > 0
         ? formatDuration(remaining)
         : "Due";
     sessionRemaining.classList.toggle("due", remaining <= 0);
+    setProgress(total > 0 ? (now - state.startedAt) / total : 1, remaining <= 0);
 }
 
 function renderSession() {

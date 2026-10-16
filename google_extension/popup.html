@@ -257,6 +257,37 @@
             color: #b3261e;
         }
 
+        .session-rows dd.session-progress {
+            grid-column: 1 / -1;
+
+            margin: 2px 0;
+        }
+
+        .progress-track {
+            height: 6px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background: #e6e6e6;
+        }
+
+        .progress-fill {
+            width: 0;
+            height: 100%;
+
+            border-radius: inherit;
+
+            background: #1d192b;
+
+            transition: width 0.3s linear;
+        }
+
+        .progress-fill.due {
+            background: #b3261e;
+        }
+
         .session-id {
             margin-top: 8px;
 
@@ -407,6 +438,20 @@
 
                 <dt>Remaining</dt>
                 <dd id="session-remaining">—</dd>
+
+                <dd class="session-progress">
+                    <div
+                            aria-label="Session progress"
+                            aria-valuemax="100"
+                            aria-valuemin="0"
+                            aria-valuenow="0"
+                            class="progress-track"
+                            id="session-progress"
+                            role="progressbar"
+                    >
+                        <div class="progress-fill" id="session-progress-fill"></div>
+                    </div>
+                </dd>
 
                 <dt>Reminder</dt>
                 <dd id="session-reminder">—</dd>
