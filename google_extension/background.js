@@ -24,15 +24,17 @@
 import {clampDuration, DEFAULT_DURATION_MINUTES} from "./duration.js";
 
 /**
- * Trusted TickBun web origins.
- * Keep in sync with "externally_connectable" in manifest.json.
+ * TickBun web app match patterns, read from "externally_connectable"
+ * in manifest.json (the single source of truth).
+ * Patterns must use an exact host (no "*." wildcard) so that their
+ * origins can be compared against sender.origin.
  */
-const ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    // "https://<production-web-app-origin>"
-];
+const TICKBUN_URLS = chrome.runtime.getManifest().externally_connectable?.matches ?? [];
 
-const TICKBUN_URLS = ALLOWED_ORIGINS.map((origin) => `${origin}/*`);
+/** Trusted TickBun web origins, derived from TICKBUN_URLS. */
+const ALLOWED_ORIGINS = [...new Set(
+    TICKBUN_URLS.map((pattern) => new URL(pattern).origin)
+)];
 
 const STATE_KEY = "reminderState";
 const DURATION_KEY = "durationMinutes";

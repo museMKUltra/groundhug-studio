@@ -5,9 +5,9 @@
  */
 
 export const DEFAULT_DURATION_MINUTES = 30;
-export const MIN_DURATION_MINUTES = 1;
+export const MIN_DURATION_MINUTES = 5;
 export const MAX_DURATION_MINUTES = 100;
-export const STEP_MINUTES = 1;
+export const STEP_MINUTES = 5;
 
 /**
  * Keep duration within the allowed range.

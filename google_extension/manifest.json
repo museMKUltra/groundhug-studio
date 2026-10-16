@@ -30,7 +30,7 @@
   },
   "externally_connectable": {
     "matches": [
-      "http://localhost:5173/*"
+      "https://spring-api-starter-production-0867.up.railway.app/*"
     ]
   }
 }
