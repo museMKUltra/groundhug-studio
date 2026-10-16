@@ -29,3 +29,6 @@ coverage/
 # env
 .env.development
 .env.production
+
+# MCP
+.mcp.json
