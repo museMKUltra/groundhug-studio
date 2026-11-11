@@ -7,12 +7,15 @@ import {
     CircularProgress,
     Dialog,
     DialogActions,
+    IconButton,
     DialogContent,
     DialogTitle,
     Stack,
     Switch,
+    Tooltip,
     Typography,
 } from "@mui/material";
+import PictureInPictureAltIcon from "@mui/icons-material/PictureInPictureAlt";
 import dayjs from "dayjs";
 import type {AxiosError} from "axios";
 
@@ -32,7 +35,10 @@ import LabelSelect from "@/shared/components/LabelSelect.tsx";
 import LabelDialog from "@/shared/components/LabelDialog.tsx";
 import ViewEditField from "@/shared/components/ViewEditField.tsx";
 
-import {useTickBunExtension} from "@/features/attendance/infrastructure/extension/useTickBunExtension.ts";
+import BreakReminderPip from "@/shared/components/BreakReminderPip.tsx";
+
+import {useBreakReminder} from "@/features/attendance/useBreakReminder.ts";
+import {useDocumentPip} from "@/shared/hooks/useDocumentPip.ts";
 
 interface Props {
     session: Session | null;
@@ -112,10 +118,26 @@ export default function AttendanceCard(
         withReminder,
         setWithReminder,
         timeSettingMinutes,
-        finishTimer,
-    } = useTickBunExtension(session);
+        setTimeSetting,
+        startedAt,
+        deadline,
+        now,
+    } = useBreakReminder(session);
 
     useTimeUpNotification(isTimeUp, timeSettingMinutes);
+
+    const pip = useDocumentPip({width: 300, height: 320, title: "TickBun"});
+
+    const handleOpenPip = () => {
+        if (withReminder) {
+            requestNotificationPermission();
+        }
+
+        pip.open().catch((error) => {
+            console.error("Failed to open timer window:", error);
+            showError("Unable to open the timer window");
+        });
+    };
 
     const getClockInAndOutRequest = (): ClockInAndOutRequest => {
         const req: ClockInAndOutRequest = {labelId};
@@ -145,18 +167,10 @@ export default function AttendanceCard(
     };
 
     const handleClockOut = async () => {
-        const finishingSessionId = session?.id;
-
         resetLocalTime();
 
         try {
             await clockOut(getClockInAndOutRequest());
-
-            if (finishingSessionId !== undefined) {
-                finishTimer(finishingSessionId).catch((error) => {
-                    console.error("Failed to finish TickBun timer:", error);
-                });
-            }
 
             resetForm();
 
@@ -188,7 +202,7 @@ export default function AttendanceCard(
                     <Stack>
 
                         {/* Break Reminder */}
-                        {timeSettingMinutes && <Box
+                        <Box
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",
@@ -205,30 +219,50 @@ export default function AttendanceCard(
                                     color="text.secondary"
                                 >
                                     {withReminder
-                                        ? `Remind me after ${timeSettingMinutes ?? "--"} minutes`
+                                        ? `Remind me after ${timeSettingMinutes} minutes`
                                         : "Focus without reminder"
                                     }
                                 </Typography>
-                                <Switch
-                                    size="small"
-                                    checked={withReminder}
-                                    onChange={(event) => {
-                                        if (event.target.checked) {
-                                            requestNotificationPermission();
-                                        }
+                                <Box display="flex" alignItems="center">
+                                    {pip.isSupported && (
+                                        <Tooltip
+                                            title={pip.pipWindow
+                                                ? "Close timer window"
+                                                : "Open timer window"}
+                                        >
+                                            <IconButton
+                                                size="small"
+                                                color={pip.pipWindow ? "primary" : "default"}
+                                                onClick={pip.pipWindow ? pip.close : handleOpenPip}
+                                                aria-label={pip.pipWindow
+                                                    ? "Close timer window"
+                                                    : "Open timer window"}
+                                            >
+                                                <PictureInPictureAltIcon fontSize="small"/>
+                                            </IconButton>
+                                        </Tooltip>
+                                    )}
+                                    <Switch
+                                        size="small"
+                                        checked={withReminder}
+                                        onChange={(event) => {
+                                            if (event.target.checked) {
+                                                requestNotificationPermission();
+                                            }
 
-                                        setWithReminder(
-                                            event.target.checked
-                                        );
-                                    }}
-                                    slotProps={{
-                                        input: {
-                                            "aria-label": "Enable break reminder"
-                                        }
-                                    }}
-                                />
+                                            setWithReminder(
+                                                event.target.checked
+                                            );
+                                        }}
+                                        slotProps={{
+                                            input: {
+                                                "aria-label": "Enable break reminder"
+                                            }
+                                        }}
+                                    />
+                                </Box>
                             </Box>
-                        </Box>}
+                        </Box>
 
 
                         <ViewEditField
@@ -343,6 +377,22 @@ export default function AttendanceCard(
             </CardContent>
 
 
+            {/* Floating timer (Document PiP) */}
+            {pip.pipWindow && (
+                <BreakReminderPip
+                    pipWindow={pip.pipWindow}
+                    isActive={isActive}
+                    isTimeUp={isTimeUp}
+                    withReminder={withReminder}
+                    durationMinutes={timeSettingMinutes}
+                    startedAt={startedAt}
+                    deadline={deadline}
+                    now={now}
+                    onDurationChange={setTimeSetting}
+                    onDismiss={dismissTimeUp}
+                />
+            )}
+
             {/* Time's Up Dialog */}
             <Dialog
                 open={isTimeUp}
@@ -356,7 +406,7 @@ export default function AttendanceCard(
                 <DialogContent>
                     <Typography>
                         You've been focusing for{" "}
-                        {timeSettingMinutes ?? "--"} minutes.
+                        {timeSettingMinutes} minutes.
                         It's time to take a break.
                     </Typography>
                 </DialogContent>
